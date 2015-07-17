@@ -1,0 +1,76 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Convert base(10) to base(16) or Hexidecimal
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//callfunc "F_Hex",Number;
+// 00 - Number
+//	  Number you wish to Hex
+Function	Script	F_Hex	{
+	set .@i,getarg(0);
+	set .@results$,"";
+	while(.@i > 15){
+		setarray .@calc,.@i/16,.@i%16;
+		switch(.@calc[1]){
+			default:
+				set .@results$,atoi(.@calc[1]) + .@results$;
+			break;
+			case 10:
+				set .@results$,"A"+ .@results$;
+			break;
+			case 11:
+				set .@results$,"B"+ .@results$;
+			break;
+			case 12:
+				set .@results$,"C"+ .@results$;
+			break;
+			case 13:
+				set .@results$,"D"+ .@results$;
+			break;
+			case 14:
+				set .@results$,"E"+ .@results$;
+			break;
+			case 15:
+				set .@results$,"F"+ .@results$;
+			break;
+		}
+		set .@i,.@calc[0];
+	}
+	switch(.@i){
+		default:
+			set .@results$,atoi(.@i) + .@results$;
+		break;
+		case 10:
+			set .@results$,"A"+ .@results$;
+		break;
+		case 11:
+			set .@results$,"B"+ .@results$;
+		break;
+		case 12:
+			set .@results$,"C"+ .@results$;
+		break;
+		case 13:
+			set .@results$,"D"+ .@results$;
+		break;
+		case 14:
+			set .@results$,"E"+ .@results$;
+		break;
+		case 15:
+			set .@results$,"F"+ .@results$;
+		break;
+	}
+return;
+}
