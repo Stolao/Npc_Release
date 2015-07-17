@@ -1,0 +1,55 @@
+//===== EinherjarRO Scripts ================================== 
+//= At_afk
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= An @afk command for points
+//===== Uses: ================================================
+//===== Comments: ============================================
+//= [Stolao]
+//= Optimize
+//= Add map array for all towns
+//===== Additional Comments: =================================
+//= 1.00 Initial Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	At_Afk	-1,{
+OnAFK:
+	getmapxy(.@Map$,.@X,.@y,0);
+	if(.@Map$ != .AFKMap$){
+		dispbottom "Must be in "+.AFKMap$+" to use @afk.";
+		end;
+	}
+	if((.@X > .NonAFKCellsX1 && .@X < .NonAFKCellsX2) && (.@y > .NonAFKCellsY1 && .@y < .NonAFKCellsY2)){
+		dispbottom "This area of the map @afk is not allowed, try another area";
+		end;
+	}	
+	sit;
+	if(.AFKHG) setlook 4,.AFKHG;
+	for(set .@i,0; .@i < .Maxafk; set .@i,.@i+1){
+		progressbar "0xFFFFFF", .Delay;
+		set zeny,zeny + .PointsPer;
+	}
+end;
+OnInit:
+	set .AFKMap$,"prontera";			// Map Allowed
+	set .NonAFKCellsX1,139;				// Min X Afk Disabled
+	set .NonAFKCellsX2,170;				// Max X Afk Disabled
+	set .NonAFKCellsY1,148;				// Min Y Afk Disabled
+	set .NonAFKCellsY2,204;				// Max Y Afk Disabled
+	set .Delay,900;					// Delay between each time points iven in seconds
+							//   900 = 15 Mins
+	set .Maxafk,32;					// Max number of delays allowed before script stops
+							//   32 * 900 Delay = 8 Hours
+	set .PointsPer,10000;				// Number of points earned at each intervul
+	set .AFKHG,0;					// Afk Headgear View ID
+	bindatcmd("afk","At_Afk::OnAFK",0,99);
+	bindatcmd("afkshop","At_Afk::OnAFK",0,99);
+end;
+}

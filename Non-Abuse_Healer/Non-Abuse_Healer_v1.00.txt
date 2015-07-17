@@ -1,0 +1,27 @@
+//===== EinherjarRO Scripts ================================== 
+//= Healer
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A Simple Non-Abuse Healer
+//===== Comments: ============================================
+//= N/A
+//===== Additional Comments: =================================
+//= 1.00 Initial Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+prontera,156,204,0	script	Fountain	111,{
+	mes "Drink From Fountain?";
+	if(select("Yes:No")!=1) close;
+	close2;
+	while(1){
+		progressbar "0x11CC99",2;
+		percentheal rand(5),rand(5);
+	}
+}

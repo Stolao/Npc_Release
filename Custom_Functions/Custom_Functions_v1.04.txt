@@ -1,0 +1,307 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.04
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Some usefull custom functions
+//===== Comments: ============================================
+//= Optmize more?
+//= More Functions
+//===== Additional Comments: =================================
+//= 1.00 Original Make, F_CheckAll
+//= 1.01 Added F_CoinZenyCheck
+//= 1.02 Added F_ZenyCoinTrade
+//= 1.03 Added F_Hex
+//= 1.04 Added F_CoinZenyTrade
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+//======================  F_Hex ==============================
+//callfunc "F_Hex",Number;
+// 00 - Number
+//	  Number you wish to Hex
+Function	Script	F_Hex	{
+	set .@i,getarg(0);
+	set .@results$,"";
+	while(.@i > 15){
+		setarray .@calc,.@i/16,.@i%16;
+		switch(.@calc[1]){
+			default:
+				set .@results$,atoi(.@calc[1]) + .@results$;
+			break;
+			case 10:
+				set .@results$,"A"+ .@results$;
+			break;
+			case 11:
+				set .@results$,"B"+ .@results$;
+			break;
+			case 12:
+				set .@results$,"C"+ .@results$;
+			break;
+			case 13:
+				set .@results$,"D"+ .@results$;
+			break;
+			case 14:
+				set .@results$,"E"+ .@results$;
+			break;
+			case 15:
+				set .@results$,"F"+ .@results$;
+			break;
+		}
+		set .@i,.@calc[0];
+	}
+	switch(.@i){
+		default:
+			set .@results$,atoi(.@i) + .@results$;
+		break;
+		case 10:
+			set .@results$,"A"+ .@results$;
+		break;
+		case 11:
+			set .@results$,"B"+ .@results$;
+		break;
+		case 12:
+			set .@results$,"C"+ .@results$;
+		break;
+		case 13:
+			set .@results$,"D"+ .@results$;
+		break;
+		case 14:
+			set .@results$,"E"+ .@results$;
+		break;
+		case 15:
+			set .@results$,"F"+ .@results$;
+		break;
+	}
+return;
+}
+//============================================================
+
+
+//======================  F_CheckAll  ========================
+//Format
+//callfunc "F_CheckAll",Mode {,Cost ,"Points" ,DeletePoints ,"Point Name" }{,"Item Ids","Quantities" ,"Delete Items" }{,Base Level ,Job Level ,Check };
+// 00 - Mode
+//	  Bitwise 1: Points, 2: Items, 4: Levels
+//	  e.g. 5: Checks Points + Levels
+// 01 - Cost
+//	  The required number of "Points"
+// 02 - Points
+//	  What points it checks
+//	  e.g. "Zeny", "CASHPOINTS", "PKPOINTS"
+// 03 - DeletePoints
+//	  Toggle Delete Points?
+//	  0: No, 1: Yes
+// 04 - Point Name
+//	  Display name for points
+//	  e.g. "Zeny", "Cash Points", "Pk Points", "M0nieZ"
+// 05 - Item Ids
+//	  Items Required
+//	  "ItemID 1:ItemID 2:ItemID 3:...ItemID 42"
+//	  Supports up to 42 items
+// 06 - Quantities
+//	  Item Quantities Required
+//	  "Item 1:Item 2:Item 3:...Item 42"
+// 07 - DeleteItems
+//	  Toggle  Delete Items Required?
+//	  0: No, 1: Yes
+//	  "Item 1:Item 2:Item 3:...Item 42"
+//	  Tip:
+//	   Put a "" and no items will delete, or Copy 'Item Ids' and all items will delete
+// 08 - BaseLevel
+//	  Base Level Required
+// 09 - JobLevel
+//	  Job Level Required
+// 10 - Check
+//	  How Will it Compare Levels?
+//	  Bitwise 0: !=, 1: =, 2: >, 4: <
+//	  e.g. 3: 'Base Level' >= 'BaseLevel'
+//	  Note setting to 7 is like disabling mode 4, so dont bother...
+
+
+Function	Script	F_CheckAll	{
+//Defaults
+Set .@mode,1;
+Set .@cost,100000;
+Set .@points$,"Zeny";
+Set .@deletepoints,1;
+Set .@pointname$,"Zeny";
+Set .@ids$,"501";
+Set .@quantities$,"0";
+Set .@deleteitems$,"0";
+Set .@baselevel,1;
+Set .@joblevel,1;
+Set .@check,0;
+//function
+	if(getarg(0,.@mode)&1){
+		if(getd(getarg(2,.@Points$)) < getarg(1,.@Cost)){
+			mes "You need "+(getarg(1,.@Cost)-getd(getarg(2,.@Points$)))+" more "+getarg(4,getarg(2,.@pointname$))+" to continue.";
+			close;
+		}
+	}
+	If(getarg(0,.@mode)&2){
+		Explode .@is,getarg(5,getarg(1,.@ids$)),":";
+		Explode .@qs,getarg(6,getarg(2,.@quantities$)),":";
+		Explode .@ds,getarg(7,getarg(3,.@deleteitems$)),":";
+		Set .@gas,((getarraysize(.@is)<getarraysize(.@qs))?""+getarraysize(.@is)+"":""+getarraysize(.@qs)+"")-1;
+		Set .@I,0;
+		While(.@I < .@gas){
+			sleep2 50;
+			If(countitem(.@is[.@I]) < .@qs[.@I]){
+				Mes "Sorry you need "+(.@qs[.@I]-countitem(.@is[.@I]))+" more "+getitemname(.@is[.@I])+" to continue.";
+				Close;
+			}
+			Set .@I,.@I+1;
+		}
+	}
+	If(getarg(0,.@mode)&4){
+		if(!getarg(10,getarg(7,getarg(3,.@check))))
+			If(BaseLevel == getarg(8,getarg(5,getarg(1,.@BaseLevel))) || JobLevel == getarg(9,getarg(6,getarg(2,.@JobLevel)))){
+				set .@bs,.@bs-10;
+				set .@js,.@js-10;
+		} else {
+			if(getarg(10,getarg(7,getarg(3,.@check)))&1){
+				If(BaseLevel == getarg(8,getarg(5,getarg(1,.@BaseLevel)))) set .@bs,.@bs+1;
+				If(JobLevel == getarg(9,getarg(6,getarg(2,.@JobLevel)))) set .@js,.@js+1;	
+			}
+			if(getarg(10,getarg(7,getarg(3,.@check)))&2){
+				If(BaseLevel > getarg(8,getarg(5,getarg(1,.@BaseLevel)))) set .@bs,.@bs+1;
+				If(JobLevel > getarg(9,getarg(6,getarg(2,.@JobLevel)))) set .@js,.@js+1;	
+			}
+			if(getarg(10,getarg(7,getarg(3,.@check)))&4){
+				If(BaseLevel < getarg(8,getarg(5,getarg(1,.@BaseLevel)))) set .@bs,.@bs+1;
+				If(JobLevel < getarg(9,getarg(6,getarg(2,.@JobLevel)))) set .@js,.@js+1;
+			}
+		}
+		if(!.@bs || !.@js){
+			Mes "Sorry you dont meet level requirements";
+			close;
+		}
+	}
+//Delete
+	If(getarg(0,.@mode)&1){
+		if(getarg(3,.@deletepoints)) setd getarg(2,.@Points$),getd(getarg(2,.@Points$)) - getarg(1,.@Cost);
+		return;
+	}
+	If(getarg(0,.@mode)&2){
+		Set .@I,0;
+		While(.@I < .@gas){
+			sleep2 50;
+			If(.@ds[.@I] != 0) Delitem .@is[.@I],.@qs[.@I];
+			Set .@I,.@I+1;
+		}
+	}
+	return;
+}
+
+//============================================================
+
+//=====================  F_CoinZenyCheck  ====================
+//= Will compare zeny and coins (configable values and ids)
+//= deleting <X> value from coins and zeny, assuming player
+//= has enough combined credits, no more trading coins for
+//= zeny via npc ever again
+//============================================================
+//Format
+//callfunc "F_CheckZCB",Values,Cost1{,Cost2{,Cost3{...,{Cost126}}}};
+// - Values are the total number of cost you want in the array, up to 126
+//	  Cost Are Additive to make a total cost
+//	  Max of 2147483647 (2 bil) Per Cost, Absolute Limit of 272730423169 (272 Bil)
+
+Function	Script	F_CoinZenyCheck	{
+//	setarray .CoinName$	,"Bronze","Silver","Gold","Platinum","Mithril";	// Referance Only
+	setarray .@CoinID	,673,675,671,677,674;
+	setarray .@ZenyValue	,100000,1000000,10000000,100000000,1000000000;
+	setarray .@BreakLimit	,2147483647 / .@ZenyValue[0];
+	for(set .@m,0; .@m < getarg(0,1) && .@m < 127; set .@m, .@m + 1){
+		set .@RemainingCost[.@m],getarg(.@m+1,0);
+	}
+	set .@g,getarraysize(.@RemainingCost);
+	for(set .@m,0; .@m <= .@g; set .@m, .@m + 1){
+		for(set .@i,getarraysize(.@CoinID) - 1; .@i >= 0; set .@i, .@i - 1){
+			if(.@RemainingCost[.@m] - .@ZenyValue[.@i] > 0){
+				set .@RemainingCost[.@m],.RemainingCost[.@m] - .@ZenyValue[.@i];
+				set .@CoinCost[.@i],.@CoinCost[.@i] + 1;
+			}
+		}
+		if(.@m < .@g){
+			set .@RemainingCost[.@g],.@RemainingCost[.@g] + .@RemainingCost[.@m];
+			set .@RemainingCost[.@m],0;
+		}
+	}
+	copyarray .@CoinCost2[0],.@CoinCost[0],getarraysize(.@CoinID) - 1;
+	for(set .@i,getarraysize(.@CoinID) - 1; .@i >= 0; set .@i, .@i - 1){
+		set .@CoinCost[.@i-1],.@CoinCost[.@i-1]+.@CoinCost[.@i];
+		set .@CoinCost[.@i],0;
+	}
+	for(set .@i,0; .@i < getarraysize( .@CoinID ); set .@i, .@i + 1){
+		set .@TotalCoin[.@i],countitem(.@CoinID[.@i]);
+	}
+	copyarray .@TotalCoin2[0],.@TotalCoin[0],getarraysize(.@CoinID) - 1;
+	for(set .@i,getarraysize(.@CoinID) - 1; .@i >= 0; set .@i, .@i - 1){
+		set .@TotalCoin[.@i-1],.@TotalCoin[.@i-1]+.@TotalCoin[.@i];
+		set .@TotalCoin[.@i],0;
+	}
+	if(.@TotalCoin[0] < .@CoinCost[0]){
+		if(.@BreakLimit > .@CoinCost[0] - .@TotalCoin[0]){
+			mes "Not Enough Credit.";
+			close;
+		} else { 
+			set .@Zenny,(.@CoinCost[0] - .@TotalCoin[0]) * .@ZenyValue[0] + .@RemainingCost[.@g];
+			if( .@Zenny > Zeny){
+				mes "Not Enough Credit.";
+				close;
+			}
+		}
+	}
+	for(set .@i,getarraysize(.@CoinID) - 1; .@i >= 0; set .@i, .@i - 1){
+		if(.@TotalCoin2[.@i] < .@CoinCost2[.@i] && .@i > 0){
+			set .@CoinCost2[.@i-1], .@CoinCost2[.@i-1] + (.@CoinCost2[.@i] - .@TotalCoin2[.@i]) *10;
+			set .@CoinCost2[.@i], .@TotalCoin2[.@i];
+		}
+		Delitem .@CoinID[.@i], .@CoinCost2[.@i];
+	}
+	set Zeny, Zeny - .@Zenny;
+return;
+}
+
+//============================================================
+
+//=====================  F_ZenyCoinTrade  ====================
+//= Gives all Coins a consumable feature to turn to zeny
+//= first checking if player can hold that much
+//============================================================
+//Format
+//callfunc "F_BreakCoin",Value ,Coin ID {,"Points","Point Name"};
+// 00 - Mode
+Function	Script	F_ZenyCoinTrade	{
+set .@MaxZeny,2000000000;
+	If( getd( ""+getarg(2,Zeny)+"" ) > .@MaxZeny - getarg(0)  ){
+		dispbottom "Unable to conver to "+getarg(4,Zeny)+" youy already at "+callfunc("F_InsertComma",(getd(""+getarg(3,Zeny)+"")))+"";
+	} else {
+		setd ""+getarg(2,Zeny)+"",getd( ""+getarg(2,Zeny)+"" ) + getarg(0);
+		dispbottom "Converted, you now have "+callfunc("F_InsertComma",(getd(""+getarg(3,Zeny)+"")))+" "+getarg(4,Zeny)+"";
+		delitem getarg(1),1; 
+	}
+end;
+}
+
+//============================================================
+
+//=====================  F_CoinZenyTrade  ====================
+//= Atcommand to convert Zeny to coins
+//============================================================
+
+Function	Script	F_CoinZenyTrade	{
+//	setarray .CoinName$	,"Bronze","Silver","Gold","Platinum","Mithril";	// Referance Only
+	setarray .@CoinID	,673,675,671,677,674;
+	setarray .@ZenyValue	,100000,1000000,10000000,100000000,1000000000;
+	//check itemcount
+	//if cant carry more item types stop
+}

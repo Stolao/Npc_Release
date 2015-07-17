@@ -1,0 +1,206 @@
+//===== EinherjarRO Scripts ================================== 
+//= Daily Prize, OnPCLoginEvent
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.48
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A reward system for players who play more frequently
+//===== Comments: ============================================
+//= Todo:
+//= Revamp Exp and Points System, its kinda meh
+//===== Additional Comments: =================================
+//= 1.00 Daily Prize
+//= 1.01 Fixed Typo
+//= 1.02 Removed unessisary calculation
+//= 1.03 Added a sleep2 for delayed reward
+//= 1.04 Added dispbottom
+//= 1.05 Made Clearer
+//= 1.06 Made Disbutton Dynamic
+//= 1.07 Added .RewardQnt for configable Reward Quantity
+//= 1.08 Fixed Typo
+//= 1.09 Seperated .ZMulti into .Mode and .ZMulti
+//= 1.0A Changed zeny formula for .Mode 0
+//= 1.0B Changed Variable Names, More detailed exsplanations
+//= 1.0C Fixed typo again lol
+//= 1.0D Added in .PointType$, can now configure zeny into any point types
+//= 1.0E Added LoginCount
+//= 1.0F Made LoginCount Customisable
+//= 1.10 Changed Variable Names, More detailed exsplanations
+//= 1.11 Added Wipe feature
+//= 1.12 Fixed bug, changed "close;" to "close2;"
+//= 1.13 Changed .LogCount to bitwise
+//= 1.14 Changed .wipe to a whisper event, per Euphys Suggestion
+//= 1.15 Changed Formatting of config, per Euphys Suggestion
+//= 1.16 Added Login Reward Countdown, on each login
+//= 1.17 Added .PointName$
+//= 1.18 Fixed Typo
+//= 1.19 Added Checkweight
+//= 1.1A Changed query_sql for $LOGINCOUNT to set
+//= 1.1B Fixed bug with #DRewardCon, arraysize compersison (Thanks AnnieRuru)
+//= 1.1C Added meathod for characters online for attachrid
+//= 1.1D Actually Fixed the 1.1B Bug
+//= 1.1F Changed zeny formula to remove .ZMulti from mode 0
+//= 1.20 Changed .Reminder to .Welcome
+//= 1.21 Fixed missing details in Welcome Message
+//= 1.22 Changed .Mode to be bitwise
+//= 1.23 Added Item enable disable to .Mode
+//= 1.24 Changed whisper to allow for player Whispers
+//= 1.25 Added "time" Whisper Command for players, Thanks arzzae for suggestion
+//= 1.26 Made Whisper commands configable
+//= 1.27 Made GmLvl for wipe Configable
+//= 1.28 Fixed "Points" bitwise
+//= 1.29 Added Exp to .Mode
+//= 1.2A Optimized Rewards Script a little
+//= 1.2B Bug Fix with Display message on reciving rewards
+//= 1.2C Optimize a little more
+//= 1.2D Added server xp rate to config
+//= 1.2F Re-added checkweight
+//= 1.30 Move Checkweight up higher in script, makes more since
+//= 1.31 Removed XP Dispbutton
+//= 1.32 Added Buffer
+//= 1.33 Made BUffer Toggle-able
+//= 1.34 Made Buffer Dynamic
+//= 1.35 Optimized Buffer a little
+//= 1.36 Made Buffer More Dynamic
+//= 1.37 Optimized Buffer a little more
+//= 1.38 Fixed a typo in "seem" was "see"
+//= 1.39 removed "typo" bindatcmds
+//= 1.3A Fixed bug with sc_, didnt support names had to switch to ids
+//= 1.3B Fixed bug in buff bonus (time and rate)
+//= 1.3C Revamped buffs to take only 1 variable (now can only be 32 buffs)
+//= 1.3D Made Day(s) dynamic
+//= 1.3E Removed "Time" reqirement from players to check there Next Login Bonus
+//= 1.3F Added an Else after checkweight
+//= 1.40 Fixed typo in .BuffInfo
+//= 1.41 Reorganized rewards script
+//= 1.42 changed .@i -> .@x in Option & 32 (bug report by rakuzas)
+//= 1.43 Removed Login Count related scripts, as its not really part of rewards system
+//= 1.44 Made @loginreward do whole script, instead of relogging,
+//= 1.45 Removed Disable/Enable for whole script (just remove npc)
+//= 1.46 Changed A few Description, for easier understanding
+//= 1.47 Move sleep2 up to prevent possible multi rewards bug
+//= 1.48 Deleted unnecessary line "if( #DRewardCon == 0 ) set #DRewardCon,1;"
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	LOGIN	-1,{
+OnWhisperGlobal:
+OnLoginCmnd:
+OnPCLoginEvent:
+	sleep2 1000+.Rest*60000;
+	set .@i,(gettime(7)*365*24)+(gettime(8)*24)+gettime(3);
+	set .@g,getarraysize(.Rewards);
+	if(.@i >= (#LastDailyReward + .MinWait)){
+		if(.@i < #LastDailyReward + .MaxWait){ set #DRewardCon,#DRewardCon+1;
+		 } else { set #DRewardCon,1; }
+		if(#DRewardCon*2 > .@g-1){ set .@p,.Rewards[.@g-2]; set .@q,.Rewards[.@g-1];
+		} else { set .@p,.Rewards[#DRewardCon*2-2];  set .@q,.Rewards[#DRewardCon*2-1]; }
+		if(.Mode&1&&.@p){ 
+			if(!checkweight(.@p,.@q)){ dispbottom "You seem to be oveweight, put some stuff away and relog to claim prize"; end;
+			} else { getitem .@p,.@q; dispbottom ""+.@q+" "+getitemname(.@p)+""; }
+		}
+		if(.Mode&2) set .@A,#DRewardCon*.ZMulti;
+		if(.Mode&8) set .@A,.@A+.@q;
+		if(.Mode&2||.Mode&8){  setd .PointType$,getd(.PointType$)+.@A; dispbottom ""+.@A+" "+.PointType$+""; }
+		if(.Mode&4){ set .@B,#DRewardCon*.XPMulti[0]; set .@C,#DRewardCon*.XPMulti[1]; }
+		if(.Mode&16){ set .@B,.@B+.@q; set .@C,.@C+.@q; }
+		if(.Mode&4||.Mode&16){ getexp .@B,.@C; }
+		if(.Mode&32){
+			for(set .@x,0; .@x < getarraysize(.BuffInfo); set .@x,.@x+4){
+				if(#DRewardCon % .BuffInfo[.@x+1] == 0) sc_start .BuffInfo[.@x], .BuffInfo[.@x+2]*60000, .BuffInfo[.@x+3];
+			}
+		}
+		dispbottom "You have collected your daily reward, for "+#DRewardCon+" day"+((DRewardCon>1)?"s":"")+" in a row.";
+		set #LastDailyReward,.@i;
+	} else { dispbottom "You have "+(#LastDailyReward + .MinWait-.@i)+" hours till your next reward"; }
+end;
+OnInit:
+// -----------------------------------------------------------
+//  Daily Reward
+// -----------------------------------------------------------
+
+	//To Enable @ Command '@LoginReward' unslash next lines
+	// * Needs extra commands for typos
+//	bindatcmd("loginreward"	,"LOGIN::OnLoginCmnd",0,99);
+
+	//Minimum Hours Between Collecting Daily Reward
+	//   Day: 22-24
+	//   Week: 168
+	set .MinWait,22;
+
+	//Hours Before Lose Consecutive Daily Rewar
+	//   Day: 48-50
+	//   Week: 336
+	set .MaxWait,50;
+
+	//Number of mins after logging before collecting prize
+	set .Rest,0;
+
+	//Type of Points/Zeny earned 
+	//   eg: CASHPOINTS, Zeny, LoginPoints
+	set .PointType$,"Zeny";
+
+	//Toggle 
+	//   1: Item | 2: "Points" from Multi | 4: Exp from Multi 
+	//   8: "Points" from Days with ItemID of 0 |16: Exp from Days with ItemID of 0
+	//   32: Gain Buffs Every X Consecutive Days logged in
+	// (a bit value, e.g. 3 = Items & Points from Multi)
+	set .Mode,1+2+4+8+16+32;
+
+	//Consecutive Day Points Multiplier
+	// * If players login longer than the last set day,
+	//   they will keep getting a larger Multiplier
+	set .ZMulti,100;
+
+	//Consecutive Day Exp Multiplier
+	//  <Base Exp>,<Job Exp>;
+	// * If players login longer than the last set day,
+	//   they will keep getting a larger Multiplier.
+	setarray .XPMulti,10,10;
+
+	// Consecutive Days Buff
+	// Each buff contains 4 variables (32 Total Max)
+	// <Type>,<Days>,<Duration>,<Rate>, // Buff 1
+	// <Type>,<Days>,<Duration>,<Rate>, // Buff 2
+	//   ...;
+	//
+	//  Example: 188,7,45,3
+	//    -Every 7th consecutive day logged in Player gains +3 Str for 45 mins
+	//
+	//  Type is 188, which references which SC_ to use, SC_INCSTR in this example
+	//     -For a full list of SC_ visit the db/const.txt
+	//  Days is days buff is applied, in this example 7, so every 7th day, 14,21,28....
+	//  Duration is buff duration is Minuits, in this example 45 mins
+	//  Rate is buff strength, in this example player gains 3 Str
+	setarray .BuffInfo	,188,7,45,3	// +3 Str for 45 Mins Every 7th Day
+				,189,7,45,3	// +3 Agi for 45 Mins Every 7th Day
+				,190,7,45,3	// +3 Vit for 45 Mins Every 7th Day
+				,191,7,45,3	// +3 Int for 45 Mins Every 7th Day
+				,192,7,45,3	// +3 Dex for 45 Mins Every 7th Day
+				,193,7,45,3	// +3 Luk for 45 Mins Every 7th Day
+				,194,4,45,25	// +25 Hit for 45 Mins Every 4th Day
+				,196,4,45,25	// +25 Flee for 45 Mins Every 4th Day
+				,198,10,60,10	// +10% Hp for 60 Mins Every 10th Day
+				,199,10,60,10	// +10% Sp for 60 Mins Every 10th Day
+				,200,13,30,10	// +10% Atk for 30 Mins Every 10th Day
+				,201,13,30,10	// +10% Matk for 30 Mins Every 10th Day
+				,257,9,120,50	// +50% Exp for 120 Mins Every 9th Day
+				,258,9,120,50;	// +50% Item Drops for 120 Mins Every 9th Day
+
+	// Daily Prize items (max 64 days):
+	//   <itemID>,<amount>, // Day 1
+	//   <itemID>,<amount>, // Day 2
+	//   ...;
+	// * If players login longer than the last set
+	//   day, they will keep getting the last prize.
+	setarray .Rewards[0],
+		512,1,		// Day 1
+		513,2,		// Day 2
+		514,3,		// Day 3
+		0,1000;		// Day 4
+end;
+}

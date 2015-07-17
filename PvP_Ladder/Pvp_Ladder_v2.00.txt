@@ -1,0 +1,171 @@
+//===== EinherjarRo Scripts ==================================
+//= PvP Ladder
+//===== Author ===============================================
+//= Stolao (Original Author)
+//= Happy (2.0)
+//===== Current Version: =====================================
+//= 2.00
+//===== Compatible With: =====================================
+//= rAthena SVN, Hercules, 3ceam, eAthena
+//===== Description: =========================================
+// Configurable Pvp Ladder
+//===== Comments: ============================================
+//= [Stolao]
+// Needs bug testing, please report any bugs
+// Unable to test thurally on my comp atm
+//= [Happy]
+// Update* I tested it and found tons of bugs, I'm in rush so
+// I fixed them myself. It is now working 100%.
+// The version is unofficial version. Sorry Stolao I fixed it
+// Without your permission XD
+//===== Additional Comments: =================================
+//= 1.00 Initial Release
+//= 1.01 Added Location with veiwing of ladder
+//= 1.02 Added GM Menu
+//= 1.03 Added atcommand
+//= 1.04 Shortend menu script
+//= 1.05 Added PvpPoints into confug and script
+//= 1.06 Added Abuse Protection
+//= 1.07 Made Pvp Points Configurable
+//= 1.08 Fixed typo in Reset Option
+//= 1.09 Made Amount of pvp points earned configurable
+//= 1.0A Ajusted Spacing for easier reading
+//= 1.0B Added Warp to savepoint on abuse into config
+//= 2.00 Fixed bugs on ranking modification and
+// bitwise permissions
+//===== Contact Ifo: =========================================
+//= [Stolao]
+// Email: Taingram11@gmail.com
+//= [Happy]
+// Email: http://hercules.ws/board/user/164-happy/
+//============================================================
+prontera,202,203,4 script Ladder Event 837,{
+	mes "[Ladder Event]";
+OnPvpLadder:
+	mes "Ranking";
+	if(getgmlevel() >= .GM){ // Menu Generator for GM and Normal Player
+		set .@i,select("View Ranking:Leave:Reset PVP Stats");
+	} else {
+		set .@i,select("View Ranking:Leave");
+	}
+	switch(.@i) { // Where generated menu goes to
+		case 3: // DReset PvP Stats
+			mes "Are you sure you want to delete";
+			mes "ALL pvp records?";
+			if(select("No:Yes")==1) close;
+			next;
+			mes "Wait one Moment...";
+			mes ".....";
+			cleararray $TOPPK$[0],0,127;							// Clears array where top rank char names are stored.
+			cleararray $TOPPK[0],0,127;							// Clears array where top rank kill count are stored.
+			query_sql("DELETE FROM `global_reg_value` WHERE `str` = 'pl_pkcount'");		// Clears kills saved on character variables
+			set .@self, getcharid(3);							// Remembers RID of current char talking to npc
+			set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+			for(set .@i,0; .@i<.@size; set .@i,.@i+1) { // Deletes kills of online players
+				if(attachrid(.@aid[.@i])){						//attach rid of online player 1 by 1 and remove kills
+					set pl_pkcount,0;
+				}
+			}
+			attachrid(.@self); 								// attach remembered rid back
+			mes "Cleared pvp data.";
+			close;
+		case 1: // View PvP Records
+			for(set .@i,1; .@i <= .MaxPlayers; set .@i,.@i+1){
+				mes (.@i)+": "+ $TOPPK$[.@i] +" with "+ $TOPPK[.@i] +" kills";
+				if((.@i) % 10 == 0){ // A nice way to create multiple pages by 10 ranks
+					if(select("Read More:Leave") == 1){
+						next;
+					} else {
+						close;
+					}
+				}
+			}
+		case 2: // Leave
+			close;
+	}
+close;
+OnPCKillEvent:
+	if(.Options&2 && (agitcheck() || agitcheck2())){ // Check to disable during woe
+		end;
+	}
+	if(getgmlevel() <= .GmLvl){
+		if(.Options&1 || strcharinfo(3) == .Map$){
+			if(.Options&32){ 								// Repeatkill abuse counter
+				for(set .@i,.RepeatCount; .@i > 0; set .@i, .@i-1){
+					set @PKedID[.@i+1], @PKedID[.@i]; 				// Old killedrids moved to upper array elements
+				}
+				set @PKedID,killedrid; 							// set killedrid to [0] position.
+				for(set .@i,1; .@i < .RepeatCount; set .@i,.@i + 1){
+					if(@PKedID[0] == @PKedID[.@i]){					// check if killerid same as the previously killedrids
+						set .@s, .@s + 1; 					// if all 5 past killedrid are the same then this would become 5 and trigger protection
+					} else {
+						break; 							// else stop checking
+					}
+				}
+			}
+		if(.@s < .RepeatCount){ 								// if not abusing kills according to repeatcount
+			set pl_pkcount,pl_pkcount + 1;
+			if(.Options&16) {
+				set getd(.PointType$),getd(.PointType$) + .PvpEarned; 			// add points
+			}
+			if(pl_pkcount > $TOPPK[.MaxPlayers]) { 						// If higher than last ranker
+				for(set .@i,1; .@i <= .MaxPlayers ; set .@i, .@i + 1) { 		// Reorganize the ranking
+					if (pl_pkcount > $TOPPK[.@i] && !.@newrank) {
+						set .@newrank,.@i;
+					}
+				if (strcharinfo(0) == $TOPPK$[.@i] && .@newrank == .@i) {
+					setarray $TOPPK$[.@i], strcharinfo(0);
+					setarray $TOPPK[.@i], pl_pkcount;
+					set .@newrank,0;
+					break;
+				}
+			if ( strcharinfo(0) == $TOPPK$[.@i] && .@newrank != .@i) {
+				set .@existrank,.@i;
+				break;
+			}
+		}
+		if (.@newrank) {
+			for (set .@e,.MaxPlayers; .@e >= 0 ; set .@e, .@e - 1) {
+				if (.@e < .@existrank) {
+					setarray $TOPPK$[.@e + 1], $TOPPK$[.@e]; 			// move this ranker backward
+					setarray $TOPPK[.@e + 1], $TOPPK[.@e];
+				}
+				if (.@e == .@newrank) {
+					setarray $TOPPK$[.@e], strcharinfo(0);
+					setarray $TOPPK[.@e], pl_pkcount;
+					if(.Options&4) {
+						announce strcharinfo(0)+"'s rank is now "+(.@e)+"",bc_all;
+					}
+					break;
+							}
+						}
+					}
+				}
+			} else {
+				if(.Options&64) {
+					warp "Save",0,0;
+				}
+			}
+		}
+	}
+	end;
+OnInit:
+	set .GM,99;
+	set .MaxPlayers,10;		// Number of Players held in Records
+	set .GmLvl,99; 			// Highest GM level Able to Hold a Record, if Option 8 is Disabled
+	set .Map$,"prontera"; 		// Map Pvp Must Take Place on in order to Count, if Option 1 is Disabled
+	set .RepeatCount,5; 		// Number of kills on same person before it detects abuse, max of 128
+	set .PointType$,"#PvpPoints"; 	// Name of points earned, E.G. #Cash Points
+	set .PvpEarned,1; 		// Number of Pvp Points Earned
+	set .Options,4|32|64; 		// Bitwise Variable
+		// 1: Only Counts Kills on .Map$ if Disabled
+		// 2: Disables Record Holding during WOE
+		// 4: Announce When Someone Takes a Rank
+		// 8: Allow Gms Above level .GmLvl To Be on Ladder
+		// 16: Gain PvP Points on Kills (#PvpPoints)
+		// 32: Repeat Kill Protection
+		// 64: Warp to Save on abuse
+		// Example: "1+2+4 = 7" No Forced Map, Disables Record Holding during WOE and Announces New Record Holders
+bindatcmd("PvpLadder" ,"Pvp_Ladder::OnPvpLadder",0,99);
+end;
+}

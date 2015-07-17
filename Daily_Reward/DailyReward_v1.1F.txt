@@ -1,0 +1,189 @@
+//===== EinherjarRO Scripts ================================== 
+//= Daily Prize, OnPCLoginEvent
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.1F
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Events that happen when a player logs in
+//= Including a Daily login(configable) prize
+//===== Comments: ============================================
+//= add @wipelogin later
+//===== Additional Comments: =================================
+//= 1.00 Daily Prize
+//= 1.01 Fixed Typo
+//= 1.02 Removed unessisary calculation
+//= 1.03 Added a sleep2 for delayed reward
+//= 1.04 Added dispbottom
+//= 1.05 Made Clearer
+//= 1.06 Made Disbutton Dynamic
+//= 1.07 Added .RewardQnt for configable Reward Quantity
+//= 1.08 Fixed Typo
+//= 1.09 Seperated .ZMulti into .Mode and .ZMulti
+//= 1.0A Changed zeny formula for .Mode 0
+//= 1.0B Changed Variable Names, More detailed exsplanations
+//= 1.0C Fixed typo again lol
+//= 1.0D Added in .PointType$, can now configure zeny into any point types
+//= 1.0E Added LoginCount
+//= 1.0F Made LoginCount Customisable
+//= 1.10 Changed Variable Names, More detailed exsplanations
+//= 1.11 Added Wipe feature
+//= 1.12 Fixed bug, changed "close;" to "close2;"
+//= 1.13 Changed .LogCount to bitwise
+//= 1.14 Changed .wipe to a whisper event, per Euphys Suggestion
+//= 1.15 Changed Formatting of config, per Euphys Suggestion
+//= 1.16 Added Login Reward Countdown, on each login
+//= 1.17 Added .PointName$
+//= 1.18 Fixed Typo
+//= 1.19 Added Checkweight
+//= 1.1A Changed query_sql for $LOGINCOUNT to set
+//= 1.1B Fixed bug with #DRewardCon, arraysize compersison
+//= 1.1C Added meathod for characters online for attachrid
+//= 1.1D Fixed typo bug in .Rewards being .Reward
+//= 1.1E Changed OnWhisperGlobal conditions, to allow bindatcmnd later
+//= 1.1F Changed zeny formula to remove .ZMulti from mode 0
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	LOGIN	-1,{
+OnWhisperGlobal:
+	if (getgmlevel() < 99 || @whispervar0$ != "wipe") end;
+//bindcmnd here
+	query_sql("DELETE FROM `global_reg_value` WHERE `str` = 'LOGINCOUNT'");
+	query_sql("DELETE FROM `global_reg_value` WHERE `str` = '#LOGINCOUNT'");
+	set $LOGINCOUNT,0;
+	set .@self, getcharid(3);
+	set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+	for(set .@i,0; .@i<.@size; set .@i,.@i+1) {
+		if(attachrid(.@aid[.@i])){
+			set LOGINCOUNT,0;
+			set #LOGINCOUNT,0;
+		}
+	}
+	attachrid(.@self);
+	dispbottom "Cleared all login count data.";
+	end;
+OnPCLoginEvent:
+	if(.LogCount){
+		if(.LogCount & 1) set LOGINCOUNT,LOGINCOUNT+1;
+		if(.LogCount & 2) set #LOGINCOUNT,#LOGINCOUNT+1;
+		if(.LogCount & 4) set $LOGINCOUNT,$LOGINCOUNT+1;
+		if((LOGINCOUNT + #LOGINCOUNT) < .Reminder ){ 
+			Mes "~Welcome to "+.Servername$+"~";
+			Mes .Message$;
+			close2;
+		}
+	}
+	if(.DailyPrize){
+		if( #DRewardCon == 0 ) set #DRewardCon,1; 
+		set .@i,((gettime(7))*365*24)+(gettime(8)*24)+gettime(3);
+		set .@g,getarraysize(.Rewards);
+		sleep2 .Rest*60000;
+		if(.@i >= (#LastDailyReward + .MinWait)){
+			if(.@i < #LastDailyReward + .MaxWait){ 
+				set #DRewardCon,#DRewardCon+1; 
+				} else { 
+				set #DRewardCon,1; 
+			}
+			if(#DRewardCon*2 > .@g-1){ 
+				set .@p,.Rewards[.@g-2]; 
+				set .@q,.Rewards[.@g-1];
+				} else { 
+				set .@p,.Rewards[#DRewardCon*2-2]; 
+				set .@q,.Rewards[#DRewardCon*2-1]; 
+			}
+			if(.Mode){ 
+				if(.@p) getitem .@p,.@q; 
+				setd .PointType$,getd(.PointType$)+#DRewardCon*.ZMulti; 
+				set .@DT$,""+((.@p)?.@q+" "+getitemname(.@p)+" and ":"")+#DRewardCon*.ZMulti+" "+.PointType$+"";
+			} else { 
+				if(.@p){ 
+					getitem .@p,.@q; 
+					set .@DT$,""+.@q+" "+getitemname(.@p)+"";
+				} else { 
+					setd .PointType$,getd(.PointType$)+.@q; 
+					set .@DT$,""+.@q+" "+.PointType$+"";
+				} 
+			}
+			set #LastDailyReward,.@i;
+			dispbottom "You have collected your daily reward, for "+#DRewardCon+" days in a row, of "+.@DT$+"~";
+		} else {
+			dispbottom "You have "+(#LastDailyReward + .MinWait-.@i)+" hours till your next reward";
+		}		
+	}
+end;
+OnInit:
+// -----------------------------------------------------------
+//  Login Count & Welcome Message
+// -----------------------------------------------------------
+
+	// Login types to track.
+	// 1: Character | 2: Account | 4: Server
+	// (a bit value, e.g. 5 = character + server)
+	set .LogCount,0;
+
+	// Number of logins to display welcome message.
+	set .Reminder,3;
+
+	// Server name to display.
+	set .Servername$,"Server";
+
+	// Login message
+	set .Message$,"Before playing, make sure you've read the rules, located in our forum at ^0000FF~TBA~^000000";
+
+// -----------------------------------------------------------
+//  Daily Reward
+// -----------------------------------------------------------
+
+	//Daily Prize
+	//Toggle
+	//   0: Off  | 1: On
+	set .DailyPrize,1;
+
+	//Minimum Hours Between Collecting Daily Reward
+	//   Day: 22-24
+	//   Week: 168
+	set .MinWait,22;
+
+	//Hours Before Lose Consecutive Daily Rewar
+	//   Day: 48-50
+	//   Week: 336
+	set .MaxWait,50;
+
+	//Number of mins after logging before collecting prize
+	set .Rest,0;
+
+	//Variable of Points/Zeny earned 
+	//   eg: CASHPOINTS, Zeny, LoginPoints
+	set .PointType$,"Zeny";
+
+	//Name of Points/Zeny earned
+	//   eg: Cashpoints, Zeny, Login Points
+	set .PointName$,"Zeny";
+
+	//Toggle 
+	//   0: Gain Zeny Only When ID = 0
+	//   1: Gain Zeny Every Loging regardless of prize ID
+	set .Mode,1;
+
+	//Consecutive Day Points/Zeny Multiplier
+	// * If players login longer than the last set
+	//   day, they will keep a larger Multiplier.
+	set .ZMulti,100;
+
+	// Daily Prize items (max 64 days):
+	//   <itemID>,<amount>, // Day 1
+	//   <itemID>,<amount>, // Day 2
+	//   ...;
+	// * If players login longer than the last set
+	//   day, they will keep getting the last prize.
+	setarray .Rewards[0],
+		512,1,		// Day 1
+		513,2,		// Day 2
+		514,3,		// Day 3
+		0,1000;		// Day 4
+end;
+}
