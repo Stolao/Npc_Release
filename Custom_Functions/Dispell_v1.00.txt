@@ -1,0 +1,49 @@
+//===== EinherjarRO Scripts ================================== 
+//= Function Dispell
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A dispell Like function use to replace sc_end -1;
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+function	script	dispell	{
+	while ( .@STATUS < 297 ) {
+		if (	
+			.@STATUS != SC_WEIGHT50 &&
+			.@STATUS != SC_WEIGHT90 &&
+			.@STATUS != SC_NOCHAT &&
+			.@STATUS != SC_XMAS &&
+			.@STATUS != SC_SUMMER &&
+			.@STATUS != SC_JAILED &&
+			.@STATUS != SC_STRFOOD &&
+			.@STATUS != SC_AGIFOOD &&
+			.@STATUS != SC_VITFOOD &&
+			.@STATUS != SC_INTFOOD &&
+			.@STATUS != SC_DEXFOOD &&
+			.@STATUS != SC_LUKFOOD &&
+			.@STATUS != SC_FLEEFOOD &&
+			.@STATUS != SC_BATKFOOD &&
+			.@STATUS != SC_WATKFOOD &&
+			.@STATUS != SC_MATKFOOD &&
+			.@STATUS != SC_SCRESIST &&
+			.@STATUS != SC_EXPBOOST &&
+			.@STATUS != SC_ITEMBOOST &&
+			.@STATUS != SC_BOSSMAPINFO &&
+			.@STATUS != SC_LIFEINSURANCE &&
+			.@STATUS != SC_JEXPBOOST
+		)
+		sc_end .@STATUS;
+		set .@STATUS, .@STATUS+1;
+	}
+return;
+}
