@@ -1,6 +1,18 @@
 Stolao's Script Collection
 =======
-If you find any bugs either post on the rAthena forums or submit a bug report and I will fix, if you find an error and fix yourself please submit a pull request that I may update.
+
+Usage Policy
+=======
+* You may use, modify, and host all of my released scripts.
+* You may not sell them, re-release them in any way (modified or otherwise), or remove the credits.
+* My scripts are not to be used for donation purposes, but soly for the betterment of a server.
+* Use at your own risk, Always run on a test server before going to a live enviroment.
+* If you find any bugs either post on the rAthena forums or submit a bug report and I will fix
+* If you find an error and fix yourself please submit a pull request that I may update.
+* By using my scripts you agree to the terms above
+
+Script List
+=======
 
 At Afk
 ---------
