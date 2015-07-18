@@ -1,6 +1,6 @@
 Stolao's Script Collection
 =======
-If you find any bugs eith post on the rAthena forums or submit a bug report
+If you find any bugs either post on the rAthena forums or submit a bug report and I will fix, if you find an error and fix yourself please submit a pull request that I may update.
 
 At Afk
 ---------
