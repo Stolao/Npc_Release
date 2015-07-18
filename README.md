@@ -1,6 +1,6 @@
 Stolao's Script Collection
 =======
-Public Npc Releases
+If you find any bugs eith post on the rAthena forums or submit a bug report
 
 At Afk
 ---------
