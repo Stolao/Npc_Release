@@ -58,6 +58,11 @@ Floating Rates
 Exp and Item Drop Rates Increase and Decrease Dynamically base off Online Player Count and Config
    * Easy Configuration
 
+Group Buffs
+---------
+Apply party / Guild buffs via npc or item (autobonus)
+   * Easy Configuration
+
 Non-Abuse Healer
 ---------
 A simple time delay healer that stops if player moves
