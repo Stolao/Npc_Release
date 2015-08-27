@@ -176,7 +176,7 @@ OnPCKillEvent:
 					}
 				}
 				if(.Death){
-					attachrid(@PKedID)						// switch to killedrid
+					attachrid(@PKedID);						// switch to killedrid
 					set pl_DTHcount,pl_DTHcount + 1;
 					if(pl_DTHdthcount > $TOPDTH[.MaxPlayers]) { 			// If higher than last ranker
 						for(set .@i,1; .@i <= .MaxPlayers ; set .@i, .@i + 1) { // Reorganize the ranking
