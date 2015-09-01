@@ -21,11 +21,11 @@ An @afk command for optional points
 At Commands
 ---------
 A Few Useful @Commands
-  *@Main
-  *@Market
-  *@Home
-  *@BGM
-  *@BGMALL
+  * @Main
+  * @Market
+  * @Home
+  * @BGM
+  * @BGMALL
 
 Auto Event
 ---------
