@@ -18,6 +18,15 @@ At Afk
 ---------
 An @afk command for optional points
 
+At Commands
+---------
+A Few Useful @Commands
+  *@Main
+  *@Market
+  *@Home
+  *@BGM
+  *@BGMALL
+
 Auto Event
 ---------
 Will Automatically pick one event from the events in its list every hour and run it. Giving out an Item and Announcing the Winner.
