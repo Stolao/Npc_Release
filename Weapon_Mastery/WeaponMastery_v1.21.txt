@@ -1,0 +1,321 @@
+//===== EinherjarRO Scripts ================================== 
+//= WeaponMasteries
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.21
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= As you train using a particulat weapon type you get passive 
+//= buffs depending on how much yo have used that type
+//= There are five types Slash, Stab, Smash, Ranged and Unique
+//===== Comments: ============================================
+//= Masteries can go up to level 9999 with curve of 21
+//= Requires OnEvent/OnKillNPCEvent.txt to function
+//===== Additional Comments: =================================
+//= 1.00 Origioanal Make
+//= 1.01 +33% Mastery >> Atk
+//= 1.02 +50% Mastery >> Matk
+//= 1.03 Rename Masteries
+//= 1.04 Redistibute Weapons into new masteries
+//= 1.05 Wiped Mastery Bonuses
+//= 1.06 Added Starting Bonuses
+//= 1.07 Made OnPCStatCalcEvent for Mastery System
+//= 1.08 Added mastery Bonueses for Lvl 1, 2, 4, 8, 16, 32 ,64, and 128
+//= 1.09 Changed Mysticals MaxSPRate for MaxSp
+//= 1.0A Added @wi (see bindatcmd.txt)
+//= 1.0B Added @wlvl (see bindatcmd.txt)
+//= 1.0C Removed dependency from bindatcmd.txt
+//= 1.0D Rebalanced a few formulas for differant masteries
+//= 1.0E Combined with old Sect System
+//= 1.0F Added Sect give +10 total on varried stats
+//= 1.10 Added 10% Resistance to sects Element
+//= 1.11 Added 10% more damage with sects element
+//= 1.12 Changed Sect Stats from +10 -> +3
+//= 1.13 Changed Wm Stat bonus from M/9 -> M/32
+//= 1.14 Removed Wm Booster item
+//= 1.15 Lowered Wm Max Level to 99
+//= 1.16 Rewrote Onslaught Formulas for lower effect
+//= 1.17 Rewrote Switfness Formulas for lower effect
+//= 1.18 Rewrote Safegaurd Formulas for lower effect
+//= 1.19 Rewrote Ranged Formulas for lower effect
+//= 1.1A Rewrote Mystical Formulas for lower effect
+//= 1.1B Added Exprates = job_exp_rate
+//= 1.1C Changed Exp Curve to reflect new Exp Rates
+//= 1.1D Added Debugmes on Overflow
+//= 1.1E Added Increased Exp from SC_JEXPBOOST,2
+//= 1.1F Fixed Spacing/ Readability in OnInit
+//= 1.20 Fixed Typos
+//= 1.21 Fixed Bug with No gear On
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//
+// Str - Onslaught:	2HSword,1HAxe,2HAxe,1HMace,2HMace(unused),Knuckle
+// Agi - Swiftness:	Specialty,Dagger,Fuuma Shuriken,Katar
+// Vit - Safegaurd:	Unarmmed,1HSword,1HSpear,2HSpear
+// Dex - Ranged:	Bow,Instrument,Whip,Revolver,Rifle,Gatling Gun,Shotgun,Grenade Launcher
+// Int - Mystical:	Rod,Book,2HStaff,Scythe
+
+function	script	Onslaught_M	{
+	if(OnslaughtMaster >= 1)	bonus bCritical,1+OnslaughtMaster/20;
+	if(OnslaughtMaster >= 2)	bonus bAtk,1+OnslaughtMaster/4;
+	if(OnslaughtMaster >= 4)	bonus bAtk2,1+OnslaughtMaster/4;
+	if(OnslaughtMaster >= 8)	bonus bPerfectHitAddRate,1+OnslaughtMaster/21;
+	if(OnslaughtMaster >= 16)	bonus bBaseAtk,OnslaughtMaster/4+1;
+	if(OnslaughtMaster >= 32)	bonus bCritAtkRate,OnslaughtMaster/4+1;
+	if(OnslaughtMaster >= 64)	bonus bAspdRate,OnslaughtMaster/22 + 1;
+	if(OnslaughtMaster >= 128)	bonus bSplashAddRange,1;
+	bonus bStr,1+OnslaughtMaster/32;
+	bonus bAtkrate,1+OnslaughtMaster/7+((1+OnslaughtMaster/7)*readparam(bStr)/100);	
+return;
+}
+
+function	script	Swiftness_M	{
+	if(SwiftnessMaster >= 1)	bonus bSpeedAddRate,1+SwiftnessMaster/9;
+	if(SwiftnessMaster >= 2)	bonus bFlee,SwiftnessMaster/3;
+	if(SwiftnessMaster >= 4)	bonus bDoubleAddRate,1+SwiftnessMaster/9;
+	if(SwiftnessMaster >= 8)	bonus bFlee2,1+SwiftnessMaster/33;
+	if(SwiftnessMaster >= 16)	bonus bPerfectHitAddRate,1+SwiftnessMaster/11;
+	if(SwiftnessMaster >= 32)	bonus bCritAtkRate,SwiftnessMaster/9-1;
+	if(SwiftnessMaster >= 64)	bonus bCritical,1+OnslaughtMaster/20;
+	if(SwiftnessMaster >= 128)	bonus2 bHPDrainRate,1+SwiftnessMaster,1+SwiftnessMaster/24;
+	bonus bAgi,1+SwiftnessMaster/32;
+	bonus bAspdRate,1+SwiftnessMaster/7+((1+SwiftnessMaster/7)*readparam(bAgi)/100);
+return;
+}
+
+function	script	Safegaurd_M	{
+	if(SafegaurdMaster >= 1)	bonus bHPrecovRate,1+SafegaurdMaster/2;
+	if(SafegaurdMaster >= 2)	bonus bDef,1+SafegaurdMaster/20;
+	if(SafegaurdMaster >= 4)	bonus bMdef,1+SafegaurdMaster/24;
+	if(SafegaurdMaster >= 8)	bonus bMaxHPrate,1+SafegaurdMaster/11;
+	if(SafegaurdMaster >= 16)	bonus bNearAtkDef,SafegaurdMaster/20+1;
+	if(SafegaurdMaster >= 32)	bonus bLongAtkDef,SafegaurdMaster/21+1;
+	if(SafegaurdMaster >= 64)	bonus bMagicAtkDef,SafegaurdMaster/22+1;
+	if(SafegaurdMaster >= 128)	bonus bCriticalDef,SafegaurdMaster/23+1;
+	bonus bVit,1+SafegaurdMaster/32;
+	bonus bMaxHP,SafegaurdMaster*5+5+((SafegaurdMaster*5+5)*readparam(bVit)/100);
+return;
+}
+
+function	script	Ranged_M	{
+	if(RangedMaster >= 1)		bonus bBaseAtk,OnslaughtMaster/3+2;
+	if(RangedMaster >= 2)		bonus bCritical,1+RangedMaster/21;
+	if(RangedMaster >= 4)		bonus bFlee,1+RangedMaster/11;
+	if(RangedMaster >= 8)		bonus bAspd,RangedMaster/11;
+	if(RangedMaster >= 16)		bonus bHit,RangedMaster/9;
+	if(RangedMaster >= 32)		bonus bLongAtkRate,RangedMaster/9-1;
+	if(RangedMaster >= 64)		bonus bCritAtkRate,4+RangedMaster/9;
+	if(RangedMaster >= 128)		bonus bAtkRange,1+RangedMaster/99;
+	bonus bDex,1+RangedMaster/32;
+	bonus bAtkrate,1+RangedMaster/7+((1+RangedMaster/7)*readparam(bDex)/100);
+return;
+}
+
+function	script	Mystical_M	{
+	if(MysticalMaster >= 1)		bonus bSPrecovRate,1+MysticalMaster/2;
+	if(MysticalMaster >= 2)		bonus bMaxSP,MysticalMaster*2+2;
+	if(MysticalMaster >= 4)		bonus bCastrate,-1-MysticalMaster/20;
+	if(MysticalMaster >= 8)		bonus bUseSPrate,-1-MysticalMaster/21;
+	if(MysticalMaster >= 16)	bonus bDelayrate,-1-MysticalMaster/22;
+	if(MysticalMaster >= 32)	bonus bHealPower,1+MysticalMaster/2;
+	if(MysticalMaster >= 64)	bonus bMAtkrate,1+MysticalMaster/7;
+	if(MysticalMaster >= 128)	bonus bNoCastCancel,1;
+	bonus bInt,1+MysticalMaster/32;
+	bonus bEquipmentMatk,1+MysticalMaster+((1+MysticalMaster)*readparam(bInt)/100);
+	
+return;
+}
+
+prontera,5,5,5	script	PCSTATCALC	111,{
+end;
+OnWeaponInfo:
+	set .@M$,.@atcmd_parameters$[0];
+	if((.@M$ == "")){
+		if(getequipid(EQI_HAND_R){ set .@ei,getiteminfo(getequipid(EQI_HAND_R),11); }
+		else { set .@ei,-1 }
+		switch(.@ei){
+			case 3:  	case 6: 	case 7: 	case 8:	
+			case 9:		case 12:					set .@M$,"Onslaught";	Break;
+			case 0: 	case 1: 	case 16:	case 22:	set .@M$,"Swiftness";	Break;
+			case 2: 	case 4: 	case 5:		case -1:	set .@M$,"Safegaurd";	Break;
+			case 11:	case 13:	case 14:	case 17:
+			case 18:	case 19:	case 20:	case 21:	set .@M$,"Ranged";	Break;
+			case 10:	case 15:	case 23:	case 24:	set .@M$,"Mystical";	Break;
+		}
+	}
+	if(.@M$ == "Onslaught" || .@M$ == "onslaught" || .@M$ == "OnSlaught") set .@i,1;
+	if(.@M$ == "Swiftness" || .@M$ == "swiftness") set .@i,2;
+	if(.@M$ == "Safegaurd" || .@M$ == "SafeGaurd" || .@M$ == "safegaurd") set .@i,3;
+	if(.@M$ == "Ranged"    || .@M$ == "ranged"   ) set .@i,4;
+	if(.@M$ == "Mystical"  || .@M$ == "mystical" ) set .@i,5;
+	set .@X,atoi(.@atcmd_parameters$[1]);
+	if(!.@X) set .@X,getd(""+.@M$+"Master");
+	switch(.@i){
+		case 1:
+			dispbottom "Onslaught Lv: "+.@X+" "+OnslaughtExp+" / "+((OnslaughtMaster*OnslaughtMaster*25)+10+OnslaughtMaster)+"xp";
+			dispbottom "Str +"+(1+.@X/32)+"";
+			dispbottom "Atk +"+(1+.@X/9)+"%";
+			if(.@X >= 1)dispbottom "Critical Chance +"+(1+.@X/20)+"";
+			if(.@X >= 2)dispbottom "Atk +"+(1+.@X/9)+"";
+			if(.@X >= 4)dispbottom "Weapon Atk +"+(1+.@X/11)+"";
+			if(.@X >= 8)dispbottom "Perfect Hit +"+(1+.@X/21)+"";
+			if(.@X >= 16)dispbottom "Base Atk +"+(.@X/4+1)+"";
+			if(.@X >= 32)dispbottom "Crit Damage +"+(.@X/8+3)+"%";
+			if(.@X >= 64)dispbottom "Aspd +"+.@X/16+"%";
+			if(.@X >= 128)dispbottom "Splash attack radius +1";
+		break;
+		case 2:	
+			dispbottom "Swiftness Lv: "+.@X+" "+SwiftnessExp+" / "+((SwiftnessMaster*SwiftnessMaster*25)+10+SwiftnessMaster)+"xp";
+			dispbottom "Agi +"+(1+.@X/32)+"";
+			dispbottom "Aspd +"+(1+.@X/9)+"%";
+			if(.@X >= 1)dispbottom "Moving speed +"+(1+.@X/9)+"%";
+			if(.@X >= 2)dispbottom "Flee +"+(.@X/2)+"";
+			if(.@X >= 4)dispbottom "Double Attack Chance +"+(1+.@X/9)+"%";
+			if(.@X >= 8)dispbottom "Perfect Dodge +"+(1+.@X/33)+"";
+			if(.@X >= 16)dispbottom "On-target impact chance +"+(1+.@X/11)+"%";
+			if(.@X >= 32)dispbottom ""+(1+SwiftnessMaster)/10+"."+((1+SwiftnessMaster)%10)+"% chance of healing for "+(.@X/24+1)+"% of damage dealt with each normal attack";
+			if(.@X >= 64)dispbottom "Critical Chance +"+(1+.@X/20)+"";
+			if(.@X >= 128)dispbottom "Crit Damage +"+(.@X/9-1)+"%";
+		break;
+		case 3:
+			dispbottom "Safegaurd Lv: "+.@X+" "+SafegaurdExp+" / "+((SafegaurdMaster*SafegaurdMaster*25)+10+SafegaurdMaster)+"xp";
+			dispbottom "Vit +"+(1+.@X/32)+"";
+			dispbottom "Max HP +"+(.@X*5+5)+"";
+			if(.@X >= 1)dispbottom "Natural HP recovery ratio +"+(1+.@X/2)+"%";
+			if(.@X >= 2)dispbottom "Def +"+(1+.@X/20)+"";
+			if(.@X >= 4)dispbottom "Mdef +"+(1+.@X/24)+"";
+			if(.@X >= 8)dispbottom "Max HP +"+(1+.@X/9)+"%";
+			if(.@X >= 16)dispbottom "Adds "+(.@X/20+1)+" damage reduction against Critical Hits";
+			if(.@X >= 32)dispbottom "Adds "+(.@X/21+1)+" damage reduction against melee physical attacks";
+			if(.@X >= 64)dispbottom "Adds "+(.@X/22+1)+" damage reduction against ranged physical";
+			if(.@X >= 128)dispbottom "Adds "+(.@X/23+1)+" damage reduction against magical attacks";
+		break;
+		case 4:
+			dispbottom "Ranged Lv: "+.@X+" "+RangedExp+" / "+((RangedMaster*RangedMaster*25)+10+RangedMaster)+"xp";
+			dispbottom "Dex +"+(1+.@X/32)+"";
+			dispbottom "Atk +"+(1+.@X/9)+"%";
+			if(.@X >= 1)dispbottom "Moving speed +"+(1+.@X/20)+"%";
+			if(.@X >= 2)dispbottom "Critical +"+(1+.@X/21)+"";
+			if(.@X >= 4)dispbottom "Flee +"+(1+.@X/2)+"";
+			if(.@X >= 8)dispbottom "Aspd +"+(.@X/11)+"";
+			if(.@X >= 16)dispbottom "Hit +"+(.@X/9)+"";
+			if(.@X >= 32)dispbottom "Increases damage of ranged attacks by "+(.@X/11)+"%";
+			if(.@X >= 64)dispbottom "Crit Damage +"+(4+.@X/9)+"%";
+			if(.@X >= 128)dispbottom "Atk Range +"+(1+.@X/99)+"";
+		break;
+		case 5:
+			dispbottom "Mystical Lv: "+.@X+" "+MysticalExp+" / "+((MysticalMaster*MysticalMaster*25)+10+MysticalMaster)+"xp";
+			dispbottom "Int +"+(1+.@X/32)+"";
+			dispbottom "Matk +"+(1+.@X/9)+"%";
+			if(.@X >= 1)dispbottom "Natural SP recovery ratio +"+(.@X/2+1)+"%";
+			if(.@X >= 2)dispbottom "Max SP +"+(2+.@X*2)+"";
+			if(.@X >= 4)dispbottom "Skill casting time "+(-1-.@X/20)+"%";
+			if(.@X >= 8)dispbottom "SP consumption "+(-1-.@X/21)+"%";
+			if(.@X >= 16)dispbottom "Decreases skill delay by "+(1+.@X/22)+"%";
+			if(.@X >= 32)dispbottom "Increase heal amount of all heal skills by "+(1+.@X/2)+"%";
+			if(.@X >= 64)dispbottom "Weapon magical attack power +"+(.@X+1)+"";
+			if(.@X >= 128)dispbottom "Prevents casting from being interrupted when hit";
+		break;
+		default:
+			dispbottom "@wi <Type> <Level>";
+			dispbottom "Type: Onslaught, Swiftness, Safegaurd, Ranged, Mystical";
+		break;
+	}
+end;
+OnWeaponLevel:
+	set .@M$,.@atcmd_parameters$[0];
+	set .@X,atoi(.@atcmd_parameters$[1]);
+	if((.@M$ != "Onslaught" && .@M$ != "Swiftness" && .@M$ != "Safegaurd" && .@M$ != "Ranged" && .@M$ != "Mystical" && .@M$ != "All")||!.@X){
+		dispbottom "@wlvl <type> <lvl>";
+		dispbottom "Onslaught,  Swiftness,  Safegaurd,  Ranged,  Mystical,  All";
+		end;
+	}
+	if(getvariableofnpc(.MaxMastery,"NPCKILL") >= .@X){
+		if(.@M$ == "All"){
+			setarray .@X$[0],"Onslaught","Swiftness","Safegaurd","Ranged","Mystical";
+			set .@i,0;
+			while(.@i < 5){
+				setd ""+.@X$[.@i]+"Master",.@X;
+				setd ""+.@X$[.@i]+"Exp",0;
+				dispbottom ""+.@X$[.@i]+" Mastery has advanced to Lv "+.@X+"!";
+				set .@i,.@i+1;
+			}
+		} else {
+			setd ""+.@M$+"Master",.@X;
+			setd ""+.@M$+"Exp",0;
+			dispbottom ""+.@M$+" Mastery has advanced to Lv "+.@X+"!";
+		}
+	} else {
+		dispbottom "Sorry. Your "+.@M$+" Mastery has reached its limit!";
+	}
+end;
+
+OnPCStatCalcEvent:
+	switch(getiteminfo(getequipid(EQI_HAND_R),11)){
+		case 3:  	case 6: 	case 7: 	case 8:	
+		case 9:		case 12:					Onslaught_M;	Break;
+		case 0: 	case 1: 	case 16:	case 22:	Swiftness_M;	Break;
+		case 2: 	case 4: 	case 5:		case -1:	Safegaurd_M;	Break;
+		case 11:	case 13:	case 14:	case 17:
+		case 18:	case 19:	case 20:	case 21:	Ranged_M;	Break;
+		case 10:	case 15:	case 23:	case 24:	Mystical_M;	Break;
+	}
+end;
+OnNPCKillEvent:
+	if(.Weapon){
+		set .@M$,"";
+		switch(getiteminfo(getequipid(EQI_HAND_R),11)){
+			case 3:  	case 6: 	case 7: 	case 8:	
+			case 9:		case 12:					Set .@M$,"Onslaught";	Break;
+			case 0: 	case 1: 	case 16:	case 22:	Set .@M$,"Swiftness";	Break;
+			case 2: 	case 4: 	case 5:		case -1:	Set .@M$,"Safegaurd";	Break;
+			case 11:	case 13:	case 14:	case 17:
+			case 18:	case 19:	case 20:	case 21:	Set .@M$,"Ranged";	Break;
+			case 10:	case 15:	case 23:	case 24:	Set .@M$,"Mystical";	Break;
+		}
+		if(.MaxMastery > getd(""+ .@M$ + "Master")){
+			Setd ""+.@M$+"Exp",getd(""+.@M$+"Exp") + (strmobinfo(3,killedrid)+.wLvBonus*getiteminfo(getequipid(EQI_HAND_R),13)) * (getbattleflag("job_exp_rate") + getbattleflag("job_exp_rate") * getstatus(SC_JEXPBOOST,2));
+			if(getd(""+.@M$+"Exp") > getd(""+.@M$+"Master")*(getd(""+.@M$+"Master")*.expcurve)+10+getd(""+.@M$+"Master")){
+				setd ""+.@M$+"Master",getd(""+.@M$+"Master")+1;
+				announce ""+.@M$+" Mastery has advanced to Lv "+getd(""+.@M$+"Master")+"!",bc_blue|bc_self;
+				Setd ""+.@M$+"Exp",0;
+			}
+		}
+	}
+end;
+OnInit:
+	bindatcmd("wi"		,"PCSTATCALC::OnWeaponInfo",1,99);
+	bindatcmd("weaponinfo"	,"PCSTATCALC::OnWeaponInfo",1,99);
+	bindatcmd("wlvlup"	,"PCSTATCALC::OnWeaponLevel",60,99);
+	bindatcmd("wlvl"	,"PCSTATCALC::OnWeaponLevel",60,99);
+	set .Weapon,1;		// Toggle Exp Groth On/Off
+				//   1 = On
+				//   0 = Off
+
+	set .expcurve,2500;	// Exp curve for weapon mastery
+				//   Lv*Lv*.expcurve+10+Lv
+				//   Default 2500
+
+	set .MaxMastery,99;	// Sets the max Weapon Mastery Level
+				//   Default 128
+
+	set .wLvBonus,1;	// Amount of extra Weapon Exp from higher level weapons, 
+				//   Bonus exp = WLv*.wLvBonus
+				//   Default 1
+	// System Debug
+	if(.MaxMastery * .MaxMastery *(.expcurve/10) + .MaxMastery + 10 > 214748364 ){
+		debugmes "[Weapon Mastery]: Max Exp Overflow Error, Lower .MaxMastery or .expcurve to fix";
+end;
+}
+
+
+
+
+
+
+
+

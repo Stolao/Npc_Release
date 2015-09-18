@@ -1,0 +1,32 @@
+//===== EinherjarRO Scripts ================================== 
+//= Lucky Pick (non-sql)
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Every Hour on a random Minute will give a random non-idle
+//= character and item
+//===== Comments: ============================================
+//= [Stolao]
+//= Optimize
+//===== Additional Comments: =================================
+//= 1.00 Initial Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	Lucky_Pick	-1,{
+OnMinute00:
+	sleep 60000 * rand(60);
+	if(addrid(0)){
+		if(checkidle() < 600) setarray .AccountIds[getarraysize(.AccountIds)],getcharid(3);
+		detachrid;
+	} else { end; }
+	while(!attachrid(.AccountIds[rand(getarraysize(.AccountIds))]));
+	getitem 501,1;
+	announce "[Lucky Prize]" + strcharinfo(0) + " recived a random prize",0;
+end;
+}

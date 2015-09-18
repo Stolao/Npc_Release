@@ -1,0 +1,91 @@
+/===== EinherjarRO Scripts ================================== 
+//= @FW and @BFW 
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= @commands for refillable bfw and fw
+//===== Comments: ============================================
+//= Item DB
+/*
+35501,Wing_Of_Fly_,Endless Fly Wing,11,60,,50,,,,,0xFFFFFFFF,7,2,,,,,,{ set .@i,countitem(601); if(.@i){ delitem 601,.@i; Set #FlyWing,#FlyWing + .@i; } else if(#FlyWing){ Set #FlyWing,#FlyWing - 1; if(@fw){ message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining; } warp "Random",0,0; } },{},{}
+35502,Wing_Of_Butterfly_,Endless Butterfly Wing,11,300,,50,,,,,0xFFFFFFFF,7,2,,,,,,{  set .@i,countitem(602); if(.@i){ delitem 602,.@i; Set #BFlyWing,#BFlyWing + .@i; } else if(#BFlyWing){ Set #BFlyWing,#BFlyWing - 1; if(@bfw){ message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining; } warp "SavePoint",0,0; } },{},{}
+*/
+//= ItemInfo
+/*
+	[35501] = {
+		unidentifiedDisplayName = "Refillable Fly Wing",
+		unidentifiedResourceName = "파리의날개",
+		unidentifiedDescriptionName = {
+			"A Magic Fly Wing that absorbs the magic of any Fly Wings owned and stores the power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		identifiedDisplayName = "Refillable Fly Wing",
+		identifiedResourceName = "파리의날개",
+		identifiedDescriptionName = {
+			"A Magic Fly Wing that absorbs the magic of any Fly Wings owned and stores the power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+
+	[35502] = {
+		unidentifiedDisplayName = "Refillable Butterfly Wing",
+		unidentifiedResourceName = "나비의날개",
+		unidentifiedDescriptionName = {
+			"A Magic Butterfly Wing that absorbs the magic of any Butterfly Wings owned and stores there power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		identifiedDisplayName = "Refillable Butterfly Wing",
+		identifiedResourceName = "나비의날개",
+		identifiedDescriptionName = {
+			"A Magic Butterfly Wing that absorbs the magic of any Butterfly Wings owned and stores there power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+*/
+//===== Additional Comments: =================================
+//= 1.00 Origional Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+-	script	atbfw	-1,{
+OnBFW:
+	if(@bfw){	set @bfw,0; 
+	} else {	set @bfw,1; }
+	message strcharinfo(0),"[Butterfly Wing]: Count Messages "+((@bfw)?"Enabled":"Disabled");
+	message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining;
+end;
+OnFW:
+	if(@fw){	set @fw,0;
+	} else {	set @fw,1; }
+	message strcharinfo(0),"[Fly Wing]: Count Messages "+((@fw)?"Enabled":"Disabled");
+	message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining;
+end;
+OnInit:
+	bindatcmd("fw","atbfw::OnFW",0,99);
+	bindatcmd("bfw","atbfw::OnBFW",0,99);
+end;
+}
+
+
+
+
+
+
+
+
+
+
