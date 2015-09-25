@@ -71,6 +71,10 @@ Group Buffs
 ---------
 Apply party / Guild buffs via npc or item (autobonus)
    * Easy Configuration
+ 
+Mining
+---------
+A mob + script based mining system
 
 Non-Abuse Healer
 ---------
