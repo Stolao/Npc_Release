@@ -1,0 +1,1288 @@
+//===== EinherjarRO Scripts ================================== 
+//= Mining System 
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 2.13
+//===== Compatible With: ===================================== 
+//= eAthena SVN
+//===== Description: ========================================= 
+//= Mining System 
+//===== Comments: ============================================
+//= [Stolao]
+//= Needs More Mining Spots
+//= Make Killable Rock with onkillevent to run script
+//= Add Prision Mine
+//= Make use Arrays
+//= 1 Array for each pick switch(rand(MINE_LVL + MINE_LVL / 4 + 3)
+//===== Additional Comments: =================================
+//= 1.00 Basic Layout
+//= 1.01 Miner NPC
+//= 1.02 Mine#mjo_dun03 
+//= 1.03 Cost SP by % Based off Mining Level
+//= 1.04 If SP < 10% Cant Mine
+//= 1.05 Lower Chance of Disguise Clip
+//= 1.06 Add Effect When Death
+//= 1.07 Made Level Scipt Shorter
+//= 2.00 Switch to a Function Based Script
+//= 2.01 Changed Zeny Formulars
+//= 2.02 Changed Miner into a shop -check npc/neo/shop.txt
+//= 2.03 Changed item list for less diversity
+//= 2.04 Mine#Thor_v02  
+//= 2.05 Removed max mining of 99 limit
+//= 2.06 Changed Mine-Exp Formula made harder now MINE_LVL*(MINE_LVL*2+10)
+//= 2.07 Incorperated Sect System into 
+//= 2.08 Changed Break Formula to rely on Stats 
+//= 2.09 Changed Miss Formula to rely on Stats
+//= 2.0A Changed BOOM Formula to rely on Stats
+//= 2.0B Changed Mine-Exp Formula made harder now MINE_LVL*(MINE_LVL*3)
+//= 2.0C Added @zenymulti 
+//= 2.0D Added @expmulti
+//= 2.0E lowered @Anti-Break Chance
+//= 2.0F Changed Mine-Exp Formula made harder now MINE_LVL*(MINE_LVL*4)
+//= 2.10 Changed Mine-Exp Gaind from @pick to rand(@pick)
+//= 2.11 Created a Mining Starter Quest
+//= 2.12 Added Progress Bar
+//= 2.13 Fixed a bug in the "rare" probablility
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+Golden_Jewel,3,6000,,100,,,,,,,,,,,,,{},{},{}
+Bluish_Green_Jewel,3,6000,,100,,,,,,,,,,,,,{},{},{}
+Crystal_Jewel,3,10000,,100,,,,,,,,,,,,,{},{},{}
+Crystal_Jewel_,2carat Diamond,3,25000,,100,,,,,,,,,,,,,{},{},{}
+Crystal_Jewel__,3carat Diamond,3,55000,,100,,,,,,,,,,,,,{},{},{}
+Crystal_Jewel___,3,10,,100,,,,,,,,,,,,,{},{},{}
+756,Oridecon_Stone,Rough Oridecon,3,550,,200,,,,,,,,,,,,,{},{},{}
+757,Elunium_Stone,Rough Elunium,3,650,,200,,,,,,,,,,,,,{},{},{}
+
+Garlet,3,40,,10,,,,,,,,,,,,,{},{},{}
+Scell,3,160,,10,,,,,,,,,,,,,{},{},{}
+Rotten_Bandage,3,350,,10,,,,,,,,,,,,,{},{},{}
+931,Orcish_Voucher,Orcish Voucher,3,142,,10,,,,,,,,,,,,,{},{},{}
+932,Skel_Bone,Skel-Bone,3,232,,10,,,,,,,,,,,,,{},{},{}
+934,Mementos,Memento,3,600,,10,,,,,,,,,,,,,{},{},{}
+935,Shell,Shell,3,14,,10,,,,,,,,,,,,,{},{},{}
+936,Scales_Shell,Scale Shell,3,466,,10,,,,,,,,,,,,,{},{},{}
+937,Posionous_Canine,Venom Canine,3,148,,10,,,,,,,,,,,,,{},{},{}
+941,Nose_Ring,Nose Ring,3,568,,10,,,,,,,,,,,,,{},{},{}
+943,Solid_Shell,Solid Shell,3,448,,10,,,,,,,,,,,,,{},{},{}
+944,Horseshoe,Horseshoe,3,588,,10,,,,,,,,,,,,,{},{},{}
+945,Raccoon_Leaf,Raccoon Leaf,3,106,,10,,,,,,,,,,,,,{},{},{}
+946,Snail's_Shell,Snail's Shell,3,64,,10,,,,,,,,,,,,,{},{},{}
+947,Horn,Horn,3,116,,10,,,,,,,,,,,,,{},{},{}
+953,Stone_Heart,Stone Heart,3,184,,10,,,,,,,,,,,,,{},{},{}
+954,Shining_Scales,Shining Scale,3,466,,10,,,,,,,,,,,,,{},{},{}
+957,Decayed_Nail,Decayed Nail,3,82,,10,,,,,,,,,,,,,{},{},{}
+967,Turtle_Shell,Turtle Shell,3,680,,10,,,,,,,,,,,,,{},{},{}
+968,Voucher_Of_Orcish_Hero,Heroic Emblem,3,3000,,10,,,,,,,,,,,,,{},{},{}
+969,Gold,Gold,3,200000,,200,,,,,,,,,,,,,{},{},{}
+984,Oridecon,3,1100,,200,,,,,,,,,,,,,{},{},{}
+985,Elunium,3,1100,,200,,,,,,,,,,,,,{},{},{}
+Boody_Red,3,1000,,50,,,,,,,,,,,,,{},{},{}
+Crystal_Blue,3,1000,,50,,,,,,,,,,,,,{},{},{}
+Wind_Of_Verdure,3,1000,,50,,,,,,,,,,,,,{},{},{}
+Yellow_Live,Green Live,3,1000,,50,,,,,,,,,,,,,{},{},{}
+Flame_Heart,3,3000,,300,,,,,,,,,,,,,{},{},{}
+Mistic_Frozen,3,3000,,300,,,,,,,,,,,,,{},{},{}
+Rough_Wind,3,3000,,300,,,,,,,,,,,,,{},{},{}
+Great_Nature,3,3000,,300,,,,,,,,,,,,,{},{},{}
+998,Iron,Iron,3,100,,50,,,,,,,,,,,,,{},{},{}
+999,Steel,Steel,3,1000,,100,,,,,,,,,,,,,{},{},{}
+Star_Crumb,3,4500,,100,,,,,,,,,,,,,{},{},{}
+Sparkling_Dust,3,1500,,10,,,,,,,,,,,,,{},{},{}
+Iron_Ore,Iron Ore,3,50,,150,,,,,,,,,,,,,{},{},{}
+1003,Coal,Coal,3,500,,50,,,,,,,,,,,,,{},{},{}
+1004,Patriotism_Marks,Chivalry Emblem,3,2,,100,,,,,,,,,,,,,{},{},{}
+Phracon,Phracon,3,200,,200,,,,,,,,,,,,,{},{},{}
+Emveretarcon,Emveretarcon,3,1000,,200,,,,,,,,,,,,,{},{},{}
+1041,Lantern,Lantern,3,250,,10,,,,,,,,,,,,,{},{},{}
+
+7444,Treasure_Box,Treasure Box,3,300000,,10,,,,,,,,,,,,,{},{},{}
+7445,Dragonball_Green,Green Bijou,3,887,,10,,,,,,,,,,,,,{},{},{}
+7446,Dragonball_Blue,Blue Bijou,3,887,,10,,,,,,,,,,,,,{},{},{}
+7447,Dragonball_Red,Red Bijou,3,887,,10,,,,,,,,,,,,,{},{},{}
+7448,Dragonball_Yellow,Yellow Bijou,3,887,,10,,,,,,,,,,,,,{},{},{}
+
+
+
+einbech,124,234,2	script	Joseph	848,{
+	if(MINE_LVL < 1){ switch(rand(1,5)) {
+		case 1:
+		case 2:
+		mes "[Joseph]";
+		mes "Praise Edron, Im lucky to be alive, the Ungoliant attacked me and nearly tore off my leg.";
+		close;
+		break;
+		case 3:
+		case 4:
+		mes "[Joseph]";
+		mes "After a long day of work theres nothing better then going home and drinking a large grape juice.";
+		close;
+		break;
+		case 5:
+		set MINE_LVL,1;
+		goto MINEQUEST;
+		break;
+		end;
+		}
+	}
+MINEQUEST:
+	if(MINE_LVL == 4){
+	mes "[Joseph]";
+	mes "There are mines throughout the world.";
+	mes "Here take a few swings here till you get a little practice.";
+	close;
+	}
+	if(MINE_LVL == 3){
+	if(countitem(533)>0){
+		mes "[Joseph]";
+		mes "Mmm thank you.";
+		next;
+		mes "[Joseph]";
+		mes "Now just so you know minng takes alot of SP. and unlike most thing where the better you get the easier it is. With mining it takes more energy as you get better. So keep your body strong.";
+		set MINE_LVL,4;
+		close;
+	}
+	mes "[Joseph]";
+	mes "I really need that juice...";
+	close;
+	}
+	if(MINE_LVL == 2){
+	if(countitem(20506)>0)||(countitem(20507)>0)||(countitem(20508)>0)||(countitem(20509)>0)||(countitem(20510)>0)||(countitem(20511)>0){
+	if(isequipped(20506)){
+		mes "[Joseph]";
+		mes "A very nice Bone Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	if(isequipped(20507)){
+		mes "[Joseph]";
+		mes "A very nice Bronze Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	if(isequipped(20508)){
+		mes "[Joseph]";
+		mes "A very nice Silver Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	if(isequipped(20509)){
+		mes "[Joseph]";
+		mes "A very nice Gold Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	if(isequipped(20510)){
+		mes "[Joseph]";
+		mes "A very nice Platnium Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	if(isequipped(20511)){
+		mes "[Joseph]";
+		mes "A very nice Emperium Pick.";
+		next;
+		mes "[Joseph]";
+		mes "May you bring me some grape juice? I just dont have the energy to teach you right now.";
+		set MINE_LVL,3;
+		close;
+	}
+	mes "[Joseph]";
+	mes "Thats a very nice Pick why dont you weild it?";
+	close;
+	}
+	if(countitem(7318)>0){
+		mes "[Joseph]";
+		mes "Your going to need a new pick that just wont work.";
+		close;
+	}
+	mes "[Joseph]";
+	mes "Come back when you have that Pick.";
+	close;
+	}
+	if(MINE_LVL == 1){
+		mes "[Joseph]";
+		mes "Oh you must be the new guy?";
+		if(select("No:Yes")==1) close;
+		next;
+		mes "[Joseph]";
+		mes "Awesome, Lets get started right away. What did you say your name was?";
+		next;
+		input .@charname$;
+		if (.@charname$!=strcharinfo(0)) {
+			mes "[Joseph]";
+			mes "Sorry, but I don't think I heard you correctly";
+			close;
+		}
+		set MINE_LVL,2;
+		mes "[Joseph]";
+		mes "Ok, Now why dont you go get yourself a Pick and come back.";
+		close;
+	}
+}
+
+
+
+
+einbech,122,234,2	script	Mine#einbech	111,{
+	if(MINE_LVL < 4){ dispbottom ""+strcharinfo(0)+" come back when you improve your mining skills.";
+	end; }
+	if(MINE_LVL > 8){ switch(rand(10)) {
+		case 0:
+		mes "[Joseph]";
+		mes "There is a great mine on the third floor of the cave up ahead.";
+		close;
+		break;
+		case 1:
+		case 2:
+		mes "[Joseph]";
+		mes "Praise Edron,you have gotten so much better.";
+		close;
+		break;
+		case 3:
+		mes "[Joseph]";
+		mes "Great you have gotten so much better. Now why dont to you into the mines and give it a try.";
+		close;
+		break;
+		end;
+		}
+	}
+	callfunc("MineStart");
+		switch(@mine) {
+			case 1:
+			set @getitem,932;				//Skel_Bone
+			if(@pick > 2) set @getitem3,rand(718,729);	//Random Jewls
+			break;
+			case 3:
+			if(@pick > 1) set @getitem2,rand(715,717);	//Yellow, Red, Blue Gemstones
+			case 2:
+			set @getitem,rand(756,757);			//Rough Oridecon, Rough Elunium
+			break;
+			case 4:
+			if(@pick == 5) set @getitem5,rand(730,733);	//Random Dimonds
+			break;
+	}
+	if(@getitem == 0) set @getitem,1003;
+	callfunc("MineGetItem");
+	end;
+}
+
+
+
+
+
+mjo_dun03,32,108,2	script	Mine#mjo_dun03	111,{
+	if(MINE_LVL < 5){ dispbottom ""+strcharinfo(0)+" come back when you improve your mining skills.";
+	end; }
+	if(BaseLevel < 50){ dispbottom ""+strcharinfo(0)+" come back when raise you base level.";
+	 end; }
+	if(JobLevel < 30){ dispbottom ""+strcharinfo(0)+" come back when you raise your job level.";
+	 end; }
+	set @randomlist,99;
+	set @randomitemA,1003;						//Coal
+	set @randomitemB,1003;						//Coal
+	set @randomitemC,1003;						//Coal
+	set @baseexpup,(@mine+MINE_LVL/2+readparam(bInt))*(@pick+2)+rand(Baselevel,5*Baselevel)*(@pick+2);
+	set @jobexpup,(@mine+MINE_LVL/3+readparam(bInt))*(@pick+1)+rand(Joblevel,5*Joblevel)*(@pick+1);
+	set @zenyup,(@mine+readparam(bStr))*@pick+(@mine+BaseLevel+JobLevel)*(MINE_LVL*@pick);
+	set @VeryRare,24007;						//Disguise Clip
+	set @UltraRare,31762;						//Sword of Lore
+	callfunc("MineStart");
+	if(rand(1000-MINE_LVL*@pick) < @pick){ callfunc("Randomlist");
+	end;
+	}
+	if(MINE_LVL > 99){ switch(rand(1,3)) {
+		case 1:
+		set @mine,rand(1,33);
+		break;
+		case 2:
+		set @mine,rand(1,66);
+		break;
+		case 3:
+		set @mine,rand(1,100);
+		break;
+		end;
+		}
+	}
+	if(rand(10) == 7) goto M_COAL;
+	if(rand(10+@pick) == 7) goto M_COAL;
+	if(@mine > 20 && @pick == 0) callfunc("BreakItem");		//Break Number
+	if(@mine > 30 && @pick == 1) callfunc("BreakItem");
+	if(@mine > 45 && @pick == 2) callfunc("BreakItem");
+	if(@mine > 65 && @pick == 3) callfunc("BreakItem");
+	if(@mine > 90 && @pick == 4) callfunc("BreakItem");
+	if(@mine > 99 && @pick == 5) callfunc("BreakItem");
+		switch(@mine) {
+			case 1:
+			case 12:
+			set @getitem,932;				//Skel_Bone
+			break;
+			case 3:
+			if(@pick > 1) set @getitem2,rand(715,717);	//Yellow, Red, Blue Gemstones
+			if(@pick > 2) set @getitem3,rand(718,729);	//Random Jewls
+			if(@pick == 5) set @getitem5,rand(730,733);	//Random Dimonds
+			case 2:
+			case 31:
+			case 32:
+			case 35:
+			set @getitem,rand(756,757);			//Rough Oridecon, Rough Elunium
+			break;
+			case 4:
+			case 69:
+			case 70:
+			case 80:
+			case 81:
+			set @getitem,1002;				//Iron_Ore
+			if(@random == 1) set @getitem,932;		//Skel_Bone
+			break;
+			case 5:
+			if(@pick == 1) set @getitem2,7049;		//Stone
+			if(@pick == 2) set @getitem2,998;		//Iron
+			if(@pick >= 2) set @getitem3,7049;		//Stone
+			if(@pick == 3) set @getitem2,999;		//Steel
+			if(@pick == 4) set @getitem2,1003;		//Coal
+			if(@pick == 5) set @getitem2,1001;		//Star Dust
+			set @getitem,rand(7521,7524);			//Ninja Stones
+			if(@random > 0) set @getitem,7049;		//Stone
+			set @amount,rand(1+@pick);
+			break;
+			case 6:
+			set @getitem,rand(990,993);			//Red Blood, Crystl Blue, Wind of Verdure, Green Live
+			if(@random == 1) set @getitem,7420;		//Skull
+			break;
+			case 7:
+			case 48:
+			set @getitem,rand(909,912);			//Jellopy, Scell, Garlet
+			break;
+			case 8:
+			if(@pick >= 1) set @getitem2,rand(909,912);	//Jellopy, Scell, Garlet
+			if(@pick >= 3) set @getitem3,rand(984,985);	//Oridecon, Elunium
+			if(@pick == 5) set @getitem4,1003;		//Coal
+			set @getitem,1003;				//Coal
+			if(@random == 1) set @getitem,1000;		//Star Crumb
+			break;
+			case 9:
+			case 36:
+			case 37:
+			set @getitem,rand(984,985);			//Oridecon, Elunium
+			break;
+			case 10:
+			set @getitem,1003;				//Coal
+			if(@random == 1) set @getitem,rand(935,936);	//Shell, Scale Shell
+			set @amount4,rand(1,4);
+			break;
+			case 11:
+			set @getitem,1001;				//Star Dust
+			break;
+			case 13:
+			if(@pick > 1) set @getitem2,719-@pick;		//Gems, Emperium
+			set @getitem,731;				//2carat Diamond
+			break;
+			case 14:
+			case 33:
+			case 40:
+			case 66:
+			case 84:
+			set @getitem,rand(730,733);			//Random Dimond
+			break;
+			case 15:
+			case 39:
+			set @getitem,rand(756,757);			//Rough Elunium,Rough Oridecon
+			if(@random == 1) set @getitem,rand(730,733);	//Random Dimond
+			set @amount,@random+1;
+			break;
+			case 16:
+			case 17:
+			case 24:
+			set @getitem,rand(715,729);			//Random Gem/Jewel
+			break;
+			case 61:
+			case 62:
+			case 38:
+			case 18:
+			case 28:
+			case 46:
+			case 49:
+			case 50:
+			case 51:
+			case 93:
+			case 95:
+			set @getitem,1003;				//Coal
+			set @amount,rand(1+@pick);
+			break;
+			case 19:
+			case 34:
+			case 20:
+			case 88:
+			case 21:
+			if(@pick > 3) set @getitem3,rand(730,733);	//Random Dimond
+			if(@random <= 1) set @getitem,1003;		//Coal
+			set @amount,2;
+			break;
+			case 22:
+			if(@pick == 5) set @getitem2,rand(990,1003);	//Random Item
+			if(@pick == 5) set @getitem3,7049;		//Stone
+			set @getitem,rand(990,1003);			//Random Item
+			if(@random == 1) set @getitem,rand(715,729);	//Random Gem/Jewel
+			set @amount,2;
+			set @amount2,3;
+			break;
+			case 23:
+			if(@pick == 3) set @getitem2,rand(909,912);	//Jellopy, Scell, Garlet
+			set @getitem,rand(909,912);			//Jellopy, Scell, Garlet
+			set @amount2,2;
+			set @amount3,1;
+			break;
+			case 25:
+			set @getitem,rand(990,1003);			//Random Item
+			break;
+			case 26:
+			case 52:
+			case 42:
+			case 44:
+			case 43:
+			case 83:
+			case 75:
+			case 78:
+			case 79:
+			set @getitem,7049;				//Stone
+			set @amount,rand(@pick+1);
+			break;
+			case 27:
+			case 29:
+			case 30:
+			if(@pick == 3) set @getitem2,rand(715,729);	//Random Gem/Jewel
+			if(@pick == 4) set @getitem2,7444;		//Treasure
+			if(@pick == 5) set @getitem3,rand(756,757);	//Rough Oridecon, Rough Elunium
+			set @getitem,rand(7521,7524);			//Ninja Stone
+			set @amount3,@random+1;
+			set @amount3,@random;
+			break;
+			case 41:
+			set @getitem,rand(714,732);			//Random Gems/Jewels/Dimond/Emp
+			if(@random == 1) set @getitem,7067;		//Stone Fragment
+			break;
+			case 45:
+			case 56:
+			case 57:
+			case 71:
+			set @getitem,rand(730,733);			//Random Dimond
+			break;
+			case 47:
+			set @getitem,rand(935,936);			//Oridecon, Elunium
+			case 53:
+			set @getitem,rand(984,985);			//Gold,Emp Anvil
+			if(@random == 1) set @getitem,rand(7230,7233);	//Gold Bullion-Mith Ore
+			break;
+			case 54:
+			set @getitem,rand(714,732);			//Random Item
+			if(@random == 1) set @getitem,7444;		//Treasure
+			break;
+			case 55:
+			if(@pick == 4) set @getitem2,rand(714,732);	//Random Item
+			if(@pick == 5) set @getitem2,rand(990,997);	//Red Blood-Great Nature
+			set @getitem,rand(984,985);			//Oridecon, Elunium
+			if(@random == 1) set @getitem,969;		//Gold
+			break;
+			case 58:
+			set @getitem,rand(7231,7233);			//Gold Bullion-Mith Ore	
+			if(@random == 1) set @getitem,rand(730,732);	//Dimond
+			break;
+			case 59:
+			set @getitem,rand(990,997);			//Red Blood-Great Nature
+			if(@random == 1) set @getitem,rand(714,732);	//Random Item
+			set @amount,rand(1,3);
+			break;
+			case 60:
+			if(@pick >= 4) set @getitem2,969;		//Gold
+			if(@pick == 5) set @getitem3,rand(984,985);	//Oridecon, Elunium
+			set @getitem,rand(990,997);			//Red Blood-Great Nature
+			break;
+			case 63:
+			set @getitem,969;				//Gold
+			if(@random == 1) set @getitem,rand(7231,7233);	//Gold Bullion-Mith Ore	
+			break;
+			case 64:
+			case 73:
+			case 74:
+			case 87:
+			set @getitem,rand(715,732);			//Random Item
+			break;
+			case 65:
+			set @getitem,rand(990,997);			//Red Blood-Great Nature
+			if(@random == 1) set @getitem,7178;		//Sobbing Starlight
+			break;
+			case 67:
+			set @getitem,969;				//Gold
+			if(@random == 1) set @getitem,rand(990,1003);	//Random Item
+			set @amount,((@random)+1);
+			break;
+			case 68:
+			set @getitem,rand(715,729);			//Random Item
+			if(@random == 1) set @getitem,rand(990,1003);	//Random Item
+			break;
+			case 72:
+			set @getitem,rand(730,733);			//Random Dimond
+			if(@random == 1) set @getitem,rand(984,985);	//Oridecon, Elunium
+			break;
+			case 76:
+			set @getitem,7758;				//Star Crystal
+			break;
+			case 77:
+			set @getitem,rand(7231,7233);			//Gold Bullion-Mith Ore	
+			if(@random == 1) set @getitem,969;		//Gold
+			break;
+			case 86:
+			set @getitem,rand(715,732);			//Random Item
+			if(@random == 1) set @getitem,rand(7231,7233);	//Gold Bullion-Mith Ore	
+			break;
+			case 82:
+			set @getitem,rand(715,732);			//Random Item
+			if(@random == 1) set @getitem,rand(990,997);	//Red Blood-Great Nature
+			break;
+			case 94:
+			set @getitem,7444;				//Tresure Box
+			break;
+			case 85:
+			case 89:
+			set @getitem,rand(7231,7233);			//Gold Bullion-Mith Ore	
+			if(@random == 1) set @getitem,7049;		//Stone
+			break;
+			case 90:
+			set @getitem,rand(715,732);			//Random Item
+			if(@random > 0) set @getitem,7049;		//Stone
+			break;
+			case 91:
+			set @getitem,7444;				//Treasure Box
+			if(@random == 1) set @getitem,969;		//Gold
+			set @amount,((@random)+1);
+			break;
+			case 92:
+			set @getitem,969;				//Gold
+			if(@random == 1) set @getitem,7049;		//Stone
+			break;
+			case 96:
+			if(rand(7) == 7) callfunc("BreakItem");
+			if(rand(14) == 7) callfunc("BreakItem");
+			if(rand(21) == 7) callfunc("BreakItem");
+			set @getitem,6024;				//17_Carat_Diamond
+			break;
+			case 97:
+			if(rand(7) == 7) callfunc("BreakItem");
+			if(rand(25) == 7) callfunc("BreakItem");
+			set @getitem,7721;				//O'Rally Treasure Box
+			if(@random == 1) set @getitem,20100;		//Event Ticket
+			break;
+			case 98:
+			if(rand(7) == 7) callfunc("BreakItem");
+			if(rand(25) == 7) callfunc("BreakItem");
+			set @getitem,rand(7619,7620);			//Enhanced Oridecon, Enhanced Elunium
+			if(@random == 1) set @getitem,14229;		//Cherry Blossoms Scroll
+			break;
+			case 99:
+			if(rand(7) == 7) callfunc("BreakItem");
+			set @getitem,7582;				//Jewel of Destruction
+			if(@random == 1) set @getitem,7807;		//God Ore
+			break;
+	}
+	if(@getitem == 0) set @getitem,1003;
+	callfunc("MineGetItem");
+	end;
+M_COAL:
+	if(MINE_LVL > 99)set @mine,rand(1,99);
+	set $getitem,1003;						//Coal
+	callfunc("MineGetItem");	
+	end;
+}
+
+
+
+
+
+thor_v02,96,138,2	script	Mine#thor_v02	111,{
+	if(MINE_LVL < 35){ dispbottom ""+strcharinfo(0)+" come back when you improve your mining skills.";
+	end; }
+	if(BaseLevel < 80){ dispbottom ""+strcharinfo(0)+" come back when raise you base level.";
+	end; }
+	if(JobLevel < 35){ dispbottom ""+strcharinfo(0)+" come back when you raise your job level.";
+	end; }
+	set @randomlist,99;
+	set @randomitemA,716;						//Red Gemstone
+	set @randomitemB,990;						//Red Blood
+	set @randomitemC,994;						//Flame Heart
+	set @baseexpup,@mine+(@mine+MINE_LVL+readparam(bInt))*(@pick+2)+rand(Baselevel,5*Baselevel)*(@pick+2);
+	set @jobexpup,@mine+(@mine+MINE_LVL+readparam(bInt))*(@pick+1)+rand(Joblevel,5*Joblevel)*(@pick+1);
+	set @zenyup,(@mine+readparam(bStr)+readparam(bLuk))*@pick+(@mine+BaseLevel+JobLevel)*(@mine+MINE_LVL*@pick);
+	set @VeryRare,18502;						//Fireblend[1]
+	set @UltraRare,31422;						//Red Flame
+	callfunc("MineStart");
+	if(rand(MINE_LVL+150) < @pick*2){ callfunc("Randomlist");
+	end;
+	}
+	if(MINE_LVL > 120){ switch(rand(1,3)) {
+		case 1:
+		set @mine,rand(1,40);
+		break;
+		case 2:
+		set @mine,rand(1,80);
+		break;
+		case 3:
+		set @mine,rand(1,120);
+		break;
+		end;
+		}
+	}
+	if(@mine > 50 && @pick == 0) callfunc("BreakItem");		//Break Number
+	if(@mine > 65 && @pick == 1) callfunc("BreakItem");
+	if(@mine > 80 && @pick == 2) callfunc("BreakItem");
+	if(@mine > 95 && @pick == 3) callfunc("BreakItem");
+	if(@mine > 110 && @pick == 4) callfunc("BreakItem");
+	if(@mine > 120 && @pick == 5) callfunc("BreakItem");
+		switch(@mine) {
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 67:
+			case 94:
+			set @getitem,9097;				//Burning Heart
+			break;
+			case 28:
+			case 29:
+			case 30:
+			case 31:
+			set @getitem,rand(756,757);			//Rough Oridecon, Rough Elunium
+			break;
+			case 7:
+			case 8:
+			case 9:
+			set @getitem3,rand(756,757);			//Rough Oridecon, Rough Elunium
+			case 43:
+			case 44:
+			case 45:
+			case 46:
+			set @getitem,716;				//Red Gemstones
+			if(rand(10) == 7) set @getitem,1752;		//Fire Arrow
+			break;
+			case 83:
+			case 84:
+			set @getitem,1752;				//Red Gemstones
+			if(rand(10) == 7) set @getitem,2292;		//Welding Mask
+			break;
+			case 10:
+			case 11:
+			set @amount,rand(@pick+1);
+			case 12:
+			case 13:
+			case 14:
+			set @getitem,13203;				//Flare Sphere
+			if(rand(10) == 7)set @amount,rand(25);
+			break;
+			case 15:
+			case 16:
+			set @getitem3,rand(756,757);			//Rough Oridecon, Rough Elunium
+			case 17:
+			set @getitem2,13203;				//Flare Sphere
+			if(rand(10) == 7)set @amount,rand(25);
+			case 18:
+			case 19:
+			case 20:
+			if(rand(10) == 7)set @amount,rand(5);
+			set @getitem,1752;				//Fire Arrow
+			break;
+			case 117:
+			case 34:
+			set @getitem,2683;				//Ring of Fire
+			break;
+			case 40:
+			case 41:
+			case 105:
+			set @getitem,716;				//Red Gemstones
+			if(rand(10) == 7) set @getitem,1752;		//Fire Arrow
+			set @amount,rand(@pick+1);
+			break;
+			case 77:
+			case 91:
+			case 92:
+			set @getitem,1752;				//Fire Arrow
+			set @getitem2,13203;				//Flare Sphere
+			set @getitem3,rand(756,757);			//Rough Oridecon, Rough Elunium
+			break;
+			case 101:
+			case 61:
+			case 114:
+			case 107:
+			set @getitem,1752;				//Fire Arrow
+			if(rand(10) == 7)set @amount,rand(25);
+			break;
+			case 62:
+			case 95:
+			case 54:
+			case 27:
+			if(@pick == 1) set @getitem2,7049;		//Stone
+			if(@pick == 2) set @getitem2,998;		//Iron
+			if(@pick >= 2) set @getitem3,7049;		//Stone
+			if(@pick == 3) set @getitem2,999;		//Steel
+			if(@pick == 4) set @getitem2,1003;		//Coal
+			if(@pick == 5) set @getitem2,1001;		//Star Dust
+			set @getitem,rand(7521,7524);			//Ninja Stones
+			if(@random > 0) set @getitem,7049;		//Stone
+			set @amount,rand(1+@pick);
+			break;
+			case 39:
+			case 68:
+			case 82:
+			case 37:
+			set @getitem,rand(909,912);			//Jellopy, Scell, Garlet
+			break;
+			case 119:
+			case 103:
+			case 75:
+			case 76:
+			case 49:
+			case 66:
+			set @getitem,7420;				//Skull
+			break;
+			case 79:
+			case 80:
+			case 81:
+			case 70:
+			case 64:
+			case 53:
+			set @getitem,rand(984,985);			//Oridecon, Elunium
+			break;
+			case 99:
+			case 88:
+			case 59:
+			case 38:
+			case 25:
+			set @getitem,rand(730,733);			//Random Dimond
+			if(@random == 1) set @getitem,rand(984,985);	//Oridecon, Elunium
+			break;
+			case 116:
+			case 73:
+			set @getitem,7444;				//Treasure Box
+			if(@random == 1) set @getitem,969;		//Gold
+			set @amount,((@random)+1);
+			break;
+			case 86:
+			case 69:
+			case 22:
+			set @getitem,12118;				//Fire Resist Potion
+			set @amount,1;
+			break;
+			case 85:
+			case 35:
+			set @getitem,2344;				//Lucius's Fierce Armor of Volcano[0]
+			set @amount,1;
+			case 23:
+			case 24:
+			case 36:
+			case 26:
+			set @getitem,1003;				//Coal
+			set @amount,rand(1+@pick);
+			break;
+			case 50:
+			case 108:
+			set @getitem4,rand(696,699);			//Level 1/5 Fire Ball/Wall
+			case 89:
+			case 65:
+			set @getitem2,rand(696,697);			//Level 1/5 Fire Ball
+			case 71:
+			case 56:
+			case 57:
+			set @getitem3,rand(690,691);			//Level 3/5 Fire Bolt
+			case 63:
+			set @getitem,7049;				//Stone
+			set @amount,rand(@pick+1);
+			set @amount2,rand(@pick+1);
+			set @amount3,rand(@pick+1);
+			set @amount4,rand(@pick+1);
+			break;
+			case 90:
+			case 96:
+			case 106:
+			case 42:
+			case 47:
+			set @getitem,7521;				//Burning Stone
+			set @amount,rand(@pick+1);
+			break;
+			case 87:
+			case 32:
+			case 58:
+			case 33:
+			set @getitem,rand(713,733);			//Random Item
+			break;
+			case 60:
+			case 93:
+			case 98:
+			set @amount,rand(@pick+1);
+			case 109:
+			case 74:
+			case 21:
+			set @getitem,990;				//Red Blood
+			break;
+			case 78:
+			case 48:
+			case 52:
+			case 55:
+			set @getitem,rand(716,718);			//Red Gemstone, Blue Gemstone, Garnet,
+			break;
+			case 97:
+			set @getitem,7575;				//Red-colored Gem
+			break;
+			case 72:
+			case 118:
+			set @getitem,7426;				//Red Charm Stone
+			break;
+			case 100:
+			case 51:
+			case 104:
+			set @getitem,7444;				//Treasure Box
+			if(@random == 1) set @getitem,969;		//Gold
+			break;
+			case 102:
+			case 110:
+			if(rand(7) == 7) callfunc("BreakItem");
+			if(rand(25) == 7) callfunc("BreakItem");
+			set @getitem,7721;				//O'Rally Treasure Box
+			if(@random == 1) set @getitem,20100;		//Event Ticket
+			break;
+			case 111:
+			case 112:
+			if(rand(7) == 7) callfunc("BreakItem");
+			if(rand(25) == 7) callfunc("BreakItem");
+			set @getitem,rand(7619,7620);			//Enhanced Oridecon, Enhanced Elunium
+			if(rand(1) == 1) set @getitem,14229;		//Cherry Blossoms Scroll
+			break;
+			case 113:
+			case 115:
+			set @getitem,rand(7231,7233);			//Gold Bullion-Mith Ore	
+			break;
+			case 120:
+			set @getitem,2345;				//Lucius's Fierce Armor of Volcano[1]
+			if(rand(10) > 1) set @getitem,rand(7619,7621);	//Enhanced Oridecon/Elunium, Token of Siegfried
+			break;
+	}
+	if(@getitem == 0) set @getitem,1003;
+	callfunc("MineGetItem");
+	end;
+}
+
+
+
+
+
+
+function	script	MineStart	{
+	getmapxy(.@npc_map$, .@npc_x, .@npc_y, 1);
+	getmapxy(.@pc_map$, .@pc_x, .@pc_y, 0);
+
+	if(distance(.@npc_x, .@npc_y, .@pc_x, .@pc_y)>=6) {
+	dispbottom ""+strcharinfo(0)+" your to far come closer.";
+	end;
+	}
+	if(distance(.@npc_x, .@npc_y, .@pc_x, .@pc_y)<6) {
+	if(isequipped(20506)) set @pick,0;				//Check Pick Being Used
+	if(isequipped(20507)) set @pick,1;
+	if(isequipped(20508)) set @pick,2;
+	if(isequipped(20509)) set @pick,3;
+	if(isequipped(20510)) set @pick,4;
+	if(isequipped(20511)) set @pick,5;
+	if(isequipped(20506)) set @break,20506;				//Set Pick To Break
+	if(isequipped(20507)) set @break,20507;
+	if(isequipped(20508)) set @break,20508;
+	if(isequipped(20509)) set @break,20509;
+	if(isequipped(20510)) set @break,20510;
+	if(isequipped(20511)) set @break,20511;
+	if(isequipped(20506)) goto START;				//Start Mining
+	if(isequipped(20507)) goto START;
+	if(isequipped(20508)) goto START;
+	if(isequipped(20509)) goto START;
+	if(isequipped(20510)) goto START;
+	if(isequipped(20511)) goto START;
+	goto NOPICK;
+	end;
+START:
+	set .@time,7*150/readparam(bDex)/(@pick+2)/(@pick+2);
+	progressbar "ffff00",.@time;
+	set @tempSp,(Sp);						//Check SP
+	if(@tempSp <= ((MaxSp)/10)) goto NOSP;				//If Lower then 10% Cant Mine
+	if(MaxSp*10 > MINE_LVL){
+	set Sp,Sp-1-@pick-rand(2*@pick)-MINE_LVL;
+	}
+	if(MaxSp*10 <= MINE_LVL){
+	percentheal 0,-rand(1,9);					//Lowers SP by 1-10%
+	}
+	if(Sect !=9) percentheal 0,-1;					//Lowers SP by 1%
+	set @getitem,0;							//Reset Item
+	set @getitem2,0;
+	set @getitem3,0;
+	set @getitem4,0;
+	set @getitem5,0;
+	set @amount,1;							//Amount Of Items Get
+	set @amount2,1;
+	set @amount3,1;
+	set @amount4,1;
+	set @amount5,1;
+	set @random,rand(3);						//Random Mining
+	if(MINE_LVL < 100)set @mine,rand(1,MINE_LVL);			//More Random Mining
+	if(rand(1000+readparam(bLuk)-readparam(bStr)) == 7) goto BOOM;	//1/1000 Chance of Dieing When Mining
+	if(rand(1000+readparam(bVit)-readparam(bStr)) == 7) goto BOOM;
+	if(rand(1000+MINE_LVL-readparam(bStr)) <= 7-@pick) goto BOOM;
+
+	if(Sect != 9 && rand(50) == 7) callfunc("BreakItem");
+	if(Sect == 9 && rand(100) == 7) callfunc("BreakItem");
+	if(rand(MINE_LVL+@pick+(Baselevel+readparam(bDex)+readparam(bLuk))/3) == MINE_LVL) callfunc("BreakItem");
+	if(rand(16*(@pick+1)) == 7) callfunc("BreakItem");
+	if(rand(50+readparam(bLuk)*3/5-readparam(bStr)) == @pick && @pick == 0) callfunc("BreakItem");
+	if(rand(55+readparam(bLuk)-readparam(bStr)) < @pick && @pick == 1) callfunc("BreakItem");
+	if(rand(60+readparam(bLuk)*8/7-readparam(bStr)) < @pick && @pick == 2) callfunc("BreakItem");
+	if(rand(65+readparam(bLuk)*8/7-readparam(bStr)*4/7) < @pick && @pick == 3) callfunc("BreakItem");
+	if(rand(70+readparam(bLuk)*8/7-readparam(bStr)*3/7) < @pick && @pick == 4) callfunc("BreakItem");
+	if(rand(75+readparam(bLuk)*6/5-readparam(bStr)*3/7) < @pick && @pick == 5) callfunc("BreakItem");
+
+	if(rand(MINE_LVL+Baselevel+readparam(bDex)) == MINE_LVL) goto MISS;
+	if(rand(MINE_LVL+Baselevel+readparam(bDex)) == MINE_LVL) goto MISS;
+	if(rand(25+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(25+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(50+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(50+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(75+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(75+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(99+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(99+(Baselevel+readparam(bDex))/10) == 7) goto MISS;
+	if(rand(@pick+(Baselevel+readparam(bDex))/2) == 7) goto MISS;
+	if(rand(25+(Baselevel+readparam(bDex))/2) == 7) goto MISS;
+	if(rand(100+(Baselevel+readparam(bDex))/2) == 7) goto MISS;
+	if(rand(1000+(Baselevel+readparam(bDex))/2) <= 7) goto MISS;
+	if(rand(20*(@pick+1)+(Baselevel+readparam(bDex))/2) == 7) goto MISS;
+	if(rand(20*(@pick+1)+(Baselevel+readparam(bDex))/2) == 7) goto MISS;
+	if(@random > 2) goto MISS;
+	if(rand(15) == 7) goto MISS;
+	return;
+	}
+	dispbottom ""+strcharinfo(0)+" your to far come closer.";
+	end;
+MISS:
+	emotion 4;
+	end;
+NOSP:
+	dispbottom ""+strcharinfo(0)+" You need more Sp.";
+	end;
+NOPICK:
+	dispbottom ""+strcharinfo(0)+" You dont have a pick...";
+	end;
+BOOM:
+	delitem @break,1;
+	set zeny,-(zeny/25);
+	percentheal -100,-100;
+	specialeffect 32;
+	specialeffect2 97;
+	specialeffect 32;
+	specialeffect2 97;
+	specialeffect 32;
+	specialeffect2 97;
+	end;
+}
+
+function	script	MineGetItem	{
+	getexp @baseexpup/2,@jobexpup/2;
+	if(rand(50) == 7) 	getexp @baseexpup/15,@jobexpup/15;
+	if(sect == 9 && rand(25) == 7) 	getexp @baseexpup/30,@jobexpup/30;
+	if(rand(100) == 7) set zeny,zeny+@zenyup;
+	if(rand(50) == 7) set zeny,zeny+@zenyup/10;
+	if(Sect == 9) set zeny,zeny+@zenyup/50;
+	if(@zenymulti > 0){
+	set @zenymulti,@zenymulti-1;
+	if(rand(50) == 7) set zeny,zeny+@zenyup;
+	if(rand(10) == 7)set zeny,zeny+@zenyup/10;
+	if(Sect == 9) set zeny,zeny+@zenyup/20;
+	}
+	if(@expmulti > 0){
+	set @expmulti,@expmulti-1;
+	getexp @baseexpup/2,@jobexpup/2;
+	if(rand(100) == 7) getexp @baseexpup/15,@jobexpup/15;
+	if(sect == 9 && rand(50) == 7) 	getexp @baseexpup/30,@jobexpup/30;
+	}
+	if(@getitem > 0) getitem @getitem,@amount;
+	if(@getitem2 > 0) getitem @getitem2,@amount2;
+	if(@getitem3 > 0) getitem @getitem3,@amount3;
+	if(@getitem4 > 0) getitem @getitem4,@amount4;
+	if(@getitem5 > 0) getitem @getitem5,@amount5;
+	specialeffect2 154;
+	set MINE_EXP,MINE_EXP+rand(@pick);
+	if(Sect == 9) set MINE_EXP,MINE_EXP+rand(1)*rand(1);
+								//Raise Mining Level
+	if(MINE_EXP > MINE_LVL*(MINE_LVL*3)+10 || @mine == MINE_LVL && rand(3) == 0){ 
+	set MINE_LVL,MINE_LVL+1;
+	specialeffect2 371;
+	percentheal 0,100;
+	dispbottom ""+strcharinfo(0)+" your mining level went up.";
+	dispbottom "It is now level "+MINE_LVL+"";
+	set MINE_EXP,0;
+	}
+	if(getgmlevel()<1) {
+	if(MINE_LVL > $TOPMINE && $TOPMINEHOLDER$ != strcharinfo(0)) Announce ""+strcharinfo(0)+" is now the Best Miner",8;
+	if(MINE_LVL > $TOPMINE) set $TOPMINEHOLDER$,strcharinfo(0);
+	if(MINE_LVL > $TOPMINE) set $TOPMINE,MINE_LVL;
+	}
+	if(Sect == 9 && rand(30000/(1+@pick)-Baselevel-MINE_LVL) <= @pick){
+	set .@templuk,readparam(bLuk);
+	if(.@templuk > 120) set .@templuk,120;
+	dispbottom "Edron, The God Of Craftmanship Blesses You";
+	set @AntiBreak,rand(1,.@templuk);
+	specialeffect2 44;
+	percentheal 0,25+15*@pick;
+	}
+	if(Sect == 9 && rand(15000/(1+@pick)-(Baselevel-MINE_LVL)/2) <= @pick){
+	set .@templuk,readparam(bLuk)/6;
+	if(.@templuk > 20) set .@templuk,20;
+	dispbottom "Edron, The God Of Craftmanship Blesses You";
+	set @zenymulti,rand(1,.@templuk);
+	specialeffect2 44;
+	percentheal 0,25+15*@pick;
+	}
+	if(Sect == 9 && rand(15000/(1+@pick)-(Baselevel-MINE_LVL)/2) <= @pick){
+	set .@templuk,readparam(bLuk)/6;
+	if(.@templuk > 20) set .@templuk,20;
+	dispbottom "Edron, The God Of Craftmanship Blesses You";
+	set @expmulti,rand(1,.@templuk);
+	specialeffect2 44;
+	percentheal 0,25+15*@pick;
+	}
+	return;
+}
+
+function	script	BreakItem	{
+	if(@AntiBreak > 0){
+	Set @AntiBreak,@AntiBreak-1;
+	return;
+	}
+	delitem @break,1;
+	specialeffect2 155;
+	dispbottom ""+strcharinfo(0)+" Your item broke!";
+	end;
+}
+
+function	script	Randomlist	{
+Randomlist:
+	set @getitem,0;							//Reset Item
+	set @getitem2,0;
+	set @getitem3,0;
+	set @getitem4,0;
+	set @getitem5,0;
+	switch(@randomlist) {
+		case 0:
+		case 2:
+		case 64:
+		case 65:
+		set @getitem,932;					//Skel_Bone
+		break;
+		case 1:
+		case 12:
+		case 17:
+		case 19:
+		case 27:
+		case 37:
+		case 60:
+		set @getitem,@randomitemB;
+		break;
+		case 3:
+		case 13:
+		case 15:
+		case 21:
+		case 23:
+		case 29:
+		case 34:
+		case 56:
+		case 57:
+		set @getitem,@randomitemA;
+		break;
+		case 4:
+		case 26:
+		case 58:
+		case 59:
+		case 94:
+		set @getitem,rand(718,729);				//Random Jewel
+		break;
+		case 5:
+		set @getitem,rand(730,733);				//Random Dimond	
+		break;
+		case 6:
+		case 7:
+		case 8:
+		set @getitem,rand(756,757);				//Rough Oridecon, Rough Elunium
+		set @amount,rand(1,2);
+		break;
+		case 9:
+		case 62:
+		case 63:
+		case 93:
+		case 99:
+		set @getitem,rand(909,912);				//Jellopy, Garlet, Scell, Zargon
+		break;
+		case 10:
+		set @getitem,935;					//Shell
+		break;
+		case 11:
+		set @getitem,936;					//Scale Shell
+		break;
+		case 14:
+		case 18:
+		case 22:
+		case 24:
+		case 28:
+		case 61:
+		set @getitem,@randomitemC;
+		break;
+		case 16:
+		case 49:
+		case 85:
+		case 86:
+		case 87:
+		set @getitem,7067;					//Stone Fragment
+		break;
+		case 20:
+		case 48:
+		set @getitem,7049;					//Stone
+		break;
+		case 25:
+		set @getitem,7420;					//Skull
+		break;
+		case 30:
+		case 31:
+		case 32:
+		case 47:
+		case 88:
+		set @getitem,rand(990,1003);				//Random Item	
+		break;
+		case 33:
+		set @getitem,1003;					//Coal
+		break;
+		case 35:
+		case 36:
+		case 38:
+		case 39:
+		case 40:
+		case 44:
+		case 45:
+		case 46:
+		case 75:
+		case 89:
+		case 90:
+		set @getitem,rand(984,985);				//Oridecon, Elunium
+		break;	
+		case 41:
+		case 42:
+		case 43:
+		set @getitem,rand(756,757);				//Rough Oridecon, Rough Elunium
+		set @amount,rand(1,3);
+		break;
+		case 50:
+		set @getitem,rand(7426,7430);				//Charm Stones
+		break;
+		case 51:
+		set @getitem,7444;					//Treasure Box
+		break;
+		case 52:
+		set @getitem,7563;					//Bloody Rune
+		break;
+		case 53:
+		set @getitem,7807;					//Black Anvil
+		break;
+		case 54:
+		set @getitem,14229;					//Cherry Scroll
+		break;
+		case 55:
+		set @getitem,20100;					//Event Ticket
+		break;			
+		case 66:
+		set @getitem,7757;					//Mithril
+		break;
+		case 67:
+		set @getitem,7758;					//Star Crystal
+		break;
+		case 68:
+		set @getitem,7721;					//O'Rally Treasure Box
+		break;
+		case 69:
+		set @getitem,rand(7619,7621);				//Enriched Elunium, Enriched Oridecon
+		break;
+		case 70:
+		set @getitem,rand(7575,7578);				//Colored Gems
+		break;
+		case 71:
+		case 72:
+		case 73:
+		case 74:
+		set @getitem,rand(7521,7524);				//Ninja Stone
+		break;
+		case 76:
+		set @getitem,7191;					//Lamplight
+		break;
+		case 77:
+		set @getitem,7300;					//Gemstone
+		break;
+		case 78:
+		set @getitem,7315;					//Dark Crystal Fragment
+		break;
+		case 79:
+		case 80:
+		set @getitem,7420;					//Skull
+		break;
+		case 81:
+		set @getitem,736;					//Skull
+		break;
+		case 82:
+		set @getitem,rand(7231,7233);				//Random Ore-Bullion
+		break;
+		case 83:
+		case 84:
+		set @getitem,rand(7177,7178);				//Crumb of Sobbing Starlight, Sobbing Starlight
+		break;
+		case 91:
+		case 92:
+		set @getitem,969;					//Gold
+		break;
+		case 95:
+		case 96:
+		case 97:
+		set @getitem,rand(715,717);				//Random Gem
+		break;
+		case 98:
+		set @getitem,714;					//Emperium
+		break;
+		}
+	if(@getitem == 0 && @random == 0 ) set @getitem,@randomitemA;
+	if(@getitem == 0 && @random == 1 ) set @getitem,@randomitemB;
+	if(@getitem == 0 && @random == 2 ) set @getitem,@randomitemC;
+	if(@getitem == 0 && @random > 2 ) set @getitem,@randomitemA;
+	if(rand((10000/(@pick+1))-@mine) == 1) set @getitem,@VeryRare;
+	if(rand(10000-readparam(bLuk)) == 7) set @getitem,@UltraRare;
+	callfunc("MineGetItem");
+	if(rand(25-@pick) == 7) goto Randomlist;			//Redo Random List
+	if(rand(50-@pick) == 7 && Sect == 9) goto Randomlist;
+	end;
+}
