@@ -1,0 +1,356 @@
+//===== EinherjarRO Scripts ================================== 
+//= Mining System 
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 4.08
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Mining System 
+//===== Comments: ============================================
+//= [Stolao]
+//= Needs More Mining Spots
+//= Add Prision Mine
+//===== Additional Comments: =================================
+//= 1.-- Origional Design Scapped, very bad design
+//= 2.-- 2nd Make Worked but didn't like it Scrapped
+//= 3.-- 3rd Make Worked perfectly, but scapped for a less random style
+//= 4.00 Revamp yet again, made monster based onkillscripts with follow up callfunc
+//= 4.01 Added prontera/jellopy test mine
+//= 4.02 Removed Test Mines
+//= 4.03 Converted script froma  callfunc -> function
+//= 4.04 Added 5 New Jellopy Mines
+//= 4.05 Generated Coal Mine Function
+//= 4.06 Added 5 Coal Mines
+//= 4.07 Seperated Setup into Tiers
+//= 4.08 Fixed unneeded dispbottom when max level mining
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//calfunc "MiningFunc",<MinBaseLevel>,<MinMineLvl>,<Min Pick>,<Break Chance>,<Damage Chance>,<Exp>,<ItemID1>,<Get Chance1>{,<ItemID2>,<Get Chance2>.....,<ItemID10>,<Get Chance10>};
+// 0 - MinBaseLevel
+//	Minimal Base Level to collect items from this mine
+// 1 - MinMineLvl
+//	Minimal Mining Level to collect items from this mine
+// 2 - Min Pick
+//	Minimal Pick required to mine
+// 3 - Break Chance
+//	Chance of breaking your pickaxe permently
+// 4 - Damage Chance
+//	Chance of damaging your pickaxe, just need to repair
+// 5 - Exp
+//	Amount of Mining Exp earned
+// 6 - ItemID1 - 10
+//	Item Id
+// 7 - Get Chance1 - 10
+//	Chance of Collecting / 10000
+
+
+-	script	Mining	-1,{
+function MiningSpawn;	function MiningFunc;
+OnMineJellopy:	//Level 0 - 1 - 5
+	MiningSpawn(1,rand(0,4));
+	MiningFunc(0,0,.Pick[0],1,50,rand(1,2),7049,5000,909,2500,909,1250,909,625,909,625,909,625,909,625,909,625,909,625,7126,625);
+end;
+OnMineCoal:	//Level 5 - 1 - 10
+	MiningSpawn(1,rand(5,9));
+	MiningFunc(5,5,.Pick[0],2,55,rand(5,10),909,500,7049,2500,1003,500,7049,1500,1003,750,1003,750,1003,750,1003,750,1003,750,1003,750);
+end;
+OnMineIron:	//Level 10 - 1 - 10
+	MiningSpawn(1,rand(10,14));
+	MiningFunc(10,10,.Pick[0],2,60,rand(25,70),7049,1000,1002,1000,7049,1000,1002,1000,7049,1000,1002,1000,7049,2500,1002,2500,1002,2500,998,1000);
+end;
+OnMineFire:	//Level 25 - 2 - 12	magma	thor
+	MiningSpawn(1,rand(15,24));
+	MiningFunc(25,25,.Pick[1],3,65,rand(100,200),7049,5000,7096,1000,7097,1000,7098,1000,7521,1000,1003,1000,990,1000,7049,1000,990,1000,994,1500);
+end;
+OnMineIce:	//Level 25 - 2 - 12	icedun	xmasfild
+	MiningSpawn(1,rand(15,24));
+	MiningFunc(25,25,.Pick[1],3,65,rand(100,200),7049,5000,7066,1000,7066,1000,7561,1000,7522,1000,1003,1000,991,1000,7049,1000,991,1000,995,1500);
+end;
+OnMineWind:	//Level 25 - 2 - 12	sograts
+	MiningSpawn(1,rand(15,24));
+	MiningFunc(25,25,.Pick[1],3,65,rand(100,200),7049,5000,7189,1000,7189,1000,7189,1000,7523,1000,1003,1000,992,1000,7049,1000,992,1000,996,1500);
+end;
+OnMineEarth:	//Level 25 - 2 - 12
+	MiningSpawn(1,rand(15,24));
+	MiningFunc(25,25,.Pick[1],3,65,rand(100,200),7049,5000,953,1000,953,1000,7049,1000,953,1000,1003,1000,993,1000,7049,1000,993,1000,997,1500);
+end;
+OnMineGold:	//Level 50 - 3 - 7
+	MiningSpawn(1,rand(25,29));
+	MiningFunc(50,50,.Pick[2],4,70,rand(300,500),7049,1000,969,1000,7049,1000,969,500);
+end;
+OnMineGems:	//Level 50 - 3 - 7
+	MiningSpawn(1,rand(25,29));
+	switch(rand(0,1)){
+		case 0: MiningFunc(50,50,.Pick[2],4,70,rand(300,500),909,3000,718,750,719,750,720,750,721,750,722,750,723,750,715,500,716,500,717,500);	break;
+		case 1: MiningFunc(50,50,.Pick[2],4,70,rand(300,500),909,3000,724,750,725,750,726,750,727,750,728,750,729,750,715,500,716,500,717,500);	break;
+	}
+end;
+OnMineCrystal:	//Level 70 - 4 - 4
+OnMineOri:	//Level 70 - 4 - 4
+OnMineElu:	//Level 70 - 4 - 4
+OnMineMaster:	//Level 99 - 4 - 2
+OnInit:
+	function MiningSpawn;	function MiningFunc;
+	set .MinelvlMax,100;
+	set .expcurve,25;
+	setarray .Pick, 47001,47002,47003,47004,47005;
+
+	setarray .Tier0-N$[0],		"Jellopy"	,"Jellopy"	,"Jellopy"	,"Jellopy"	,"Jellopy";
+	setarray .Tier0-T$[0],		"OnMineJellopy"	,"OnMineJellopy","OnMineJellopy","OnMineJellopy","OnMineJellopy";
+	setarray .Tier0-M$[0],		"prt_fild08"	,"prt_fild08"	,"einbech"	,"pay_dun00"	,"prt_fild06";
+	setarray .Tier0-X1[0],		181		,41		,132		,147		,97;
+	setarray .Tier0-X2[0],		209		,57		,122		,156		,102;
+	setarray .Tier0-Y1[0],		303		,46		,231		,173		,152;
+	setarray .Tier0-Y2[0],		283		,61		,253		,172		,136;
+
+	setarray .Tier1-N$[0],		"Coal"		,"Coal"		,"Coal"		,"Coal"		,"Coal";
+	setarray .Tier1-T$[0],		"OnMineCoal"	,"OnMineCoal"	,"OnMineCoal"	,"OnMinCoal"	,"OnMinCoal";
+	setarray .Tier1-M$[0],		"mjo_dun01"	,"mjo_dun01"	,"mjo_dun03"	,"ein_dun01"	,"einbech";
+	setarray .Tier1-X1[0],		39		,143		,20		,181		,132;
+	setarray .Tier1-X2[0],		35		,135		,300		,50		,122;
+	setarray .Tier1-Y1[0],		174		,143		,20		,214		,231;
+	setarray .Tier1-Y2[0],		135		,300		,68		,135		,253;
+
+	setarray .Tier2-N$[0],		"Iron"		,"Iron"		,"Iron"		,"Iron"		,"Iron";
+	setarray .Tier2-T$[0],		"OnMineIron"	,"OnMineIron"	,"OnMineIron"	,"OnMineIron"	,"OnMineIron";
+	setarray .Tier2-M$[0],		"mjo_dun01"	,"mjo_dun03"	,"ein_dun01"	,"ein_dun01"	,"hu_fild05";
+	setarray .Tier2-X1[0],		143		,-1		,137		,181		,101;
+	setarray .Tier2-X2[0],		135		,-1		,122		,50		,110;
+	setarray .Tier2-Y1[0],		143		,-1		,264		,214		,109;
+	setarray .Tier2-Y2[0],		135		,-1		,252		,68		,119;
+
+	setarray .Tier3-N$[0],		"Fire"		,"Fire";
+	setarray .Tier3-T$[0],		"OnMineFire"	,"OnMineFire";
+	setarray .Tier3-M$[0],		"anthell01"	,"anthell02";
+	setarray .Tier3-X1[0],		-1		,-1;
+	setarray .Tier3-X2[0],		-1		,-1;
+	setarray .Tier3-Y1[0],		-1		,-1;
+	setarray .Tier3-Y2[0],		-1		,-1;
+	set .@g,getarraysize(.Tier3-N$);
+	setarray .Tier3-N$[.@g],	"Ice"		,"Ice";
+	setarray .Tier3-T$[.@g],	"OnMineIce"	,"OnMineIce";
+	setarray .Tier3-M$[.@g],	"anthell01"	,"anthell02";
+	setarray .Tier3-X1[.@g],	-1		,-1;
+	setarray .Tier3-X2[.@g],	-1		,-1;
+	setarray .Tier3-Y1[.@g],	-1		,-1;
+	setarray .Tier3-Y2[.@g],	-1		,-1;
+	set .@g,getarraysize(.Tier3-N$);
+	setarray .Tier3-N$[.@g],	"Wind"		,"Wind"		,"Wind";
+	setarray .Tier3-T$[.@g],	"OnMineWind"	,"OnMineWind"	,"OnMineWind";
+	setarray .Tier3-M$[.@g],	"anthell01"	,"anthell02"	,"gefenia02";
+	setarray .Tier3-X1[.@g],	-1		,-1		,124;
+	setarray .Tier3-X2[.@g],	-1		,-1		,110;
+	setarray .Tier3-Y1[.@g],	-1		,-1		,120;
+	setarray .Tier3-Y2[.@g],	-1		,-1		,111;
+	set .@g,getarraysize(.Tier3-N$);
+	setarray .Tier3-N$[.@g],	"Earth"		,"Earth"	,"Earth";
+	setarray .Tier3-T$[.@g],	"OnMineEarth"	,"OnMineEarth"	,"OnMineEarth";
+	setarray .Tier3-M$[.@g],	"hu_fild05"	,"anthell01"	,"anthell02";
+	setarray .Tier3-X1[.@g],	101		,-1		,-1;
+	setarray .Tier3-X2[.@g],	110		,-1		,-1;
+	setarray .Tier3-Y1[.@g],	109		,-1		,-1;
+	setarray .Tier3-Y2[.@g],	119		,-1		,-1;
+
+	setarray .Tier4-N$[0],		"Gold"		,"Gold"		,"Gold";
+	setarray .Tier4-T$[0],		"OnMineGold"	,"OnMineGold"	,"OnMineGold";
+	setarray .Tier4-M$[0],		"abyss_01"	,"abyss_02"	,"abyss_03";
+	setarray .Tier4-X1[0],		206		,176		,40;
+	setarray .Tier4-X2[0],		270		,158		,148;
+	setarray .Tier4-Y1[0],		34		,217		,54;
+	setarray .Tier4-Y2[0],		91		,207		,162;
+	set .@g,getarraysize(.Tier4-N$);
+	setarray .Tier4-N$[.@g],	"Gem"		,"Gem";
+	setarray .Tier4-T$[.@g],	"OnMineGems"	,"OnMineGems";
+	setarray .Tier4-M$[.@g],	"abyss_02"	,"abyss_03";
+	setarray .Tier4-X1[.@g],	33		,40;
+	setarray .Tier4-X2[.@g],	26		,148;
+	setarray .Tier4-Y1[.@g],	225		,54;
+	setarray .Tier4-Y2[.@g],	220		,162;
+
+//	setarray .Tier5-N$[0],		"Crystal"
+//	setarray .Tier5-T$[0],	
+//	setarray .Tier5-M$[0],	
+//	setarray .Tier5-X1[0],	
+//	setarray .Tier5-X2[0],	
+//	setarray .Tier5-Y1[0],	
+//	setarray .Tier5-Y2[0],	
+//	set .@g,getarraysize(.Tier5-N$);
+//	setarray .Tier5-N$[.@g],	"Oridecon"
+//	setarray .Tier5-T$[.@g],	
+//	setarray .Tier5-M$[.@g],	
+//	setarray .Tier5-X1[.@g],	
+//	setarray .Tier5-X2[.@g],	
+//	setarray .Tier5-Y1[.@g],	
+//	setarray .Tier5-Y2[.@g],	
+//	set .@g,getarraysize(.Tier5-N$);
+//	setarray .Tier5-N$[.@g],	"Elunium"
+//	setarray .Tier5-T$[.@g],	
+//	setarray .Tier5-M$[.@g],	
+//	setarray .Tier5-X1[.@g],	
+//	setarray .Tier5-X2[.@g],	
+//	setarray .Tier5-Y1[.@g],	
+//	setarray .Tier5-Y2[.@g],	
+
+//	setarray .Tier6-N$[0],		"Master"
+//	setarray .Tier6-T$[0],	
+//	setarray .Tier6-M$[0],	
+//	setarray .Tier6-X1[0],	
+//	setarray .Tier6-X2[0],	
+//	setarray .Tier6-Y1[0],	
+//	setarray .Tier6-Y2[0],	
+
+
+	//Initial Spawn
+	MiningSpawn(45,0);
+	MiningSpawn(35,1);
+	MiningSpawn(35,2);
+	MiningSpawn(35,3);
+end;
+	function MiningSpawn {
+	//MiningSpawn(<Amount>,<Tier>,<Location>)
+		for(set .@i,getarg(0,1); .@i > 0; set .@i,.@i-1){
+			set .@s,getarg(2,rand(getarraysize(getd(".Tier"+ getarg(1,0) +"-M$"))));
+			switch(getarg(1,0)){
+				case 0:
+					if(.Tier0-X1[.@s] < 0||.Tier0-X2[.@s] < 0||.Tier0-Y1[.@s] < 0||.Tier0-Y2[.@s] < 0){
+						monster .Tier0-M$[.@s],0,0,.Tier0-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier0-T$[.@s]+"";
+					} else {
+						areamonster .Tier0-M$[.@s],.Tier0-X1[.@s],.Tier0-Y1[.@s],.Tier0-X2[.@s],.Tier0-Y2[.@s],.Tier0-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier0-T$[.@s]+"";
+					}
+				break;
+				case 1:
+					if(.Tier1-X1[.@s] < 0||.Tier1-X2[.@s] < 0||.Tier1-Y1[.@s] < 0||.Tier1-Y2[.@s] < 0){
+						monster .Tier1-M$[.@s],0,0,.Tier1-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier1-T$[.@s]+"";
+					} else {
+						areamonster .Tier1-M$[.@s],.Tier1-X1[.@s],.Tier1-Y1[.@s],.Tier1-X2[.@s],.Tier1-Y2[.@s],.Tier1-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier1-T$[.@s]+"";
+					}
+				break;
+				case 2:
+					if(.Tier2-X1[.@s] < 0||.Tier2-X2[.@s] < 0||.Tier2-Y1[.@s] < 0||.Tier2-Y2[.@s] < 0){
+						monster .Tier2-M$[.@s],0,0,.Tier2-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier2-T$[.@s]+"";
+					} else {
+						areamonster .Tier2-M$[.@s],.Tier2-X1[.@s],.Tier2-Y1[.@s],.Tier2-X2[.@s],.Tier2-Y2[.@s],.Tier2-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier2-T$[.@s]+"";
+					}
+				break;
+				case 3:
+					if(.Tier3-X1[.@s] < 0||.Tier3-X2[.@s] < 0||.Tier3-Y1[.@s] < 0||.Tier3-Y2[.@s] < 0){
+						monster .Tier3-M$[.@s],0,0,.Tier3-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier3-T$[.@s]+"";
+					} else {
+						areamonster .Tier3-M$[.@s],.Tier3-X1[.@s],.Tier3-Y1[.@s],.Tier3-X2[.@s],.Tier3-Y2[.@s],.Tier3-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier3-T$[.@s]+"";
+					}
+				break;
+				case 4:
+					if(.Tier4-X1[.@s] < 0||.Tier4-X2[.@s] < 0||.Tier4-Y1[.@s] < 0||.Tier4-Y2[.@s] < 0){
+						monster .Tier4-M$[.@s],0,0,.Tier4-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier4-T$[.@s]+"";
+					} else {
+						areamonster .Tier4-M$[.@s],.Tier4-X1[.@s],.Tier4-Y1[.@s],.Tier4-X2[.@s],.Tier4-Y2[.@s],.Tier4-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier4-T$[.@s]+"";
+					}
+				break;
+				case 5:
+					if(.Tier5-X1[.@s] < 0||.Tier5-X2[.@s] < 0||.Tier5-Y1[.@s] < 0||.Tier5-Y2[.@s] < 0){
+						monster .Tier5-M$[.@s],0,0,.Tier5-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier5-T$[.@s]+"";
+					} else {
+						areamonster .Tier5-M$[.@s],.Tier5-X1[.@s],.Tier5-Y1[.@s],.Tier5-X2[.@s],.Tier5-Y2[.@s],.Tier5-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier5-T$[.@s]+"";
+					}
+				break;
+				case 6:
+					if(.Tier6-X1[.@s] < 0||.Tier6-X2[.@s] < 0||.Tier6-Y1[.@s] < 0||.Tier6-Y2[.@s] < 0){
+						monster .Tier6-M$[.@s],0,0,.Tier6-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier6-T$[.@s]+"";
+					} else {
+						areamonster .Tier6-M$[.@s],.Tier6-X1[.@s],.Tier6-Y1[.@s],.Tier6-X2[.@s],.Tier6-Y2[.@s],.Tier6-N$[.@s]+" Deposit",rand(3501,3502) + 2*getarg(1,rand(0,6)),1,"Mining::"+.Tier6-T$[.@s]+"";
+					}
+				break;
+
+
+			}
+
+		}
+	return;
+	}
+	function MiningFunc {
+		set .@T, getequipid(EQI_HAND_R);
+		if(.@T < 1){
+			message strcharinfo(0),strcharinfo(0)+" your hand looks as though it could break...";
+			percentheal -15,-15;
+			heal -5,0;
+			end;
+		}
+		if( .@T < .Pick[0] || .@T > .Pick[4] ){
+			if(rand(5)){
+				message strcharinfo(0),strcharinfo(0)+" your "+getitemname(.@T)+" looks as though it could break...";
+			} else {
+				unequip EQI_HAND_R;
+				if(rand(5)){
+					message strcharinfo(0),strcharinfo(0)+" your "+getitemname(.@T)+" was knocked out of your hand.";
+				} else {
+					message strcharinfo(0),strcharinfo(0)+" your "+getitemname(.@T)+" has broken.";
+					delitem .@T,1;
+				}
+			}
+			percentheal -5,-5;
+			heal -5,0;
+			end;
+		} else if(getarg(0,0) > BaseLevel){
+			message strcharinfo(0),strcharinfo(0)+" your body is too weak to harvest this.";
+			percentheal -3,-3;
+			heal -5,0;
+			end;
+		} else if(getarg(1,0) > MineMaster){
+			message strcharinfo(0),strcharinfo(0)+" your not skilled enough to harvest this effectivly.";
+			percentheal -3,-3;
+			heal -5,0;
+			end;
+		} else if(getarg(2,.Pick[0]) > .@T){
+			message strcharinfo(0),strcharinfo(0)+" your pickaxe is not advanced enough to harvest this.";
+			end;
+		} else if(getarg(3,5) > rand(10000)/(.@T-(.Pick[0] -1)) && .@T != .Pick[4]){
+			unequip EQI_HAND_R;
+			message strcharinfo(0),strcharinfo(0)+" your "+getitemname(.@T)+" has broken.";
+			delitem .@T,1;
+			end;
+		} else if(getarg(4,20) > rand(10000)/(.@T-(.Pick[0] -1)) && .@T != .Pick[4]){
+			unequip EQI_HAND_R;
+			message strcharinfo(0),strcharinfo(0)+" your "+getitemname(.@T)+" was damaged.";
+			delitem .@T,1;
+			getitem2 .@T,1,1,0,1,0,0,0,0;
+			end;
+		} else {
+			
+			for(set .@i,6; .@i < getargcount() - 6 && !.@C; set .@i, .@i + 2 ){
+				if(getarg(.@i + 1,0) > rand(10000)){
+					getitem getarg(.@i,7049),1;
+					set .@C,1;
+				}
+			}
+			if(!.@C){
+				message strcharinfo(0),strcharinfo(0)+" you failed to harvest anything.";
+				end;
+			} else if(MineMaster != .MinelvlMax){
+				set .@expneed,MineMaster*(MineMaster*.expcurve)+10+MineMaster;
+				set MineExp,MineExp+getarg(5,1);
+				if(MineExp > .@expneed && MineMaster < .MinelvlMax){
+					set MineMaster,MineMaster+1;
+					set MineExp,0;
+					announce "Mining Level has advanced to Lv "+MineMaster+"!",bc_blue|bc_self;
+					specialeffect2 371;
+				} else {
+					message strcharinfo(0),getarg(5,1)+" Mining Exp Gained "+MineExp+"/"+(.@expneed+1)+" untill Lv "+(MineMaster+1)+"";
+				}
+			}
+		return;
+		}
+	end;
+	}
+}
+
+
+
+
+
+
+
+
