@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.21
+//= 1.22
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -48,6 +48,7 @@
 //= 1.1F Fixed Spacing/ Readability in OnInit
 //= 1.20 Fixed Typos
 //= 1.21 Fixed Bug with No gear On
+//= 1.22 Fixed Missing )
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -135,7 +136,7 @@ end;
 OnWeaponInfo:
 	set .@M$,.@atcmd_parameters$[0];
 	if((.@M$ == "")){
-		if(getequipid(EQI_HAND_R){ set .@ei,getiteminfo(getequipid(EQI_HAND_R),11); }
+		if(getequipid(EQI_HAND_R)){ set .@ei,getiteminfo(getequipid(EQI_HAND_R),11); }
 		else { set .@ei,-1 }
 		switch(.@ei){
 			case 3:  	case 6: 	case 7: 	case 8:	
