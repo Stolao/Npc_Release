@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.59
+//= 1.5D
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -22,6 +22,9 @@
 //= 1.58 Fixed a swapped .@x and .@x+1
 //= 1.59 Serveral Edit Undocumented to fix
 //= 1.5A Fixed a logic bug, day 1 skipped
+//= 1.5B Fixed a [-1] bug
+//= 1.5C Actualy Fixed a logic bug, day 1 skipped
+//= 1.5D Added A .Rest Notification
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -30,12 +33,13 @@
 OnWhisperGlobal:
 OnLoginCmnd:
 OnPCLoginEvent:
+	if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collec reward you must remain logged in for "+  .Rest +" Minuets;
 	sleep2 1000 + .Rest * 60000;
 	set .@i, (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
 	if(.@i >= (#LastDailyReward + .MinWait)){
 		if(.@i < #LastDailyReward + .MaxWait){	set #DRewardCon, #DRewardCon + 1;
-		} else {	set #DRewardCon, 1;	}
-		set .@g - 1, (#DRewardCon > getarraysize(.Rewards$)) ? (getarraysize(.Rewards$)-1) : #DRewardCon;
+		} else {	set #DRewardCon, 0;	}
+		set .@g, (#DRewardCon > getarraysize(.Rewards$)) ? (getarraysize(.Rewards$)-1) : #DRewardCon;
 		explode(.@XT$,.Rewards$[.@g],"|");
 		for(set .@x,0; .@x < getarraysize(.@XT$); set .@x,.@x + 1){
 			set .@TT[.@x], atoi(.@XT$[.@x]);
