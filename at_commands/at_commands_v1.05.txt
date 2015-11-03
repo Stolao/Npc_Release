@@ -1,0 +1,71 @@
+//===== EinherjarRO Scripts ================================== 
+//= usefull at_commands 
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.05
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Some Usefull @commands
+//===== Comments: ============================================
+//= [Stolao]
+//= Optimize
+//= add more
+//===== Additional Comments: =================================
+//= 1.00 Added @Main
+//= 1.01 Added @Home
+//= 1.02 Added @Market
+//= 1.03 Added @bgm
+//= 1.04 Added @bgmall
+//= 1.05 Added @boom
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	atcmnd	-1,{
+OnMainCmnd:
+	progressbar "0xFFFFFF",3;
+	warp "prontera",155,181;
+end;
+OnMarketCmnd:
+	progressbar "0xFFFFFF",3;
+	warp "market",100,111;
+end;
+OnHomeCmnd:
+	progressbar "0xFFFFFF",3;
+	warp "SavePoint",0,0;
+end;
+OnBoomCmnd:
+	addrid(1,1);
+	announce "You have been Doomed to Die!!!",bc_blue|bc_self;
+	sleep2 rand(1000,60000);
+	atcommand "@nuke "+strcharinfo(0);
+end;
+OnBGMCmnd:
+	mes "[BGM]";
+	mes "Whats the file number";
+	//todo create a list
+	input .@bgm$;
+	close2;
+	playBGM .@bgm$;
+end;
+OnBGMAllCmnd:
+	mes "[BGM-All]";
+	mes "Whats the file number";
+	//todo create a list
+	input .@bgm$;
+	close2;
+	playBGMall .@bgm$;
+end;
+OnInit:
+	bindatcmd("boom","atcmnd::OnHomeCmnd",99,99);
+	bindatcmd("home","atcmnd::OnHomeCmnd",0,99);
+	bindatcmd("main","atcmnd::OnMainCmnd",0,99);
+	bindatcmd("market","atcmnd::OnMarketCmnd",0,99);
+	bindatcmd("bgm","atcmnd::OnBGMCmnd",0,99);
+	bindatcmd("BGM","atcmnd::OnBGMCmnd",0,99);
+	bindatcmd("bgmall","atcmnd::OnBGMAllCmnd",99,99);
+	bindatcmd("BGMALL","atcmnd::OnBGMAllCmnd",99,99);
+end;
+}
