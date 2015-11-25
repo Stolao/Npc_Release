@@ -26,6 +26,8 @@ A Few Useful @Commands
   * @Home
   * @BGM
   * @BGMALL
+  * @boom
+  * @getskill
 
 Auto Event
 ---------
