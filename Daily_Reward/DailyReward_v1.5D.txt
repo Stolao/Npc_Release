@@ -33,7 +33,7 @@
 OnWhisperGlobal:
 OnLoginCmnd:
 OnPCLoginEvent:
-	if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collec reward you must remain logged in for "+  .Rest +" Minuets;
+	if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collec reward you must remain logged in for "+  .Rest +" Minuets";
 	sleep2 1000 + .Rest * 60000;
 	set .@i, (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
 	if(.@i >= (#LastDailyReward + .MinWait)){
