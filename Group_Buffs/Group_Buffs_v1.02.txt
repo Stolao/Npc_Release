@@ -51,7 +51,7 @@ Function	Script	Aegis	{
 	if(getcharid(2) && getarg(0,0)&2){
 		addrid(3,0,getcharid(2));
 	}
-	switch(getarg(1,rand(1,12)));
+	switch(getarg(1,rand(1,12))){
 		case 0:
 			sc_end SC_MDEF_RATE;
 			sc_end SC_DEF_RATE;
