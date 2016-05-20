@@ -43,7 +43,7 @@ prontera,150,193,4	script	Reset Girl	124,{
 	}
 	if(.@Reset[3]){
 		mes "You can only reset "+callfunc("F_InsertPlural",.@Reset[3],"time")+" in your life, are you sure?";
-		if(select("Let me think:Thats fine") == 1) close;
+		if(select("Let me think:That's fine") == 1) close;
 	}
 	set Zeny, Zeny-.@Reset[.@i-1];
 	if(.@i&1){
