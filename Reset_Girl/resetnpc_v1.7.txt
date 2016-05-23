@@ -19,7 +19,6 @@
 //= 1.7 Improved text with F_InsertPlural [Stolao]
 //============================================================
 prontera,150,193,4	script	Reset Girl	124,{
-
 	//	 		Skills,	Stats,	Both,	Limit
 	setarray .@Reset,	5000,	5000,	9000,	0;
 	mes "[Reset Girl]";
@@ -47,7 +46,7 @@ prontera,150,193,4	script	Reset Girl	124,{
 	}
 	set Zeny, Zeny-.@Reset[.@i-1];
 	if(.@i&1){
-		sc_end SC_ALL;
+		sc_end SC_ALL;// TODO make a sc_end current classes sc only
 		ResetSkill;
 	}
 	if(.@i&2) ResetStatus;
