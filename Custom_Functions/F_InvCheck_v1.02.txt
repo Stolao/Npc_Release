@@ -1,0 +1,38 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.01
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Checks both invetory count and weight for an array of items
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//= 1.01 Fixed syntex error
+//= 1.02 Added a count item check for items already in invetory
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//callfunc "F_InvCheck",<ItemID1>,<ItemCount1>{,<ItemID2>,<ItemCount2>{,<ItemID3>,<ItemCount3>......}};
+Function	Script	F_InvCheck	{
+	for(.@i = 0; .@i < getargcount(); .@i = .@i + 2){
+		.@id[.@i / 2] = getarg(.@i);
+		.@qnt[.@i / 2] = getarg(.@i + 1);
+		if( countitem(getarg(.@i) &&
+			getiteminfo(getarg(.@i),2) != 4 &&
+			getiteminfo(getarg(.@i),2) != 5 &&
+			getiteminfo(getarg(.@i),2) != 7 && 
+			getiteminfo(getarg(.@i),2) != 8 &&
+			getiteminfo(getarg(.@i),2) != 12 ) .@c += 1;
+	}
+	if(!checkweight2(.@id,.@qnt)){
+		return 0;
+	} else if(@inventorylist_count + (getargcount() / 2) - .@c > MAX_INVENTORY){
+		return 0;
+	} 
+}
