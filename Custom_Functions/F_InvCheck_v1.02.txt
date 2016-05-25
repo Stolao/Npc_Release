@@ -34,5 +34,5 @@ Function	Script	F_InvCheck	{
 		return 0;
 	} else if(@inventorylist_count + (getargcount() / 2) - .@c > MAX_INVENTORY){
 		return 0;
-	} 
+	} return 1;
 }
