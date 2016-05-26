@@ -1,0 +1,33 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Grants a random item from an array based of the item 
+//= "Weight" similar to how an OBB or any IG_ item works
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//callfunc	"F_RandWeight",Implode(<ArrayName>,",");
+//callfunc	"F_RandWeight","<Item 1>,<Weight 1>,<Item 2>,<Weight 2>,<Item 3>,<Weight 3>.....";
+function	script	F_RandWeight	{
+		explode(.@E$,getarg(0),",");
+		for(.@x = 0; .@x < getarraysize(.@E$); .@x++)
+			.@D[.@x] = atoi(.@E$[.@x]);
+		for(.@x = 0; .@x < getarraysize(.@D); .@x = .@x + 2){
+			.@Total = .@Total + .@D[.@x + 1];
+			for(.@z = 0; .@z < .@D[.@x + 1]; .@z++)
+				.@Items[getarraysize(.@Items)] = .@D[.@x];
+		}
+		getitem .@Items[rand(.@Total)],1;
+		return 1;
+}
