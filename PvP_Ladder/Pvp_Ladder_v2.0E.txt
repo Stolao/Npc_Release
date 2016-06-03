@@ -64,7 +64,7 @@ prontera,202,203,4	script	Ladder	837,{
 	mes "[Ladder]";
 OnPvpLadder:
 	mes "Ranking";
-	i@i = select(((.Death)?"Kill Ranking:Death Ranking":"View Ranking:")+":Leave:"+((getgmlevel() >= .GM)?"Reset PVP Stats":""));
+	.@i = select(((.Death)?"Kill Ranking:Death Ranking":"View Ranking:")+":Leave:"+((getgmlevel() >= .GM)?"Reset PVP Stats":""));
 	switch(.@i) { 
 		case 4:
 			mes "Are you sure you want to delete";
@@ -77,7 +77,7 @@ OnPvpLadder:
 			cleararray $TOPDTH[0],0,127;
 			cleararray $TOPPK$[0],0,127;
 			cleararray $TOPPK[0],0,127;
-			query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount'" OR  `key` = 'pl_DTHcount'");
+			query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount' OR  `key` = 'pl_DTHcount'");
 			.@self = getcharid(3);
 			.@size = query_sql("SELECT account_id FROM `char` where online = 1", .@aid);
 			for(.@i = 0; .@i<.@size; .@i++) {
@@ -109,7 +109,7 @@ OnPCKillEvent:
 	if(getgmlevel() <= .GmLvl){
 		if(.Options&1 || strcharinfo(3) == .Map$){
 			if(.Options&32){
-				for(.@i,.RepeatCount; .@i > 0; .@i--)
+				for(.@i = .RepeatCount; .@i > 0; .@i--)
 					@PKedID[.@i+1] = @PKedID[.@i];
 				@PKedID = killedrid;
 				for(.@i = 1; .@i < .RepeatCount; .@i++){
@@ -121,7 +121,7 @@ OnPCKillEvent:
 			if(.@s < .RepeatCount){
 				pl_pkcount = pl_pkcount + 1;
 				if(.Options&16)
-					getd(.PointType$) = getd(.PointType$) + .PvpEarned;
+					set getd(.PointType$), getd(.PointType$) + .PvpEarned;
 				if(pl_pkcount > $TOPPK[.MaxPlayers]) {
 					for(.@i = 1; .@i <= .MaxPlayers ; .@i++) {
 						if (pl_pkcount > $TOPPK[.@i] && !.@newrank)

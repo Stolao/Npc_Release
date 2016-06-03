@@ -63,12 +63,12 @@ OnPCLoginEvent:
 		for(.@x = 0; .@x < 5; .@x++){
 			set .@TT[.@x], atoi(.@XT$[.@x]);
 		}
-		if(.Mode & 1 && .@XT$[4]){
+		if(.Mode & 1 && .@TT[4]){
 			for(.@x = 4; .@x < getarraysize(.@XT$); .@x += 2){
 				.@itms[.@x - 4] = atoi(.@XT$[.@x]);
 				.@qnts[.@x - 4] = atoi(.@XT$[.@x + 1]);
 			}
-			if(checkweight2(.@itms,.@qnts){
+			if(checkweight2(.@itms,.@qnts)){
 				for(.@x = 4; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x += 2){
 					getitem  .@itms[.@x], .@qnts[.@x+1];
 					message strcharinfo(0),"[Daily Rewards]: Recived "+  .@qnts[.@x+1] +" "+ getitemname(.@itms[.@x]);
@@ -95,6 +95,7 @@ OnPCLoginEvent:
 				if(#DRewardCon % .BuffInfo[.@x + 1] == 0) sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
 			}
 		}
+		@DRewardCon += 1;
 		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+@DRewardCon+" day"+((@DRewardCon > 1)?"s":"")+" in a row.";
 		#DRewardCon += 1;
 		#LastDailyReward = .@i;
