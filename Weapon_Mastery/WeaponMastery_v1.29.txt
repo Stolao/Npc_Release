@@ -133,7 +133,7 @@ function	script	Mystical_M	{
 	if(getarg(0,0) >= 64)	bonus bMAtkrate,1+getarg(0,0)/7;
 	if(getarg(0,0) >= 128)	bonus bNoCastCancel,1;
 	bonus bInt,1+getarg(0,0)/32;
-	bonus bEquipmentMatk,1+getarg(0,0)+((1+getarg(0,0))*readparam(bInt)/100);
+	bonus bMatk,1+getarg(0,0)+((1+getarg(0,0))*readparam(bInt)/100);
 	
 return;
 }
@@ -342,7 +342,7 @@ OnInit:
 				//   1 = On
 				//   0 = Off
 
-	set .Left,0;		// Toggle Left Handed Mastery, left hand recives ~1/2 exp and stats
+	set .Left,1;		// Toggle Left Handed Mastery, left hand recives ~1/2 exp and stats
 				//   1 = On
 				//   0 = Off
 
@@ -350,7 +350,7 @@ OnInit:
 				//   1 = On
 				//   0 = Off
 
-	set .LeftFist,1;	// Toggle Left fist recive Safegaurd Mastery effect
+	set .LeftFist,0;	// Toggle Left fist recive Safegaurd Mastery effect
 				//   1 = On
 				//   0 = Off
 
