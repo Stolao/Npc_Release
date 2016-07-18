@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.5C
+//= 1.93
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -14,19 +14,95 @@
 //= Manhunt event origionally a release by stydianx 
 //= from http://rathena.org/board/topic/83791-man-hunt-event/ 
 //===== Uses: ================================================
-//= The Maze event is held on a custom map, you will need to install
+//= The Maze event is held on a custom map, Download here 
+//= https://rathena.org/board/index.php?app=core&module=attach&section=attach&attach_id=10040
 //===== Comments: ============================================
 //= [Stolao]
-//= Optimize
-//= Add more events
+//= Convert Manhunt to new format
+//= Add Events DB Event, MVP Arena, Invasion, Ragnarok Training
+//= Add Events Mushroom, Disguise, Devil Square
+//= Add a vote for event option with queue
 //= Spell Check
-//= Make customisable in game by gm
 //= Make "Zeny" changable for Points
-//= Add a Shop
-//= Add a vote for event option
-//= Add Events Lucky Pick, DB Event, MVP Arena, Invasion, Ragnarok Training
+//= Make customisable in game by gm
+//= Add more events
+//= Optimize
 //===== Additional Comments: =================================
-//= 1.00 -> 1.4B See Chagelogs on forums
+//= 1.00 Basic Layout, Useing just 99-PVP
+//= 1.01 Add Zombie Survival
+//= 1.02 Add 1234
+//= 1.03 More Monster in Zombie
+//= 1.04 Fixed Stair Bug in 1234
+//= 1.05 Swich 1234 to even odd afer 7 rolls
+//= 1.06 More Monster in Zombie
+//= 1.07 More and Shorter Rounds in Zombie
+//= 1.08 Made PvpEvent 20 min limit was 10 min
+//= 1.09 Swich 1234 to last box after 8 even odd rolls
+//= 1.0A Shortened PvpEvent script by 54 line
+//= 1.0B Removed even odd afer 7 rolls in 1234
+//= 1.0C Removed last box after 8 even odd rolls in 1234
+//= 1.0D Made 1234 function baced
+//= 1.0E Made PvpEvent function based
+//= 1.0F Made Zombie function based
+//= 1.10 Added Startup via NPC Whisper
+//= 1.11 Removed "tie" in 1234
+//= 1.12 Made 1234 Configable uing arrayed server data
+//= 1.13 Added Toggable Prize item & Zeny to 1234
+//= 1.14 Added Toggable Cost item & Zeny to 1234
+//= 1.15 Added Prize Pool item & Zenyto 1234
+//= 1.16 Replaced 99-Pvp with PvpEvent
+//= 1.17 Made PVP Configable uing arrayed server data
+//= 1.18 Added Toggable Prize item & Zeny to PVP
+//= 1.10 Added Toggable Cost item & Zeny to PVP
+//= 1.1A Added Prize Pool to item & Zeny PVP
+//= 1.1B Made Zombie Kinda Configable (might add more latter)
+//= 1.1C Added Toggable Prize item & Zeny to Zombie
+//= 1.1D Added Toggable Cost item & Zeny to Zombie
+//= 1.1E Added Prize Pool to item & Zeny Zombie
+//= 1.1F Fixed minor bug in Zombies Config
+//= 1.20 Fixed minor bug in prize scripts
+//= 1.21 Fixed typo in run pvp
+//= 1.22 Fixed check Zeny in all scripts
+//= 1.23 Fixed check items in all scripts
+//= 1.24 Fixed major bug in Config
+//= 1.25 Fixed "bug" reading strings as numbers
+//= 1.26 Added event check, see if events are running already
+//= 1.27 Added Reset to config npc
+//= 1.28 Fixed bug in the prize giving phase of events
+//= 1.29 Switch prizes to close2;
+//= 1.2A Added missing Close; after Event check in whisper
+//= 1.2B Added Start of In Game Setup menu
+//= 1.2C Fixed Type in InGame Setup ":" when ";"
+//= 1.2D Fixed Missing case in 1234
+//= 1.2F Changed Perm Server Variables to Temp
+//= 1.30 replaced Monsters name with --ja--
+//= 1.31 Changed Zombie to use while, shortend script
+//= 1.32 Made PVP have a chance of being class specific
+//= 1.33 Fixed bug with pvp class specific, logic error 
+//= 1.34 Added @joinevent Command (see bindatcmnd.txt)
+//= 1.35 Removed join event npcs
+//= 1.36 Made @runevent Command (see bindatcmnd.txt)
+//= 1.37 Removed Labels from Pvp script
+//= 1.38 Removed Labels from Dice Event
+//= 1.39 Added Agit check in multiple locations
+//= 1.3A Added $@Conditions to Zombie
+//= 1.3B Changed $@Conditions&4 formula to reflect $@MaxTime
+//= 1.3C Removed dependency on bindatcmd.txt
+//= 1.3D Changed hideonnpc to disablenpc
+//= 1.3E Changed hideoffnpc to enablenpc
+//= 1.3F Added a missing else to 1234 and pvp events
+//= 1.40 Made Zombie Survival have steadily increasing waves
+//= 1.41 Added Maze Event
+//= 1.42 Added Menu on click, in case want to add a physical location
+//= 1.43 Optimized OnJoinEvent Label a little
+//= 1.44 Replaces a dispbutton with mes under OnRunEvent
+//= 1.45 Optimized 1234 Script a little
+//= 1.46 replaced while -> for
+//= 1.47 Optimized Beginging Event Countdown for all events
+//= 1.48 Made Zombies IDs Configuable
+//= 1.49 Made Zombies rate Configurable
+//= 1.4A Made killing zombie penilty greater
+//= 1.4B Optimized In event countdowns for all events
 //= 1.4C Fixed an extra '{' added by mistake
 //= 1.4D Condenced @$MobsUsed + @$MobsRate -> @$Mobs
 //= 1.4E Removed Unessisare stopnpctimer (from pre 1.0F)
@@ -42,8 +118,64 @@
 //= 1.58 Added $@Conditions&2 (precentheal 100,100) to PvPEvent
 //= 1.59 Added Manhunt Event
 //= 1.5A Fixed bug with Manhunt Target being killable after event still
-//= 1.5B Fixed a bug with storeall and item check -[Thanks Digos]
-//= 1.5C Fixed a hang screen in ( $@Cost[0] && $@Cost[1] ) -[Thanks Digos]
+//= 1.5B Began Converting variable from global temp to getarg()
+//= 1.5C Made @joinevent into a function based
+//= 1.5D Made $@Mobs into a imploded var
+//= 1.5E Converted Zombie to getarg()
+//= 1.5F Converted Dice to getarg()
+//= 1.60 Removed area warp vars for statics
+//= 1.60 Converted PvP to getarg()
+//= 1.61 Converted Maze to getarg()
+//= 1.62 Added a sc_end SC_ALL condition to defalt Maze Event
+//= 1.63 Fixed explode -> int fail in Zombie Event
+//= 1.64 Changed sc_end -> callfunc("dispell");
+//= 1.65 Replaced Zombie Events MobArray -> While( < getarccount())
+//= 1.66 Removed Debug Messages
+//= 1.67 Moved Mob array further down in Zombie Run
+//= 1.68 Fixed a bug in Zombie Event having 1394 waves
+//= 1.69 Rmoved mob respawing on killed from Zombie Event
+//= 1.6A Added Decrease AGi and Damage taken when killing Zombies
+//= 1.6B Changed Zombie Event for Max Level to 45/10 Novice only (my servers max novice level)
+//= 1.6C Fixed Missing getarg in Zombie Survival
+//= 1.6D Converted Zombie Reward to SQL Querry
+//= 1.6E Converted Dice Reward to SQL Querry
+//= 1.6F Converted PvP Reward to SQL Querry
+//= 1.70 Removed Redundant Lines from PvP Run
+//= 1.71 Removed Redundant lines from Dice Run
+//= 1.72 Removed Redundant Lines from Zombie Run
+//= 1.73 Removed Mes from Maze Prize
+//= 1.74 Removed Redundant Disable npc from Event Manager
+//= 1.75 Fixed Bug in Maze allowing multiple winners
+//= 1.76 Replaced 'Mes' with 'Message' in GMs Event Manager
+//= 1.77 Changed 'MazePrize' to 'Event_Agent#Maze'
+//= 1.78 Removed repeat callfunc for maze event
+//= 1.79 Changed 'mes' to 'message' when no event in JoinEvent
+//= 1.7A Added 'detachrid;' to Zombie SQl Querry
+//= 1.7B Added 'detachrid;' to Dice SQl Querry
+//= 1.7C Added 'detachrid;' to PvP SQl Querry
+//= 1.7D Added '&16' to join event, Adds aid to list
+//= 1.7E Added '&32' to join event, disables warp feature
+//= 1.7F Converted 'LuckyRun' to new format
+//= 1.80 Added Lucky Event to Running Event List
+//= 1.81 Added Failed Event to Lucky Event
+//= 1.82 Added vending check to Lucky Event
+//= 1.83 Added deletarray to Lucky Event
+//= 1.84 Added Npcwalk to Cluckers
+//= 1.85 Increase win rate of cluckers from 0.53% to 0.67%
+//= 1.86 Fixed 2 missing {
+//= 1.87 removed obsolete 'close2' from GM Event Manager
+//= 1.88 Fixed bug with '&32' in JoinEvent
+//= 1.89 Convert SQL Querry to "&16' reward system for PvP
+//= 1.8A Convert SQL Querry to "&16' reward system for Zombie
+//= 1.8B Convert SQL Querry to "&16' reward system for Dice
+//= 1.8C Fixed 'event full' bug in Pvp
+//= 1.8D Fixed 'event full' bug in Zombie
+//= 1.8E Fixed 'event full' bug in Dice
+//= 1.8F Fixed 	incorrect enable npc in Maze event
+//= 1.90 Changed last menu of gms runevent to "mes"
+//= 1.91 Added close2; to each case for gms runevent
+//= 1.92 Changed close -> end for runevents agit and event checks
+//= 1.93 Added Bombporing script by jazznar (modified) https://rathena.org/board/topic/103253-just-another-bombring-event-script/#entry290661
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -51,592 +183,443 @@
 
 -	script	Event_Management	-1,{
 OnWhisperGlobal:
-	mes "[Event Management]";
-	if(getgroupid() >= 60) {
-		mes "What would you like to do?";
+	if(getgroupid() >= 60){
+		message strcharinfo(0),"[Event Management]: What would you like to do?";
 		menu "Join Event",-,"RunEvent",OnRunEvent;
-	} else {
-		mes "Would you like to try and Join the event?";
-		if(select("Yes:No") > 1) close;
 	}
-	next;
 OnJoinEvent:
-	mes "[Event Management]";
-	if($@CurrentEvent <= 0 ){ mes "No events to join at the moment."; close;
-	} else {
-		mes "This is a "+$@Eventname$+" Event for "+(($@ReqJob >= 0)?jobname($@ReqJob):"Players")+" between Levels "+$@LvReq[0]+"/"+$@LvReq[1]+" and "+$@LvReq[2]+"/"+$@LvReq[3]+"";
-		if($@Players[0]) mes "Must be at least "+$@Players[0]+" players for event to take place";
-		if($@Cost[0] > 0 && $@Cost[1] > 0) mes "You will also need "+$@Cost[1]+" "+getitemname($@Cost[0])+" to join.";
-		if($@Cost[2] > 0) mes "You will also need "+$@Cost[2]+"z to join.";
-		mes "Would you like to Join?";
-		if(select("No:Yes") == 1){
-				mes "Ok come back later";
-				close;
-		} else if(BaseLevel < $@LvReq[0] || JobLevel < $@LvReq[1] || BaseLevel > $@LvReq[2] || JobLevel > $@LvReq[3] || ($@ReqJob >= 0 && BaseClass != $@ReqJob)){
-			mes "Sorry this is an Event for "+(($@ReqJob >= 0)?jobname($@ReqJob):"Players")+" between Levels "+$@LvReq[0]+"/"+$@LvReq[1]+" and "+$@LvReq[2]+"/"+$@LvReq[3]+"";
-			close;
-		} else if ( $@Cost[0] && $@Cost[1] && (countitem($@Cost[0]) < $@Cost[1]) ) {
-			if(countitem($@Cost[0]) < $@Cost[1]){
-				mes "Sorry but, You will need "+$@Cost[1]+" "+getitemname($@Cost[0])+" to join.";
-				close;
-			}
-		} else if($@Cost[2] > Zeny){
-			mes "Sorry but, You will need "+$@Cost[2]+"z to join.";
-			close;
-		} else if($@Players[1] && getmapusers($@Map$) >= $@Players[1]){ 
-			mes "Sorry event is full, try again next time.";
-			close;
-		} else {
-			if($@Conditions & 1) sc_end SC_ALL;
-			if($@Conditions & 2) percentheal 100,100;
-			if($@Conditions & 4) sc_start SC_DECREASEAGI,300000+$@MaxTime*60000,10;
-			if(($@Conditions & 16) && getarraysize($@PlayerIDList) < $@Players[1]){
-				set $@PlayerNameList$[$@SaveChars[1]],strcharinfo(0);
-				set $@SaveChars[1],$@SaveChars[1]+1;
-			}
-			if($@Cost[0] && $@Cost[1]){ delitem $@Cost[0],$@Cost[1]; set $@Pool[0],$@Pool[0]+$@Cost[1]; }
-			if($@Cost[2]){ set Zeny,zeny-$@Cost[2]; set $@Pool[1],$@Pool[1]+$@Cost[2]; }
-			if($@Conditions & 8) atcommand "@storeall";
-			warp $@Map$,$@XY[0],$@XY[1];
-		}
+	switch($@CurrentEvent){
+		default:	message strcharinfo(0),"[Event Management]: No events to join at the moment.";	end;
+//callfunc("JoinEvent",<eventname>,<minplayers>,<maxplayers>,<itemcost>,<itemqnt>,<zenycost>,<minbase>,<maxbase>,<minjob>,<maxjob>,<reqjob>,<conditions>,<eventmap>,<mapx>,<mapy>,<length>);
+
+		case 1:	callfunc("JoinEvent","Zombie Survival",1,128,0,0,0,0,45,0,10,0,27,"1@zombie",0,0,10);	break;
+		case 2:	callfunc("JoinEvent","Dice",2,128,0,0,0,0,1000,0,1000,-1,16,"quiz_01",205,92,0);	break;
+		case 3:	callfunc("JoinEvent","PvP",3,128,0,0,0,0,1000,0,1000,-1,18,"pvp_n_1-5",0,0,20);	break;
+		case 4:	callfunc("JoinEvent","Maze",1,0,0,0,0,0,1000,0,1000,-1,1,"maze",371,143,30);	break;
+		case 5: callfunc("JoinEvent","Poring",1,0,0,0,0,0,1000,0,1000,-1,0,"pvp_n_1-5",0,0,30);	break;
+		case 6: callfunc("JoinEvent","Man Hunt",3,127,0,0,0,0,1000,0,1000,-1,19,"pvp_n_1-5",0,0,10);	break;
+		case 7:	callfunc("JoinEvent","Cluckers",0,0,0,0,0,0,1000,0,1000,-1,0,"prontera",156,219,0);	break;
+		case 8: callfunc("JoinEvent","Lucky",5,128,0,0,0,0,1000,0,1000,-1,48,"prontera",155,181,0);	break;
+		case 9: callfunc("JoinEvent","Bombring",1,128,0,0,0,0,1000,0,1000,-1,16,"quiz_02",59,345,5);	break;
+//Future use for GM Customazation
+		case 255: callfunc("JoinEvent",.EventName$,.Minplayers,.Maxplayers,.ItemReq$,.ItemQnt$,.ZenyCost,.MinBase,.MaxBase,.MinJob,.MaxJob,.ReqJob,.Conditions,.EventMap$,.MapX,.MapY,.Duration);	break;
 	}
 end;
 OnRunEvent:
-	mes "[Event Management]";
-	if($@CurrentEvent){ mes "Sorry an event is already running";  close;
-	} else if(agitcheck()||agitcheck2()){  mes "Sorry cannot run event during woe";  end;
+	if(getgroupid()<60) end;
+	if($@CurrentEvent){ message strcharinfo(0),"[Event Management]: Sorry an event is already running"; end;
+	} else if(agitcheck()||agitcheck2()){  message strcharinfo(0),"[Event Management]: Sorry cannot run event during woe"; end;
 	} else {
+		mes "[Event Management]";
 		mes "Ok boss what event should we run today?";
-		switch(select("PVP:Zombie:Dice:Maze::Poring::::Man-Hunt")){
-			case 1:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("PvpEventRUN");
-				break;
-			case 2:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("ZombieRUN");
-				break;
-			case 3:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("1234RUN");
-				break;
-			case 4:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("MazeRUN");
-				break;
-			case 6:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("PoringRUN");
-				break;
-			case 10:
-				if(getgroupid()<60) delitem 26504,1;
-				close2;
-				detachrid;
-				callfunc("CleanEvents");
-				callfunc("ManHuntRUN");
-				break;
-			default: break;
+		switch(select("Zombie:Dice:PVP:Maze:Poring:Man-Hunt:Cluckers:Lucky")){
+			case 1:	close2;	detachrid;
+				callfunc("ZombieRUN",1,"Zombie Survival","1@zombie","1@zombie",175,120,0,10,1394,10,1423,5,1298,1);
+			end;
+			case 2:	close2;	detachrid;
+				callfunc("1234RUN",2,"Dice","quiz_01",2,1,100);
+			end;
+			case 3:	close2;	detachrid;
+				callfunc("PvpEventRUN",3,"PvP","pvp_n_1-5",3,20);
+			end;
+			case 4:	close2;	detachrid;
+				callfunc("MazeRUN",4,"Maze","maze",1,30);
+			end;
+			case 5:	close2;	detachrid;
+				callfunc("PoringRUN",5,"Poring","pvp_n_1-5",1,2,30,1725,5,"Porjng|P0ring|Porlng|Porimg|Porinq|Poporing|This One|Right|Kill Me|Poning|qoring|Pooring|Pouring|Polling|~Poring~|Winner|Prize|Porirg|Paring");
+			end;
+			case 6:	close2;	detachrid;
+				callfunc("CluckersRun",7,"Cluckers",30);
+			end;
+			case 7:	close2;	detachrid;
+				callfunc("ManHuntRUN",6,"Man Hunt","pvp_n_1-5",10,3);
+			end;
+			case 8:	close2;	detachrid;
+				callfunc("LuckyRun",8,"Lucky",5,1);
+			end;
+			case 9:	close2;	detachrid;
+				callfunc("BombringRun",9,"Bombring","quiz_02",1,5);
+			end;
+			default:
+			close;
 		} 
 	}
 end;
 OnMinute55:
-	if(agitcheck()||agitcheck2()) end;
-	callfunc("CleanEvents");
-	switch(rand(1,4)){
-		case 1:		callfunc("1234RUN");		break;
-		case 2:		callfunc("ZombieRUN");		break;
-		case 3:		callfunc("PvpEventRUN");	break;
-		case 4:		callfunc("MazeRUN");		break;
-		case 5:	//Invasion				break;	//save old_morocc from satan morroc
-		case 6:		callfunc("PoringRUN");		break;
-		case 7:	//Mvp Arena				break;	//Summons a random mvps and turns pvp on
-		case 8:	//Rag-narok training			break;	//Summons a random mvps (no drops) from list continuesly with pvp on, res and gives buffs to all after and prize last man standing
-		case 9:	//X-O quiz_01 140 277			break;	//like 1234 but just 2 squares
-		case 10://Manhunt				break;	//Someone elses event
-		case 11://lucky Pick				break;	//pick one person who enters map and gives them a prize
-		case 12://DB event				break:	//Auto summons monsters from dead branches (pvp on)
+	if(agitcheck()||agitcheck2()||$@CurrentEvent) end;
+	switch(rand(1,7)){
+		case 1:		callfunc("ZombieRUN",1,"Zombie Survival","1@zombie","1@zombie",175,120,0,10,1394,10,1423,5,1298,1);	break;
+		case 2:		callfunc("PvpEventRUN",3,"PvP","pvp_n_1-5",3,20);	break;
+		case 3:		callfunc("1234RUN",2,"Dice","quiz_01",2,1,100);		break;
+		case 4:		callfunc("MazeRUN",4,"Maze","maze",1,30);		break;
+		case 5:		callfunc("PoringRUN",5,"Poring","pvp_n_1-5",1,2,30,1725,5,"Porjng|P0ring|Porlng|Porimg|Porinq|Poporing|This One|Right|Kill Me|Poning|qoring|Pooring|Pouring|Polling|~Poring~|Winner|Prize|Porirg|Paring");		break;
+		case 6:		callfunc("CluckersRun",7,"Cluckers",30);	break;
+		case 7:		callfunc("LuckyRun",8,"Lucky",5,1);	break;
+		case 8:		callfunc("BombringRun",9,"Bombring","quiz_02",1,5);	break;
+		case 9:		callfunc("ManHuntRUN",6,"Man Hunt","pvp_n_1-5",10,3);	break;
+
+//		case :		//Mvp Arena			break;	//Summons a random mvp and turns pvp on
+//		case :		//Rag-narok training		break;	//Summons random mvps (no drops) from list continuesly with pvp on, gives buffs to all after and prize 4 lms
+//		case :		//X-O quiz_01 140 277		break;	//like 1234 but just 2 squares
+//		case :		//Invasion			break;	//save old_morocc from satan morroc
+//		case :		//lucky Pick			break;	//pick one person who enters map and gives them a prize
+//		case :		//DB event			break:	//Auto summons monsters from dead branches (pvp on)
 	}
-	end;
+end;
 OnInit:
 	bindatcmd("joinevent","Event_Management::OnJoinEvent",0,99);
 	bindatcmd("runevent","Event_Management::OnRunEvent",60,99);
 	set $@CurrentEvent,0;
-	disablenpc "PvpEventPrize";
-	disablenpc "ZombiePrize";
-	disablenpc "1234-Prize";
-	disablenpc "MazePrize";
 	disablenpc "ManhuntPrize";
 end;
 }
 
-function	script	CleanEvents	{
-	set $@ReturnMap$[0],"prontera";
-	setarray $@ReturnXY[0],155,181;
-	set $@SpecialConditions,0;
-	set $@Eventname$,"";
-	setarray $@Map$,"";
-	setarray $@XY[0],0,0;
-	setarray $@LvReq[0],0,0,5000,5000;
-	set $@ReqJob,-1;
-	setarray $@Prizes[0],0,0,0;
-	setarray $@Cost[0],0,0,0;
-	setarray $@PrizePool[0],0,0;
-	setarray $@Pool[0],0,0;
-	setarray $@PrizeMap$,"";
-	set $@JobGroup,0;
-	setarray $@PrizeXY[0],0,0;
-	set $@Conditions,0;
-	setarray $@Players[0],0,0;
-	set $@MaxTime,0;
-	set $@Winers,0;
-	setarray $@OOB[0],0,0,0,0;
-	setarray $@StairsX[0],0,0,0,0,0,0,0,0;
-	setarray $@StairsY[0],0,0;
-	setarray $@Box1[0],0,0;
-	setarray $@Box2[0],0,0;
-	setarray $@Box3[0],0,0;
-	setarray $@Box4[0],0,0;
-	setarray $@BoxY[0],0,0;
-	cleararray $@Mobs[0],0,127;
-	setarray $@SaveChars,0,0;
-	set $@Target,-1;
-	cleararray $@PlayerNameList$[0],0,127;
-	set $@CurrentEvent,0;
-	set $@ReturnMap$[0],"prontera";			//Map Warped to after Events
-	setarray $@ReturnXY[0],155,181;			//X, Y Warped to after Events
-	return;
+
+function	script	JoinEvent	{
+//callfunc("JoinEvent",<eventname>,<minplayers>,<maxplayers>,<itemcost>,<itemqnt>,<zenycost>,<minbase>,<maxbase>,<minjob>,<maxjob>,<reqjob>,<conditions>,<eventmap>,<mapx>,<mapy>,<length>);
+	if($@CurrentEvent <= 0 ){ message strcharinfo(0),"[Event Management]: No events to join at the moment."; close;
+	} else {
+		mes "[Event Management]";
+		if( (getarg(6,0)||getarg(8,0)) && (getarg(7,200)||getarg(9,70)) ) { mes "This is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" between levels "+getarg(6,0)+"/"+getarg(8,0)+" and "+getarg(7,200)+"/"+getarg(9,70)+"";
+		} else if(getarg(6,0)||getarg(8,0)){ mes "This is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" above level "+getarg(7,200)+"/"+getarg(9,70)+"";
+		} else if(getarg(7,200)||getarg(9,70)){ mes "This is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" below level "+getarg(7,200)+"/"+getarg(9,70)+"";
+		} else { mes "This is a "+getarg(0,"Test")+" Event "+((getarg(10,-1) >= 0)?"for "+jobname(getarg(10,-1))+"":""); }
+		if(getarg(1,0)) mes "Must be at least "+getarg(1,0)+" players for event to take place";
+		if(getarg(3,0) && getarg(4,0)) mes "You will also need "+getarg(4,0)+" "+getitemname(getarg(3,0))+" to join.";
+		if(getarg(5,0)) mes "You will also need "+getarg(5,0)+"z to join.";
+		mes "Would you like to Join?";
+		if(select("No:Yes") == 1){
+				mes "Ok come back later";
+				close;
+		} else if((BaseLevel < getarg(6,0) && getarg(6,0)) || (JobLevel < getarg(8,0) && getarg(8,0)) || (BaseLevel > getarg(7,200) && getarg(7,200)) || (JobLevel > getarg(9,70) && getarg(9,70)) || (getarg(10,-1) >= 0 && BaseClass != getarg(10,-1))){
+			if( ( getarg(6,0)||getarg(8,0) ) && ( getarg(7,200)||getarg(9,70) ) ) { mes "Sorry this is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" between levels "+getarg(6,0)+"/"+getarg(8,0)+" and "+getarg(7,200)+"/"+getarg(9,70)+"";
+			} else if(getarg(6,0)||getarg(8,0)){ mes "Sorry this is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" above level "+getarg(7,200)+"/"+getarg(9,70)+"";
+			} else if(getarg(7,200)||getarg(9,70)){ mes "Sorry this is a "+getarg(0,"Test")+" Event for "+((getarg(10,-1) >= 0)?""+jobname(getarg(10,-1))+"":"Players")+" below level "+getarg(7,200)+"/"+getarg(9,70)+"";
+			} else { mes "Sorry this is a "+getarg(0,"Test")+" Event "+((getarg(10,-1) >= 0)?"for "+jobname(getarg(10,-1))+"":""); }
+			close;
+		} else if(getarg(3,0) > 0 && getarg(4,0)){ if(countitem(getarg(3,0)) < getarg(4,0)){ mes "Sorry but, You will need "+getarg(4,0)+" "+getitemname(getarg(3,0))+" to join."; close; }
+		} else if(getarg(5,0) > Zeny){ mes "Sorry but, You will need "+getarg(5,0)+"z to join."; close;
+		} else if(getarg(2,127) && getmapusers(getarg(12,"prontera")) >= getarg(2,127)){ mes "Sorry event is full, try again next time."; close;
+		} else {
+			if(getarg(11,0)&16){
+				if(getarraysize($@EventPlayers) < getarg(2,128)){
+					for(.@i = 0; .@i < getarraysize($@EventPlayers); .@i++){
+						if($@EventPlayers[.@i] == getcharid(3)){ mes "Sorry your already listed in event."; close; }
+					}
+					setarray $@EventPlayers[getarraysize($@EventPlayers)],getcharid(3);
+				} else { mes "Sorry event is full, try again next time."; close; }
+			}
+			if(getarg(11,0)&1) callfunc("dispell");
+			if(getarg(11,0)&2) percentheal 100,100;
+			if(getarg(11,0)&4) sc_start SC_DECREASEAGI,300000+getarg(15,0)*60000,10;
+			if(getarg(11,0)&8) atcommand "@storeall";
+			if(getarg(3,0) && getarg(4,0)) delitem getarg(3,0),getarg(4,0);
+			if(getarg(5,0)) set Zeny,zeny-getarg(5,0);
+			if(getarg(11,0)&32) end;
+			warp getarg(12,"prontera"),getarg(13,0),getarg(14,0);
+		}
+	}
 }
+
 
 //========================= Running Event ===============================
 
+
+
 function	script	ZombieRUN	{
+//callfunc("ZombieRUN",<eventID>,<eventname>,<eventmap>,<prizemap>,<prizex>,<prizey>,<minplayers>,<length>,<mobsarray>);
 	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@Eventname$,"Zombie Survival";
-		set $@CurrentEvent,1;
-		setarray $@Map$,"1@zombie";				//Zombie Event Map
-		setarray $@XY[0],0,0;					//Zombie Event X, Y
-		setarray $@LvReq[0],0,0,10,10;				//Max Base,Job Levels for Zombies
-		set $@ReqJob,0;						//Base Job Required to Play
-		set $@MaxTime,10;					//Zombie Waves Times (Suggest Less then 50)
-		setarray $@Mobs,1394,10,1423,3,1298,1;			//MobID,Amount Per Wave
-		setarray $@PrizeMap$,"1@zombie";			//Zombie Prize Map
-		setarray $@PrizeXY,175,120;				//Zombie Prize X, Y
-		setarray $@Prizes,0,0,20000;				//Prize - Item, Amount, Zeny
-		setarray $@Cost,909,10,0;				//Join Cost - Item, Amount, Zeny
-		setarray $@PrizePool,10000,0;				//100 = 1% Prizes pooled from players - Items, Zeny
-		set $@Conditions,1|2|8;					//Bitwise
-									//1 sc_end SC_ALL;
-									//2 percentheal 100,100;
-									//4 sc_start SC_DECREASEAGI,300000+$@MaxTime*60000,10;
-									//8 atcommand "@storeall";
-	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	disablenpc "ZombiePrize";
+	mapwarp getarg(2,"1@zombie"),"prontera",155,181;
+	set $@CurrentEvent,getarg(0,1);
 	for(set .@i,5; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
+		Announce ""+getarg(1,"Zombie Survival")+" Event Will begin in "+.@i+" Mins!",8;
 		Announce "Please type @joinevent to join",8;
 		sleep 60000;
 	}
-	Announce ""+$@Eventname$+" Event Has Begun!",8;
-	set $@CurrentEvent,$@CurrentEvent*-1;
-	if(getmapusers($@Map$)<$@Players[0]){
-		mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
-		mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-		set $@CurrentEvent,0;
-		end;
+	Announce ""+getarg(1,"Zombie Survival")+" Event Has Begun!",8;
+	set $@CurrentEvent,-getarg(0,1);
+	if(getmapusers(getarg(2,"1@zombie"))<getarg(6,0)){
+		mapannounce getarg(2,"1@zombie"),"Sorry there are not enough players for this event to take place",8;
+		mapwarp getarg(2,"1@zombie"),"prontera",155,181;
 	} else {
+		//Insert Rules
+		set .@gc, getargcount()-8;
+		for ( .@i = 0; .@i < .@gc; set .@i,.@i + 1){
+			setarray .@Mobs[.@i], getarg(.@i + 8,0);
+		}
 		sleep 25000;
-		monster $@Map$,$@PrizeXY[0],$@PrizeXY[1],"--ja--",1394,10,"ZombiePrize::OnKillZombie";
-		for(set .@wave,0; .@wave < $@MaxTime; set .@wave,.@wave+1){
-			if(.@wave < $@MaxTime){ mapannounce $@Map$,"Wave "+.@wave+"!",8;
-			} else { mapannounce $@Map$,"FIANL WAVE!",8; }
+		for(set .@wave,0; .@wave < getarg(7,10); set .@wave,.@wave+1){
+			if(.@wave < getarg(7,10)){
+				mapannounce getarg(2,"1@zombie"),"Wave "+(.@wave + 1)+"!",8;
+			} else {
+				mapannounce getarg(2,"1@zombie"),"FIANL WAVE!",8;
+			}
 			sleep 1000;
 			for(set .@i,5; .@i > 0; set .@i,.@i-1){
-				mapannounce $@Map$,""+.@i+"...",8;
+				mapannounce getarg(2,"1@zombie"),""+.@i+"...",8;
 				sleep 1000;
 			}
-			mapannounce $@Map$,"Begin Wave!",8;
-			for(set .@i,0; (.@i < getarraysize($@Mobs)); set .@i,.@i+2){
-				monster $@Map$,0,0,"--ja--",$@Mobs[.@i],.@wave*$@Mob[.@i+1],"ZombiePrize::OnKillZombie";
+			mapannounce getarg(2,"1@zombie"),"Begin Wave!",8;
+			for(set .@i,0; (.@i < getarraysize(.@Mobs)); set .@i,.@i+2){
+				monster getarg(2,"1@zombie"),0,0,"--ja--",.@Mobs[.@i], .@wave * .@Mobs[.@i+1],"ZombiePrize::OnKillZombie";
 			}
-			if(!getmapusers($@Map$)){ set .@wave,$@MaxTime+.@wave;
+			if(!getmapusers(getarg(2,"1@zombie"))){
+				set .@wave,getarg(7,10)+.@wave;
 			} else {
-				mapannounce $@Map$,"There are "+getmapusers($@Map$)+" Players",8;
+				mapannounce getarg(2,"1@zombie"),"There are "+getmapusers(getarg(2,"1@zombie"))+" Players",8;
 				sleep 56000;
 			}
 		}
-		mapannounce $@Map$,"Zombie Survival is now over!",8;
-		mapwarp $@Map$,$@PrizeMap$,$@PrizeXY[0],$@PrizeXY[1];
-		enablenpc "ZombiePrize";
-		killmonster $@Map$,"ZombieRUN::OnKillZombie";
-		set $@CurrentEvent,0;
-		end;
-	}
-end;
-}
-
-function	script	1234RUN	{
-	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@Eventname$,"Dice";
-		set $@CurrentEvent,2;
-		setarray $@Map$,"quiz_01";				//1234 Event Map
-		setarray $@XY,205,92;					//1234 X, Y
-		setarray $@Players[0],1,0;				//Min,Max Players
-		set $@Winers,1;						//Number of Winers
-		set $@MaxTime,100;					//Max rolls before tie (suggest 100 max)
-		setarray $@OOB[0],182,94,228,88;			//Out of bounds upper area x1, y1, x2, y2
-		setarray $@StairsX[0],185,188,197,200,209,212,221,224;	//Area stairs x1, x2, x3, x4, x5, x6, x7, x8
-		setarray $@StairsY[0],87,82;				//Out of bounds area stairs y1, y2
-		setarray $@Box1[0],183,191;				//Box 1 x1, x2
-		setarray $@Box2[0],195,203;				//Box 2 x1, x2
-		setarray $@Box3[0],207,215;				//Box 3 x1, x2
-		setarray $@Box4[0],219,227;				//Box 4 x1, x2
-		setarray $@BoxY[0],81,59;				//Boxs y1, y2
-		setarray $@Prizes[0],501,5,0;				//Prize - Item, Amount, Zeny
-		setarray $@Cost[0],0,0,0;				//Join Cost - Item, Amount, Zeny
-		setarray $@PrizePool[0],0,0;				//100 = 1% Prizes pooled from players - Items,Zeny
-	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	disablenpc "1234-Prize";
-	for(set .@i,5; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
-		Announce "Please type @joinevent to join",8;
-		sleep 60000;
-	}
-	Announce ""+$@Eventname$+" Event Has Begun!",8;
-	set $@CurrentEvent,$@CurrentEvent*-1;
-	sleep 9000;
-	if(getmapusers($@Map$)<$@Players[0]){
-		mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
-		mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-		set $@CurrentEvent,0;
-		end;
-	} else {
-		mapannounce $@Map$,"Ok the rules of this "+$@Eventname$+" Event are as follows",8;
-		sleep 5000;
-		mapannounce $@Map$,"Each player picks a box 1, 2, 3 or 4",8;
-		sleep 5000;
-		mapannounce $@Map$,"There will be a count down from 10 to 0",8;
-		sleep 5000;
-		mapannounce $@Map$,"at 0 a four sided die will be rolled",8;
-		sleep 5000;
-		mapannounce $@Map$,"Anyone in the box of the number rolled will be warped to town",8;
-		sleep 5000;
-		mapannounce $@Map$,"as well as anyone on the stairs or outside the box",8;
-		sleep 5000;
-		mapannounce $@Map$,"the number of players remaining will be announced",8;
-		sleep 5000;
-		mapannounce $@Map$,"this prosses will repeat till only one player remains",8;
-		sleep 5000;
-		mapannounce $@Map$,"take a few moments to fnd a box",8;
-		sleep 15000;
-		mapannounce $@Map$,"we will now begin, please find a box",8;
-		sleep 6000;
-		for(set .@1234,0; .@1234 < $@MaxTime; set .@1234,.@1234+1){
-			for(set .@i,10; .@i > 0; set .@i,.@i-1){
-				mapannounce $@Map$,""+.@i+"...",8;
-				sleep 1000;
-			}
-			set .@i,rand(1,4);
-			mapannounce $@Map$,"0... Good Bye Box "+.@i+"",8;
-			switch(.@i){
-				case 1:	areawarp $@Map$,$@Box1[0],$@BoxY[0],$@Box1[1],$@BoxY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	break;
-				case 2:	areawarp $@Map$,$@Box2[0],$@BoxY[0],$@Box2[1],$@BoxY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	break;
-				case 3:	areawarp $@Map$,$@Box3[0],$@BoxY[0],$@Box3[1],$@BoxY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	break;
-				case 4:	areawarp $@Map$,$@Box4[0],$@BoxY[0],$@Box4[1],$@BoxY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	break;
-			}
-			areawarp $@Map$,$@OOB[0],$@OOB[1],$@OOB[2],$@OOB[3],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];			//Upper Area
-			areawarp $@Map$,$@StairsX[0],$@StairsY[0],$@StairsX[1],$@StairsY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	//Stairs 1
-			areawarp $@Map$,$@StairsX[2],$@StairsY[0],$@StairsX[3],$@StairsY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	//Stairs 2
-			areawarp $@Map$,$@StairsX[4],$@StairsY[0],$@StairsX[5],$@StairsY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	//Stairs 3
-			areawarp $@Map$,$@StairsX[6],$@StairsY[0],$@StairsX[7],$@StairsY[1],$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];	//Stairs 4
-			if(getmapusers($@Map$)<=$@Winers){	set .@1234,$@MaxTime+1;
-			} else {
-				mapannounce $@Map$,"There are "+getmapusers($@Map$)+" Players Remaining.",8;
-				mapannounce $@Map$,"Take a few moments if you want to change boxes.",8;
-				sleep 20000;
-			}
-		}
-		mapannounce $@Map$,"Event is over",8;
-		mapannounce $@Map$,"Walk up the stairs and speak with the Npc in the center to collect your prize",8;
-		enablenpc "1234-Prize";
-		set $@CurrentEvent,0;
-		end;
-	}
-}
-
-function	script	PvpEventRUN	{
-	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@Eventname$,"Last Man Standing";
-		set $@CurrentEvent,3;
-		setarray $@Map$,"pvp_n_1-5";				//PVP Event Map
-		setarray $@XY[0],0,0;					//PVP Event X, Y
-		setarray $@Players[0],3,0;				//Min,Max Players
-		setarray $@LvReq[0],80,80,150,150;			//Min Base, Job, Max Base, Job Levels for PVP
-		set $@MaxTime,20;					//PVP Times in Mins (Suggest Less then 50)
-		set $@JobGroup,7;					//Jobs Groups Allowed Bitwise
-									//[1] Novice, [2] 1st, [4] 2nd, [8] 3rd
-		set $@Conditions,2;					//Bitwise
-									//1 sc_end SC_ALL;
-									//2 percentheal 100,100;
-									//4 sc_start SC_DECREASEAGI,300000+$@MaxTime*60000,10;
-									//8 atcommand "@storeall";
-		setarray $@Prizes[0],0,0,50000;				//Prize - Item, Amount, Zeny
-		setarray $@Cost[0],0,0,2500;				//Join Cost - Item, Amount, Zeny
-		setarray $@PrizePool[0],0,10000;			//100 = 1% Prizes pooled from players - Items, Zeny
-		if(rand(100) < 10 && $@JobGroup){
-			switch(rand(1,$@JobGroup)){
-				case 1:
-					set .i,0;
-					set $@ReqJob,.i;
-					set $@Eventname$,"Novice Last Man Standing";
-				break;
-				default:
-				case 2:	case 3:
-					set .i,rand(1,6);
-					if(rand(7) == 7) set .i,4046;
-					set $@ReqJob,.i;
-					set $@Eventname$,""+jobname(.i)+" Class Last Man Standing";
-				break;
-				case 4:	case 5:	case 6:	case 7:
-					set .i,rand(7,12) + rand(1)*7;
-					if(rand(17) > 14) set .i,rand(23,25);
-					if(rand(19) > 16) set .i,4047+rand(1)*2;
-					set $@ReqJob,.i;
-					set $@Eventname$,""+jobname(.i)+" Class Last Man Standing";
-				break;
-				case 8:		case 9:		case 10:	case 11:
-				case 12:	case 13:	case 14:	case 15:
-					set .i,rand(4054,4059)+rand(1)*(12+rand(1));
-					set $@ReqJob,.i;
-					set $@Eventname$,""+jobname(.i)+" Class Last Man Standing";
-				break;
+		mapannounce getarg(2,"1@zombie"),""+getarg(1,"Zombie Survival")+" is now over!",8;
+		killmonsterall getarg(2,"1@zombie");
+		while(getmapusers(getarg(2,"1@zombie"))){
+			for(.@i = 0; .@i < getarraysize($@EventPlayers); .@i++){
+				if(attachrid($@EventPlayers[.@i])){
+					if(strcharinfo(3) == getarg(2,"pvp_n_1-5")){
+						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Dice")+" Event!",bc_blue|bc_all;
+						getitem 7859,1;
+						warp "prontera",155,181;
+						detachrid;
+					}
+				}
 			}
 		}
 	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	disablenpc "PvpEventPrize";
-	for(set .@i,5; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
-		Announce "Please type @joinevent to join",8;
-		sleep 60000;
-	}
-	Announce ""+$@Eventname$+" Event Has Begun!",8;
-	set $@CurrentEvent,$@CurrentEvent*-1;
-	sleep 9000;
-	if(getmapusers($@Map$)<$@Players[0]){
-		mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
-	} else {
-		mapannounce $@Map$,"The Rules of this event are as follows",8;
-		sleep 5000;
-		mapannounce $@Map$,"This is a Free for all Last man Standing",8;
-		sleep 5000;
-		mapannounce $@Map$,"there is a "+$@MaxTime+" min time limit in place if there is no clear winner within "+$@MaxTime+" mins the Event ends",8;
-		sleep 5000;
-		mapannounce $@Map$,"Everyone has 1 Life so Res, Ygg Leafs and Kazail dont work",8;
-		sleep 5000;
-		mapannounce $@Map$,"Spread out PVP will begin in 10...",8;
-		sleep 1000;
-		for(set .@i,9; .@i > 0; set .@i,.@i-1){
-			mapannounce $@Map$,""+.@i+"...",8;
-			sleep 1000;
-		}
-		pvpon $@Map$;
-		mapannounce $@Map$,"Begin",8;
-		sleep 5000;
-		for(set .@PVP,0; .@PVP < $@MaxTime; set .@PVP,.@PVP+1){
-			if(getmapusers($@Map$)<2){ set .@PVP,.@PVP+$@MaxTime;
-			} else { mapannounce $@Map$,"There are "+getmapusers($@Map$)+" Players Remaining",8; }
-			sleep 60000;
-		}
-		if(getmapusers($@Map$)<2){
-			mapannounce $@Map$,"We have a winner",8;
-			pvpoff $@Map$;
-			enablenpc "PvpEventPrize";
-			mapannounce $@Map$,"Talk to the Npc in the center of the map for a prize",8;
-			set $@CurrentEvent,0;
-			end;
-		} else { mapannounce $@Map$,"Time Is up",8; }
-	}
-	sleep 5000;
-	pvpoff $@Map$;
-	set $@CurrentEvent,"0";
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	end;
-}
-
-function	script	MazeRUN	{
-	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@CurrentEvent,4;
-		set $@Eventname$,"Maze";
-		setarray $@Map$,"maze";
-		setarray $@XY,371,143;
-		setarray $@LvReq[0],0,0,5000,5000;
-		set $@ReqJob,-1;
-		setarray $@Prizes[0],0,0,10000;
-		setarray $@Cost[0],0,0,1000;
-		setarray $@PrizePool[0],0,10000;
-		setarray $@Players[0],1,0;
-		set $@MaxTime,30;				//Number of Mins to complete maze
-	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	enablenpc "mazeroadblock";
-	disablenpc "MazePrize";
-	for(set .@i,5; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
-		Announce "Please type @joinevent to join",8;
-		sleep 60000;
-	}
-	Announce ""+$@Eventname$+" Event Has Begun!",8;
-	set $@CurrentEvent,$@CurrentEvent*-1;
-	sleep 9000;
-	if(getmapusers($@Map$)<$@Players[0]){ mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
-	} else {
-		mapannounce $@Map$,"Rules are simple first to get to end of maze wins, so begin~",8;
-		disablenpc "mazeroadblock";
-		enablenpc "MazePrize";
-		for(set .@maze,0; .@maze < $@MaxTime; set .@maze,.@maze+1){
-			if(getmapusers($@Map$)<1) set .@maze,.@maze+$@MaxTime;
-			mapannounce $@Map$,"There are "+($@MaxTime-.@maze)+" Minuets Remaining",8;
-			sleep 60000;
-		}
-	mapannounce $@Map$,"Time Is up",8;
-	}
-	disablenpc "MazePrize";
-	sleep 5000;
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
 	set $@CurrentEvent,0;
 	end;
 }
 
-function	script	PoringRUN	{
+
+function	script	1234RUN	{
+//callfunc("1234RUN",<eventID>,<eventname>,<eventmap>,<minplayers>,<winers>,<maxtime>);
 	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@Eventname$,"Poring";
-		set $@CurrentEvent,6;
-		setarray $@Map$,"pvp_n_1-5";				//Poring Event Map
-		setarray $@XY[0],0,0;					//Poring  Event X, Y
-		setarray $@Players[0],1,0;				//Min,Max Players
-		setarray $@LvReq[0],0,0,1000,1000;			//Min Base, Job, Max Base, Job Levels for PVP
-		set $@MaxTime,30;					//Poring Time in Mins (Suggest Less then 50)
-		set $@Winers,2;						//Number of Winers
-		setarray $@Mobs,1725,$@Winers,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15,1725,15;		
-		setarray $@MobNames$,"Poring","P0ring","Porlng","Porimg","Porinq","Poporing","This One","Right","Kill Me","Poning","qoring","Pooring","Pouring","Polling","~Poring~","Winner","Prize","Porirg","Paring";
-		setarray $@Prizes[0],0,0,50000;				//Prize - Item, Amount, Zeny
-		setarray $@Cost[0],0,0,2500;				//Join Cost - Item, Amount, Zeny
-		setarray $@PrizePool[0],0,10000;			//100 = 1% Prizes pooled from players - Items, Zeny
-	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	pvpoff $@Map$;
-	for(set .@i,1; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
+	mapwarp getarg(2,"quiz_01"),"prontera",155,181;
+	set $@CurrentEvent,getarg(0,2);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Dice")+" Event Will begin in "+.@i+" Mins!",8;
 		Announce "Please type @joinevent to join",8;
 		sleep 60000;
 	}
-	Announce ""+$@Eventname$+" Event Has Begun!",8;
-	set $@CurrentEvent,$@CurrentEvent*-1;
-	if(getmapusers($@Map$)<$@Players[0]){ mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
+	Announce ""+getarg(1,"Dice")+" Event Has Begun!",8;
+	set $@CurrentEvent,-$@CurrentEvent;
+	sleep 9000;
+	if(getmapusers(getarg(2,"quiz_01"))<getarg(3,"2")){
+		mapannounce getarg(2,"quiz_01"),"Sorry there are not enough players for this event to take place",8;
+		mapwarp getarg(2,"quiz_01"),"prontera",155,181;
+		set $@CurrentEvent,0;
+		end;
 	} else {
-		mapannounce $@Map$,"Rules are simple",8;
-		sleep 3000;
-		mapannounce $@Map$,"Kill the 'Poring' with the correct name, and get a warped to town with a prize.",8;
-		sleep 3000;
-		mapannounce $@Map$,"Kill the wrong one and get warped to town with nothing.",8;
-		sleep 3000;
-		mapannounce $@Map$,"There "+(($@Winers>1)?"are":"is")+" "+$@Winers+" right poring"+(($@Winers>1)?"s":"")+" and a "+$@MaxTime+" min timer.",8;
-		sleep 3000;
-		mapannounce $@Map$,"Event will now Begin~",8;
-		sleep 3000;
-		for(set .@i,2; .@i < getarraysize($@Mobs); set .@i,.@i+2){
-			monster $@Map$,0,0,$@MobNames$[.@i/2],$@Mobs[.@i],$@Mobs[.@i+1],"PoringPrize::OnKillWrong";
+		mapannounce getarg(2,"quiz_01"),"Ok the rules of this "+getarg(1,"Dice")+" Event are as follows",8;	sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"Each player picks a box 1, 2, 3 or 4",8;				sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"There will be a count down from 10 to 0",8;				sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"at 0 a four sided die will be rolled",8;				sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"Anyone in the box of the number rolled will be warped to town",8;	sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"as well as anyone on the stairs or outside the box",8;			sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"the number of players remaining will be announced",8;			sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"this prosses will repeat till only one player remains",8;		sleep 5000;
+		mapannounce getarg(2,"quiz_01"),"take a few moments to fnd a box",8;					sleep 15000;
+		mapannounce getarg(2,"quiz_01"),"we will now begin, please find a box",8;				sleep 6000;
+		for(set .@1234,0; .@1234 < getarg(5,100); set .@1234,.@1234+1){
+			for(set .@i,10; .@i > 0; set .@i,.@i-1){	mapannounce getarg(2,"quiz_01"),""+.@i+"...",8;	sleep 1000;	}
+			set .@i,rand(1,4);
+			mapannounce getarg(2,"quiz_01"),"0... Good Bye Box "+.@i+"",8;
+			switch(.@i){
+				case 1:	areawarp getarg(2,"quiz_01"),183,81,191,59,"prontera",155,181;	break;
+				case 2:	areawarp getarg(2,"quiz_01"),195,81,203,59,"prontera",155,181;	break;
+				case 3:	areawarp getarg(2,"quiz_01"),207,81,215,59,"prontera",155,181;	break;
+				case 4:	areawarp getarg(2,"quiz_01"),219,81,227,59,"prontera",155,181;	break;
+			}
+			areawarp getarg(2,"quiz_01"),182,94,228,88,"prontera",155,181;	//Upper Area
+			areawarp getarg(2,"quiz_01"),185,87,188,82,"prontera",155,181;	//Stairs 1
+			areawarp getarg(2,"quiz_01"),197,87,200,82,"prontera",155,181;	//Stairs 2
+			areawarp getarg(2,"quiz_01"),209,87,212,82,"prontera",155,181;	//Stairs 3
+			areawarp getarg(2,"quiz_01"),221,87,224,82,"prontera",155,181;	//Stairs 4
+			if(getmapusers(getarg(2,"quiz_01"))<=getarg(4,1)){	set .@1234,getarg(5,100)+1;
+			} else {
+				mapannounce getarg(2,"quiz_01"),"There are "+getmapusers(getarg(2,"quiz_01"))+" Players Remaining.",8;
+				mapannounce getarg(2,"quiz_01"),"Take a few moments if you want to change boxes.",8;
+				sleep 20000;
+			}
 		}
-		monster $@Map$,0,0,"--ja--",$@Mobs[0],$@Mobs[1],"PoringPrize::OnKillRight";
- 		for(set .@poring,0; .@poring < $@MaxTime; set .@poring,.@poring+1){
-			if(getmapusers($@Map$)<1) set .@poring,.@poring+$@MaxTime;
-			mapannounce $@Map$,"There are "+($@MaxTime-.@poring)+" Minuets Remaining",8;
+		mapannounce getarg(2,"quiz_01"),""+getarg(1,"Dice")+" Event is over",8;
+		while(getmapusers(getarg(2,"quiz_01"))){
+			for(.@i = 0; .@i < getarraysize($@EventPlayers); .@i++){
+				if(attachrid($@EventPlayers[.@i])){
+					if(strcharinfo(3) == getarg(2,"pvp_n_1-5")){
+						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Dice")+" Event!",bc_blue|bc_all;
+						getitem 7859,1;
+						warp "prontera",155,181;
+						detachrid;
+					}
+				}
+			}
+		}
+		set $@CurrentEvent,0;
+		end;
+	}
+}
+
+
+function	script	PvpEventRUN	{
+//callfunc("PvpEventRUN",<eventid>,<eventname>,<eventmap>,<minplayers>,<length>);
+	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
+	pvpoff getarg(2,"pvp_n_1-5");
+	deletearray $@EventPlayers[0],getarraysize($@EventPlayers);
+	set $@CurrentEvent,getarg(0,3);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"PvP")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"PvP")+" Event Has Begun!",8;
+	set $@CurrentEvent,-$@CurrentEvent;
+	sleep 9000;
+	if(getmapusers(getarg(2,"pvp_n_1-5"))<getarg(3,3)){
+		mapannounce getarg(2,"pvp_n_1-5"),"Sorry there are not enough players for this event to take place",8;
+	} else {		mapannounce getarg(2,"pvp_n_1-5"),"The Rules of this event are as follows",8;	
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"This is a Free for all Last man Standing",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"there is a "+getarg(4,20)+" min time limit in place if there is no clear winner within "+getarg(4,20)+" mins the Event ends",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"Everyone has 1 Life so Res, Ygg Leafs and Kazail dont work",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"Spread out PVP will begin in 10...",8;	sleep 1000;
+		for(set .@i,9; .@i > 0; set .@i,.@i-1){	mapannounce getarg(2,"pvp_n_1-5"),""+.@i+"...",8;	sleep 1000;	}
+		pvpon getarg(2,"pvp_n_1-5");
+		mapannounce getarg(2,"pvp_n_1-5"),"Begin",8;
+		sleep 5000;
+		for(set .@PVP,0; .@PVP < getarg(4,20); set .@PVP,.@PVP+1){
+			if(getmapusers(getarg(2,"pvp_n_1-5"))<2){ set .@PVP,.@PVP+getarg(4,20);
+			} else { mapannounce getarg(2,"pvp_n_1-5"),"There are "+getmapusers(getarg(2,"pvp_n_1-5"))+" Players Remaining",8; }
+			sleep 60000;
+		}
+		if(getmapusers(getarg(2,"pvp_n_1-5")) == 1){
+			for(.@i = 0; .@i < getarraysize($@EventPlayers); .@i++){
+				if(attachrid($@EventPlayers[.@i])){
+					if(strcharinfo(3) == getarg(2,"pvp_n_1-5")){
+						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Dice")+" Event!",bc_blue|bc_all;
+						getitem 7859,1;
+						warp "prontera",155,181;
+						detachrid;
+					}
+				}
+			}
+		} else { mapannounce getarg(2,"pvp_n_1-5"),"Time Is up",8; }
+	}
+	pvpoff getarg(2,"pvp_n_1-5");
+	deletearray $@EventPlayers[0],getarraysize($@EventPlayers);
+	set $@CurrentEvent,0;
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
+	end;
+}
+
+
+function	script	MazeRUN	{
+//callfunc("MazeRUN",<eventid>,<eventname>,<eventmap>,<minplayers>,<length>);
+	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
+	mapwarp getarg(2,"maze"),"prontera",155,181;
+	enablenpc "mazeroadblock";
+	disablenpc "Event_Agent#Maze";
+	set $@CurrentEvent,getarg(0,4);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Maze")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"Maze")+" Event Has Begun!",8;
+	set $@CurrentEvent,$@CurrentEvent*-1;
+	sleep 9000;
+	if(getmapusers(getarg(2,"maze"))<getarg(3,1)){ mapannounce getarg(2,"maze"),"Sorry there are not enough players for this event to take place",8;
+	} else {
+		mapannounce getarg(2,"maze"),"Rules are simple first to get to end of maze wins, so begin~",8;
+		disablenpc "mazeroadblock";
+		enablenpc "Event_Agent#Maze";
+		for(set .@maze,0; .@maze < getarg(4,40); set .@maze,.@maze+1){
+			if(getmapusers(getarg(2,"maze"))<1) set .@maze,.@maze+getarg(4,40);
+			mapannounce getarg(2,"maze"),"There are "+(getarg(4,40)-.@maze)+" Minuets Remaining",8;
+			sleep 60000;
+		}
+	mapannounce getarg(2,"maze"),"Time Is up",8;
+	}
+	disablenpc "Event_Agent#Maze";
+	sleep 5000;
+	mapwarp getarg(2,"maze"),"prontera",155,181;
+	set $@CurrentEvent,0;
+	end;
+}
+
+
+function	script	PoringRUN	{
+//callfunc("PoringRUN",<eventid>,<eventname>,<eventmap>,<minplayers>,<winers>,<length>,<mobID>,<fakeqnt>,<fakenames>);
+	explode(.@Mobs$,getarg(8,"Porjng|P0ring|Porlng|Porimg|Porinq|Poporing|This One|Right|Kill Me|Poning|qoring|Pooring|Pouring|Polling|~Poring~|Winner|Prize|Porirg|Paring"),"|");
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
+	set $@CurrentEvent,getarg(0,5);
+	pvpoff getarg(2,"pvp_n_1-5");
+	setmapflag getarg(2,"pvp_n_1-5"),mf_noskill;
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Poring")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"Poring")+" Event Has Begun!",8;
+	set $@CurrentEvent,$@CurrentEvent*-1;
+	if(getmapusers(getarg(2,"pvp_n_1-5"))<getarg(3,1)){ mapannounce getarg(2,"pvp_n_1-5"),"Sorry there are not enough players for this event to take place",8;
+	} else {		mapannounce getarg(2,"pvp_n_1-5"),"Rules are simple",8;
+		sleep 3000;	mapannounce getarg(2,"pvp_n_1-5"),"Kill the 'Poring' with the correct name, and get a warped to town with a prize.",8;
+		sleep 4000;	mapannounce getarg(2,"pvp_n_1-5"),"Kill the wrong one and get warped to town with nothing.",8;
+		sleep 4000;	mapannounce getarg(2,"pvp_n_1-5"),"There "+((getarg(4,2)>1)?"are":"is")+" "+getarg(4,2)+" right poring"+((getarg(4,2)>1)?"s":"")+" and a "+getarg(5,30)+" min timer.",8;
+		sleep 4000;	mapannounce getarg(2,"pvp_n_1-5"),"Event will now Begin~",8;
+		for(set .@i,2; .@i < getarraysize(.@Mobs$); set .@i,.@i+1){
+			monster getarg(2,"pvp_n_1-5"),0,0,.@Mobs$[.@i],getarg(6,1725),getarg(7,5),"PoringPrize::OnKillWrong";
+		}
+		monster getarg(2,"pvp_n_1-5"),0,0,"--ja--",getarg(6,1725),getarg(4,1),"PoringPrize::OnKillRight";
+ 		for(set .@poring,0; .@poring < getarg(5,30); set .@poring,.@poring+1){
+			if(getmapusers(getarg(2,"pvp_n_1-5"))<1) set .@poring,.@poring+getarg(5,30);
+			mapannounce getarg(2,"pvp_n_1-5"),"There are "+(getarg(5,30)-.@poring)+" Minuets Remaining",8;
 			sleep 60000;
 		}
 	}
-	mapannounce $@Map$,"Time Is up",8;
-	killmonsterall $@Map$;
+	mapannounce getarg(2,"pvp_n_1-5"),"Time Is up",8;
+	killmonsterall getarg(2,"pvp_n_1-5");
+	removemapflag getarg(2,"pvp_n_1-5"),mf_noskill;
+	set $@CurrentEvent,0;
 	sleep 5000;
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
 end;
 }
 
+
 function	script	ManHuntRUN	{
+//callfunc("ManHuntRUN",<eventid>,<eventname>,<eventmap>,<length>,<minplayers>);
 	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
-	if(!$@SpecialConditions){
-		set $@CurrentEvent,10;
-		set $@Conditions,19;					//Bitwise
-									//1 sc_end SC_ALL;
-									//2 percentheal 100,100;
-									//4 sc_start SC_DECREASEAGI,300000+$@MaxTime*60000,10;
-									//8 atcommand "@storeall";
-									//16 save player name in array (must be on for manhunt event)
-		set $@Eventname$,"Man-Hunt";
-		setarray $@Map$,"pvp_n_1-5";				//Poring Event Map
-		setarray $@XY,0,0;					//Poring  Event X, Y
-		setarray $@Prizes,0,0,50000;				//Prize - Item, Amount, Zeny
-		setarray $@Cost,0,0,2500;				//Join Cost - Item, Amount, Zeny
-		setarray $@PrizePool[0],0,10000;			//100 = 1% Prizes pooled from players - Items, Zeny
-		setarray $@Players,5,100;				// Min,Max PLayers, keep max players no more than 125
-		set $@MaxTime,10;					//Number of Rounds, each round is a 1 min with a 10 second breather suggest under 45
-	}
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
 	enablenpc "ManhuntPrize";
-	for(set .@i,1; .@i > 0; set .@i,.@i-1){
-		Announce ""+$@Eventname$+" Event Will begin in "+.@i+" Mins!",8;
+	set $@CurrentEvent,getarg(0,6);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Man Hunt")+" Event Will begin in "+.@i+" Mins!",8;
 		Announce "Please type @joinevent to join",8;
 		sleep 60000;
 	}
+	Announce ""+getarg(1,"Man Hunt")+" Event Has Begun!",8;
 	set $@CurrentEvent,$@CurrentEvent*-1;
-	if(getmapusers($@Map$)<$@Players[0]){ mapannounce $@Map$,"Sorry there are not enough players for this event to take place",8;
-	} else {
-		setarray $@Pool,$@Pool[0]/$@MaxTime,$@Pool[1]/$@MaxTime;
-		mapannounce $@Map$,"The goal is this event is to kill the target within 60 seconds.",8;
-		sleep 5000;
-		mapannounce $@Map$,"The one who managed to kill the target will gain a prize",8;
-		sleep 5000;
-		mapannounce $@Map$,"But if the target surivived, the target will gain the prize",8;
-		sleep 5000;
-		mapannounce $@Map$,"Man-Hunt Event start!",8;
-		for(set .@round,1; .@round < $@MaxTime; set .@round,.@round+1){
-			if(getmapusers($@Map$)<$@Players[0]){ mapannounce $@Map$,"Sorry there are not enough players for this event to take place anymore",8;
+	if(getmapusers(getarg(2,"pvp_n_1-5"))<getarg(4,3)){ mapannounce getarg(2,"pvp_n_1-5"),"Sorry there are not enough players for this event to take place",8;
+	} else {		mapannounce getarg(2,"pvp_n_1-5"),"The goal is this event is to kill the target within 60 seconds.",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"The one who managed to kill the target will gain a prize",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"But if the target surivived, the target will gain the prize",8;
+		sleep 5000;	mapannounce getarg(2,"pvp_n_1-5"),"Man-Hunt Event start!",8;
+		for(set .@round,1; .@round < getarg(3,10); set .@round,.@round+1){
+			if(getmapusers(getarg(2,"pvp_n_1-5"))<getarg(4,3)){ mapannounce getarg(2,"pvp_n_1-5"),"Sorry there are no longer enough players for another round",8;
 			} else {
-				if(.@round > 1){ mapannounce $@Map$,"Next Round will begin in 10 seconds!",8; sleep 10000; }
-				while(attachrid(getcharid(0,$@PlayerNameList$[$@Target])) && strcharinfo(3)!= $@Map$){
+				if(.@round > 1){ mapannounce getarg(2,"pvp_n_1-5"),"Next Round will begin in 10 seconds!",8; sleep 10000; }
+				while(attachrid(getcharid(0,$@PlayerNameList$[$@Target])) && strcharinfo(3)!= getarg(2,"pvp_n_1-5")){
 					set $@Target,rand(getarraysize($@PlayerNameList$));
 				}
-				mapannounce $@Map$,"[Round "+.@round+"] Our target is "+$@PlayerNameList$[$@Target]+"!",8;
+				mapannounce getarg(2,"pvp_n_1-5"),"[Round "+.@round+"] Our target is "+$@PlayerNameList$[$@Target]+"!",8;
 				atcommand "killable "+$@PlayerNameList$[$@Target];
 				atcommand "size "+$@PlayerNameList$[$@Target]+" 2";
 				sleep 60000;
 				if($@Target != -1){
-					if(attachrid(getcharid(0,$@PlayerNameList$[$@Target])) && strcharinfo(3)== $@Map$){
-						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-						if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-						if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-						if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
+					if(attachrid(getcharid(0,$@PlayerNameList$[$@Target])) && strcharinfo(3)== getarg(2,"pvp_n_1-5")){
+						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Man Hunt")+" Event!",bc_blue|bc_all;
+						set Zeny,zeny+50000;
 					}
 				}
 				atcommand "alive "+$@PlayerNameList$[$@Target]+"";
@@ -646,86 +629,163 @@ function	script	ManHuntRUN	{
 		}
 	}
 	disablenpc "ManhuntPrize";
-	mapannounce $@Map$,"Event is Over",8;
+	mapannounce getarg(2,"pvp_n_1-5"),"Event is Over",8;
 	sleep 5000;
-	mapwarp $@Map$,$@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	mapwarp getarg(2,"pvp_n_1-5"),"prontera",155,181;
+	set $@CurrentEvent,0;
 }
-//========================= Prizes ======================================
 
-1@zombie,175,120,4	script	ZombiePrize	425,{
-	mes "[Event Agent]";
-	mes "So you mangaed to live";
-	next;
-	mes "[Event Agent]";
-	mes "Here is your prize and goodbye";
-	close2;
-	announce "Congrats to, "+strcharinfo(0)+" a winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-	if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-	if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-	if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-	setarray $@Pool[0],0,0;
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	end;
-OnKillZombie:
-	getmapxy(.@pc_map$, .@pc_x, .@pc_y, 0);
-	set .@i,rand(getarraysize($@Mob)/2)*2;
-	monster $@Map$,.@pc_x+rand(-5,5),.@pc_y+rand(-5,5),"--ja--",$@Mobs[.@i],.@wave*$@Mob[.@i+1],"ZombiePrize::OnKillZombie";
-	dispbottom "Don't do that";
-	sc_start SC_DECREASEAGI,SC_DECREASEAGI,300000+$@MaxTime*60000,10;
-	percentheal -20,-100;
+function	script	LuckyRun	{
+//callfunc("LuckyRun",<eventid>,<eventname>,<minplayers>,<winners>);
+	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
+	deletearray $@EventPlayers[0],getarraysize($@EventPlayers);
+	set $@CurrentEvent,getarg(0,8);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Lucky")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"Lucky")+" Event Has Begun!",8;
+	set $@CurrentEvent,-getarg(0,8);
+	if(getarraysize($@EventPlayers) >= getarg(2,5)){
+		for(.@i = 0; .@i < getarg(3,1) && .@f < getarg(2,5); .@i++){
+			if(attachrid($@EventPlayers[rand(getarraysize($@EventPlayers))])){
+				if(CheckVending() ){
+					DetachRID();
+					set .@i,.@i - 1;
+					set .@f,.@f + 1;
+				} else {
+					announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Lucky")+" Event!",bc_blue|bc_all;
+					getitem 7859,1;
+					detachrid;
+				}
+			} else { set .@i,.@i - 1; set .@f,.@f + 1;}
+		}
+	} else { Announce "Event Stopped! Not Enough Players Joined the "+getarg(1,"Lucky")+" Event!",8; }
+	if(.@f >= getarg(2,5)){ Announce "Not Enough Players Joined the "+getarg(1,"Lucky")+" Event, Event Failed!",8; }
+	deletearray $@EventPlayers[0],getarraysize($@EventPlayers);
+	set $@CurrentEvent,0;
 end;
 }
 
-quiz_01,205,92,4	script	1234-Prize	456,{
-	mes "[Event Agent]";
-	mes "Your a lucky one";
-	next;
-	mes "[Event Agent]";
-	mes "I guess you get a prize";
-	close2;
-	announce "Congrats to, "+strcharinfo(0)+" a winner of the "+$@Eventname$+" event!",bc_blue|bc_all;
-	if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-	if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-	if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-	setarray $@Pool[0],0,0;
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+function	script	CluckersRun	{
+//callfunc("CluckersRun",<eventid>,<eventname>,<Length>);
+	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
+	set $@CurrentEvent,getarg(0,7);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Cluckers")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"Cluckers")+" Event Has Begun!",8;
+	set $@CurrentEvent,$@CurrentEvent*-1;
+	sleep 60000 * getarg(2,30);
+	if($@CurrentEvent == -1 * getarg(0,7)) set $@CurrentEvent,0;
+end;
+}
+
+function	script	BombringRun	{
+	if($@CurrentEvent||agitcheck()||agitcheck2()){ end; }
+	mapwarp getarg(2,"quiz_02"),"prontera",155,181;
+	set $@CurrentEvent,getarg(0,1);
+	for(set .@i,5; .@i > 0; set .@i,.@i-1){
+		Announce ""+getarg(1,"Bombring")+" Event Will begin in "+.@i+" Mins!",8;
+		Announce "Please type @joinevent to join",8;
+		sleep 60000;
+	}
+	Announce ""+getarg(1,"Bombring")+" Event Has Begun!",8;
+	set $@CurrentEvent,-getarg(0,9);
+	if(getmapusers(getarg(2,"quiz_02"))<getarg(1,0)){
+		mapannounce getarg(2,"quiz_02"),"Sorry there are not enough players for this event to take place",8;
+		mapwarp getarg(2,"quiz_02"),"prontera",155,181;
+	} else {
+		setarray .@mapflag,
+			mf_nowarp,
+			mf_nowarpto,
+			mf_nosave,
+			mf_nomemo,
+			mf_noteleport,
+			mf_nopenalty, // disable exp loss
+			mf_noreturn,
+			mf_nobranch,
+			mf_nomobloot, // disable monster drop loots,
+			mf_nomvploot, // 2 of these
+			mf_partylock;
+		for ( .@i = 0; .@i < getarraysize( .@mapflag ); .@i++ )
+			setmapflag getarg(2,"quiz_02"), .@mapflag[.@i];
+		end;
+		set .@totalplayers, getmapusers("quiz_02");
+		mapannounce getarg(2,"quiz_02"),"Okay listen up, this is how it works.",bc_all;
+		sleep 2000;
+		mapannounce getarg(2,"quiz_02"),"Bombrings will run rampant in this area.",bc_all;
+		sleep 2000;
+		mapannounce getarg(2,"quiz_02"),"and all of them will go booooooom!",bc_all;
+		sleep 2000;
+		mapannounce getarg(2,"quiz_02"),"all you have to do is avoid them and stay alive :P",bc_all;
+		sleep 2000;
+		mapannounce getarg(2,"quiz_02"),"This will run for 30 seconds for 5 total rounds.",bc_all;
+		sleep 2000;
+		mapannounce getarg(2,"quiz_02"),"Sooooooooooo, ready or not here they come!!!", bc_all;
+		sleep 25000;
+		for(set .@wave,0; .@wave < getarg(4,5); set .@wave,.@wave+1){
+			if(.@wave < getarg(4,5)){
+				mapannounce getarg(2,"quiz_02"),"Wave "+(.@wave + 1)+"!",8;
+			} else {
+				mapannounce getarg(2,"quiz_02"),"FIANL WAVE!",8;
+			}
+			for(set .@i,0; (.@i < getarraysize(.@Mobs)); set .@i,.@i+2){
+				if ( (3 * .totalplayers) <= 60){ areamonster getarg(2,"quiz_02"),48,334,71,357,"Run for you life!",1904,3 * .totalplayers;
+				} else { areamonster getarg(2,"quiz_02"),48,334,71,357,"Run for you life!",1904,60; }
+			}
+			if(!getmapusers(getarg(2,"quiz_02"))){
+				set .@wave,getarg(4,10)+.@wave;
+			} else {
+				sleep 1000 * getarg(7,5) / .@wave;
+			}
+		}
+		sleep 30000;
+		while(getmapusers(getarg(2,"quiz_02"))){
+			for(.@i = 0; .@i < getarraysize($@EventPlayers); .@i++){
+				if(attachrid($@EventPlayers[.@i])){
+					if(strcharinfo(3) == getarg(2,"pvp_n_1-5")){
+						announce "Congrats to, "+strcharinfo(0)+" a winner in the "+getarg(1,"Dice")+" Event!",bc_blue|bc_all;
+						getitem 7859,1;
+						warp "prontera",155,181;
+						detachrid;
+					}
+				}
+			}
+		}
+	for ( .@i = 0; .@i < getarraysize( .@mapflag ); .@i++ )
+		removemapflag getarg(2,"quiz_02"), .@mapflag[.@i];
+	end;
+	}
+	set $@CurrentEvent,0;
 	end;
 }
 
-pvp_n_1-5,99,100,4	script	PvpEventPrize	405,{
-	mes "[Event Agent]";
-	mes "So your the last one standing";
-	next;
-	mes "[Event Agent]";
-	mes "Your reward";
-	close2;
-	announce "Congrats to, "+strcharinfo(0)+" the winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-	if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-	if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-	if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-	setarray $@Pool[0],0,0;
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
-	disablenpc "PvpEventPrize";
-	end;
+//========================= Prizes ======================================
+
+
+1@zombie,175,120,4	script	ZombiePrize	-1,{
+OnKillZombie:
+	dispbottom "Don't do that";
+	sc_start SC_DECREASEAGI,SC_DECREASEAGI,300000,10;
+	percentheal -20,-100;
+	heal -5,0;
+end;
 }
 
-maze,369,162,4	script	MazePrize	405,4,4,{
+maze,358,148,0	warp	mazeroadblock	2,2,maze,371,149
+
+maze,369,162,4	script	Event_Agent#Maze	405,4,4,{
 	mes "[Event Agent]";
 	mes "Walk up to me to claim prize~";
 	close;
 OnTouch:
-	mes "[Event Agent]";
-	mes "So you mangaed to reach me";
-	next;
-	mes "[Event Agent]";
-	mes "Here is your prize~";
-	close2;
-	announce "Congrats to, "+strcharinfo(0)+" a winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-	if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-	if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-	if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-	setarray $@Pool[0],0,0;
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	announce "Congrats to, "+strcharinfo(0)+" a winner in the Maze Event!",bc_blue|bc_all;
+	getitem 7859,1;
+	mapwarp getarg(2,"maze"),"prontera",155,181;
 	end;
 }
 
@@ -733,29 +793,24 @@ OnTouch:
 OnKillWrong:
 	set .@i,rand(1,(getarraysize($@Mobs)/2))*2;
 	monster $@Map$,0,0,$@MobNames$[.@i/2],$@Mobs[.@i],$@Mobs[.@i+1],"PoringPrize::OnKillWrong";
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	warp "prontera",155,181;
 end;
 OnKillRight:
-	announce "Congrats to, "+strcharinfo(0)+" a winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-	if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-	if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-	if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-	setarray $@Pool[0],0,0;
-	sleep2 1000;
-	warp $@ReturnMap$[0],$@ReturnXY[0],$@ReturnXY[1];
+	announce "Congrats to, "+strcharinfo(0)+" a winner in the Poring Event!",bc_blue|bc_all;
+	getitem 7859,1;
+	warp "prontera",155,181;
 end;
 }
 
 -	script	ManhuntPrize	-1,{
 OnPCDieEvent:
-	if ($@CurrentEvent == -10 && strcharinfo(0) == $@PlayerNameList$[$@Target] ){
+	if ($@CurrentEvent == -6 && strcharinfo(0) == $@PlayerNameList$[$@Target] ){
 		if(attachrid(killerrid)) {
-			announce "Congrats to, "+strcharinfo(0)+" a winner in the "+$@Eventname$+" event!",bc_blue|bc_all;
-			if($@Prizes[0])getitem $@Prizes[0],$@Prizes[1];
-			if($@PrizePool[0])getitem $@Cost[0],($@Pool[0]*$@PrizePool[0]/10000);
-			if($@Prizes[2]||$@PrizePool[1])set Zeny,zeny+$@Prizes[2]+($@Pool[1]*$@PrizePool[1]/10000);
-			set $@Target,-1;
+			announce "Congrats to, "+strcharinfo(0)+" a winner in the Manhunt Event!",bc_blue|bc_all;
+			getitem 7859,1;
+			warp "prontera",155,181;
        			}
+		set $@Target,-1;
 	}
 end;
 OnPCLogOutEvent:
@@ -765,9 +820,58 @@ OnPCLogOutEvent:
 	}
 end;
 }
+
+prontera,155,227,4	script	Cluckers	800,{
+	if ($@CurrentEvent == -7) {
+		specialeffect2 EF_HIT3;
+		switch(rand(15)) {
+			case 0: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 1: npctalk "Cluuuuuck!~"; break;
+			case 2: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
+			case 3: sc_start SC_Freeze,10000,0; break;
+			case 4: npctalk "CLUUUUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 5: sc_start SC_Sleep,10000,0; break;
+			case 6: sc_start SC_Stone,10000,0; emotion e_gg; break;
+			case 7: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 8: npctalk "Cluck! CLUUUCK!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 9: sc_start SC_Stun,10000,0; break;
+			case 10: sc_start SC_Sleep,10000,0; emotion e_gg; break;
+			case 11: npctalk "Cluck! Cluck!"; break;
+			case 12: sc_start SC_Stun,10000,0; break;
+			case 13: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
+			default:
+				if (!rand(10)) {
+					npctalk "WOOF!...........";
+					specialeffect2 EF_SPHERE;
+					announce "[Cluck! Cluck! Boom!] " + strcharinfo(0) + " squeezed out the prize! Well done!",0;
+					getitem 7859,1;
+					set $@CurrentEvent,0;
+				} else {
+					npctalk "Cluck! CLUUUCK!!";
+					unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1;
+					npcwalkto rand(152,159),rand(234,241);
+				}
+				break;
+		}
+		end;
+	}
+	mes "Cluck cluck! Cluuuuuck?";
+	mes "Cluck....";
+	close;
+OnTimer15000:
+	npcwalkto 70+rand(17),135+rand(16);
+	setnpctimer 0;
+OnInit:
+	npcspeed 75;
+	npcwalkto rand(152,159),rand(234,241);
+ 	initnpctimer;
+end;
+}
+
+
 //========================= Other =======================================
 
-maze,358,148,0	warp	mazeroadblock	2,2,maze,371,149
 
-
+prontera,164,175,3	itemshop	Event Headgear Shop	877,7859,5381:50,5391:50,5462:50,5463:75,5596:75,5214:100,5380:100,5210:100,5226:100,5227:100,5228:100,5229:100,5230:100,5231:100,5232:100,5233:100,5234:100,5235:100,5236:100,5237:100,5283:100,5288:100,5293:100,5313:100,5314:100,5315:100,5324:100,5372:100,5376:100,5377:100,5378:100,5503:100,5505:100,5529:100,5286:125,5263:125,5098:125,5382:125,5238:175,5239:175,5240:175,5241:175,5242:175,5374:500
+prontera,165,174,3	itemshop	Event Shop	877,7859,12209:1,12211:2,604:3,7621:3,12299:5,12212:5,12311:5,12221:7,608:10,607:15,12208:15,14592:15,12210:15,12214:20,7776:20,12041:10,12042:20,12043:30,12044:40,12045:50,12046:10,12047:20,12048:30,12049:40,12050:50,12051:10,12052:20,12053:30,12054:40,12055:50,12056:10,12057:20,12058:30,12059:40,12060:50,12061:10,12062:20,12063:30,12064:40,12065:50,12066:10,12067:20,12068:30,12069:40,12070:50
 
