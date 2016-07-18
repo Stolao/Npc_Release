@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.03
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -12,6 +12,9 @@
 //= N/A
 //===== Additional Comments: =================================
 //= 1.00 Initial Make
+//= 1.01 Changed while(1) -> for
+//= 1.02 Changed for -> while(hp/sp)
+//= 1.03 Fixed Logic Bug
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -20,8 +23,8 @@ prontera,156,204,0	script	Fountain	111,{
 	mes "Drink From Fountain?";
 	if(select("Yes:No")!=1) close;
 	close2;
-	while(1){
+	while( HP < MaxHP || SP < MaxSP){
 		progressbar "0x11CC99",2;
-		percentheal rand(5),rand(5);
+		percentheal rand(2,5),rand(2,5);
 	}
 }

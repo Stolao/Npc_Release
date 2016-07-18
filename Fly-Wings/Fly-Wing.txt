@@ -1,9 +1,9 @@
-/===== EinherjarRO Scripts ================================== 
+//===== EinherjarRO Scripts ================================== 
 //= @FW and @BFW 
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -56,6 +56,7 @@
 */
 //===== Additional Comments: =================================
 //= 1.00 Origional Make
+//= 1.01 Fixed 2 missing "
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -66,13 +67,13 @@ OnBFW:
 	if(@bfw){	set @bfw,0; 
 	} else {	set @bfw,1; }
 	message strcharinfo(0),"[Butterfly Wing]: Count Messages "+((@bfw)?"Enabled":"Disabled");
-	message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining;
+	message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining";
 end;
 OnFW:
 	if(@fw){	set @fw,0;
 	} else {	set @fw,1; }
 	message strcharinfo(0),"[Fly Wing]: Count Messages "+((@fw)?"Enabled":"Disabled");
-	message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining;
+	message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining";
 end;
 OnInit:
 	bindatcmd("fw","atbfw::OnFW",0,99);

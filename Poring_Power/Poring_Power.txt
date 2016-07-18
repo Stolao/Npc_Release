@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -12,6 +12,7 @@
 //= N/A
 //===== Additional Comments: =================================
 //= 1.00 Initial Make
+//= 1.01 Coverted to new areamob format
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -19,32 +20,28 @@
 -	script	porsize	-1,{
 OnEventPor1:
 	Getmapxy(.@m$,.@x,.@y,0);
-	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor2";
+	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor2",0,0;
 End;
 OnEventPor2:
 	Getmapxy(.@m$,.@x,.@y,0);
-	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.smobid,2,"porsize::OnEventPor3";
+	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor3",1,0;
 End;
 OnEventPor3:
 	Set .count,.count+1;
 	If(.count == 4){
-		areamonster .PlayMap$,.Area[0],.Area[1],.Area[2],.Area[3],"--ja--",.bmobid,1,"porsize::OnEventPor1";
+		areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,1,"porsize::OnEventPor1",2,0;
 		Set .count,0;
 	}
 End;
 OnInit:
 	Set .TotalBig,100;
 	Set .PlayMap$,"prt_fild08";
-	setarray .Area,50,50,500,500;
 	Set .mobid,1002;
-//Spawning Random Sizes
-	Set .bmobid,8000+.mobid;
-	Set .smobid,4000+.mobid;
 	Set .B,rand(.TotalBig)+1;
 	Set .M,rand(.TotalBig-.B);
 	Set .S,.TotalBig-.B-.M;
-	areamonster .PlayMap$,.Area[0],.Area[1],.Area[2],.Area[3],"--ja--",.bmobid,.B,"porsize::OnEventPor1";
-	areamonster .PlayMap$,.Area[0],.Area[1],.Area[2],.Area[3],"--ja--",.mobid,.M*2,"porsize::OnEventPor2";
-	areamonster .PlayMap$,.Area[0],.Area[1],.Area[2],.Area[3],"--ja--",.smobid,.S*4,"porsize::OnEventPor3";
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.B,"porsize::OnEventPor1",2,0;
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.M*2,"porsize::OnEventPor2",0,0;
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.S*4,"porsize::OnEventPor3",1,0;
 End;
 }

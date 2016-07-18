@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 3.2A
+//= 3.2E
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -18,13 +18,12 @@
 //= Uses Euphy's Renting, only modifed price area and setdragon;
 //= Used Euphy's Skill/Stats Reseter as referance for mine
 //=
-//= Euphy's work can be found here and yes I have permision
+//= Euphy's work can be found here
 //= http://rathena.org/board/topic/64394-%E2%9C%B0-euphys-scripts-%E2%9C%B0/
 //===== Known Bugs: ==========================================
 //= Platnium Skills earned are lost on job change if platnium is disabled, unsure of fix
-//= No TK Class Loading properly, bug with previous class check fix later
-//= more optimization possible?
 //= setdragon select() might not give you color you select, due to bug in setdragon
+//= more optimization possible?
 //===== Additional Comments: =================================
 //= 2.-- Scipt Was far to large spannning 9500 lines :(
 //= 3.00 Revamped almost from scatch
@@ -68,7 +67,11 @@
 //= 3.27 fixed statspoints in rebirth scaling up
 //= 3.28 Added check if have a rebirth to rebith
 //= 3.29 Changed setdragon rand() to a select() for colors
-//= 3.2A Prep for 1st release
+//= 3.2A Public Release
+//= 3.2B Fixed TK bug
+//= 3.2C Fixed jobname in wipe data
+//= 3.2D Fixed a bug with novice wiping its data
+//= 3.2E removed a few mes notes from bug testing phase
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -167,18 +170,13 @@ prontera,149,184,4	script	Job Master	123,{
 						mes "Please remove your "+((checkfalcon())?"falcon":"")+((checkcart())?"cart":"")+((checkriding())?"Peco":"")+((ismounting())?"mount":"")+" before proceeding.";
 						close; 
 					}
-					if((.@menuref[@menu]&EAJL_2) && (roclass(eaclass(.@menuref[@menu])&EAJ_UPPERMASK)) != (roclass(eaclass()|EAJL_2_1)) && (roclass(eaclass(.@menuref[@menu])&EAJ_UPPERMASK)) != (roclass(eaclass()|EAJL_2_2)) ){
+					if((.@menuref[@menu]&EAJL_2) && (roclass(eaclass(.@menuref[@menu])&EAJ_UPPERMASK)) != (roclass(eaclass()|EAJL_2_1)) && (roclass(eaclass(.@menuref[@menu])&EAJ_UPPERMASK)) != (roclass(eaclass()|EAJL_2_2)) && (.@menuref[@menu] != 4046)){
 						mes "Sorry, Must be the previous class to unlock.";
-						mes "1st";
-						mes ""+(.@menuref[@menu]&EAJL_2)+" = "+roclass(eaclass()|EAJL_2)+"";
-						close;	
+						close;
 					}
 					if(( ( 0 < eaclass(.@menuref[@menu]) && eaclass(.@menuref[@menu]) <8 ) || ( 22 < eaclass(.@menuref[@menu]) && eaclass(.@menuref[@menu]) < 26) || ( 4046 == eaclass(.@menuref[@menu]) ) ) && (EAJ_NOVICE != eaclass())){
 						next;
 						mes "Sorry, Must be the previous class to unlock.";
-						mes "Novice";
-						mes "If: "+(eaclass(.@menuref[@menu]))+"";
-						mes "&& "+(roclass(eaclass(.@menuref[@menu])&EAJ_UPPERMASK))+" == "+(roclass(eaclass()|EAJL_2_1))+" || "+(roclass(eaclass()|EAJL_2_2))+"";
 						close;	
 					}
 					if(!(.@menuref[@menu]&EAJL_2)&&!(.@menuref[@menu]&EAJL_THIRD)) setarray .@z,.UnlockFirst[0],.UnlockFirst[1];
@@ -244,22 +242,19 @@ prontera,149,184,4	script	Job Master	123,{
 					close;
 				break;
 				case 5:	//Wipe
-					Mes "Are you sure you want to wipe you "+jobname(eaclass())+" data?";
-					Mes "It will be like you never unlocked it";
+					Mes "Are you sure you want to wipe your "+jobname(roclass(eaclass()))+" data? It will be like you never unlocked it";
 					set .@i, select("No:Yes");
 					if (.@i==1) close;
 					Mes "Please type in your name";
 					input .@Name$;
-					if(.@Name$ != strcharinfo(0)){ mes "Sorry, You need to type your name in correctly."; close; }
-					next;
-					mes .Name$;
+					if(.@Name$ != strcharinfo(0)){ next; mes .Name$; mes "Sorry, You need to type your name in correctly."; close; }
 					if (checkfalcon() || checkcart() || checkriding() || ismounting()) { mes "Please remove your "+((checkfalcon())?"falcon":"")+((checkcart())?"cart":"")+((checkriding())?"Peco":"")+((ismounting())?"mount":"")+" before proceeding."; close;  }
 					if((.FeeType & 1) && .WipeCost[0] > getd(""+.FeePoint$[0]+"")){ mes "Sorry, You need "+.WipeCost[0]+" "+.FeePoint$[1]+"."; close; }
 					if((.FeeType & 2) && .WipeCost[1] > countitem(.FeeItem)){ mes "Sorry, You need "+.WipeCost[1]+" "+getitemname(.FeeItem)+"."; close; }
 					sc_end SC_ALL;
 					set .@i$, roclass(eaclass() & EAJ_UPPERMASK);
 					setd "JStats"+.@i$+"$","";
-					if(.@i$ == "0") setd "JStats"+.@i$+"$",1|1|1|0|1|1|1|1|1|1|42;
+					if(.@i$ == "0") set JStats0$,"1|1|1|0|1|1|1|1|1|1|42";
 					if((.FeeType & 1) && .WipeCost[0]) setd ""+.FeePoint$[0]+"",getd(""+.FeePoint$[0]+"")-.WipeCost[0];
 					if((.FeeType & 2) && .WipeCost[1]) delitem .FeeItem,.WipeCost[1];
 					callfunc "Load_Stats",getd("JStats0$"),0;
@@ -429,7 +424,7 @@ setarray .UnlockSecond,	10000	,0;				//Cost of Unlocking a Second Class
 setarray .UnlockBaby,	100000	,0;				//Cost of Converting to a Baby
 setarray .UnlockRebirth,1000000	,0;				//Cost of Rebirth
 setarray .UnlockThird,	1000000	,0;				//Cost of Unlocking a Third Class
-setarray .WipeCost,	7500000	,0;				//Wiping Job Data
+setarray .WipeCost,	0	,0;				//Wiping Job Data
 
 								//Cost of Resets are in array format
 //			[0]	[1]	[2]	[3]		//[0] Zeny/Point Cost; [1] Zeny/Point Per Level; [2] Item Cost; [3] Item Cost Per Level
@@ -479,7 +474,7 @@ end;
 OnPCBaseLvUpEvent:
 OnPCJobLvUpEvent:
 	callfunc "Save_Stats";
-	end;
+end;
 }
 
 function	script	Load_Stats	{

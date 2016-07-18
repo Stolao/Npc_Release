@@ -3,52 +3,119 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.0B
 //===== Compatible With: ===================================== 
-//= eAthena SVN
+//= rAthena SVN
 //===== Description: =========================================
 // Configurable Pvp Ladder
 //===== Comments: ============================================
-//= Suggestions?
-//===== Known Bugs: ==========================================
-//= none
+//= [Stolao]
+//= Needs bug testing, please report any bugs
+//= Unable to test thurally on my comp atm
 //===== Additional Comments: =================================
 //= 1.00 Initial Release
+//= 1.01 Added Location with veiwing of ladder
+//= 1.02 Added GM Menu
+//= 1.03 Added atcommand
+//= 1.04 Shortend menu script
+//= 1.05 Added PvpPoints into confug and script
+//= 1.06 Added Abuse Protection
+//= 1.07 Made Pvp Points Configurable
+//= 1.08 Fixed typo in Reset Option
+//= 1.09 Made Amount of pvp points earned configurable
+//= 1.0A Ajusted Spacing for easier reading
+//= 1.0B Added Warp to savepoint on abuse into config
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
 //============================================================
--	script	Pvp_Ladder	-1,{
+prontera,138,172,4	script	Pvp_Ladder	837,{
+	mes "~Sign Reads~";
+OnPvpLadder:
+	mes "Pvp Ladder";
+	if(getgmlevel() >= .GM){ set .@i,select("Veiw PVP Records:Leave:Reset PVP Stats");
+	} else {  set .@i,select("Veiw PVP Records:Leave"); }
+	switch(.@i){
+		case 3:
+			mes "Are you sure you want to delete ALL pvp records?";
+			if(select("No:Yes")==1) close;
+			next;
+			mes "Wait one Moment...";
+			mes ".....";
+			cleararray $TOPPK$[0],0,127;
+			cleararray $TOPPK[0],0,127;
+			query_sql("DELETE FROM `global_reg_value` WHERE `str` = 'PKCOUNT'");
+			set .@self, getcharid(3);
+			set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+			for(set .@i,0; .@i<.@size; set .@i,.@i+1) {
+				if(attachrid(.@aid[.@i])){
+					set PKCOUNT,0;
+				}	
+			}
+			attachrid(.@self);
+			mes "Cleared pvp data.";
+			close;
+		case 1:
+			for(set .@i,0; .@i < getarraysize($TOPPK$); set .@i,.@i+1){
+				mes (.@i+1)+": "+ $TOPPK$[.@i] +" with "+ $TOPPK[.@i] +" kills";
+				if(.@i % 10 == 0){
+					if(select("Read More:Leave") == 1){ next; } else { close; }
+				}
+			}
+		case 2:	close;
+	}
+close;
 OnPCKillEvent:
 	if(.Options&2 && (agitcheck() || agitcheck2())){
 		if(getgmlevel() < .GmLvl || .Options&8){
-			if(.Options&1 || strcharinfo(3)==.Map$){
-				set PkCount,PkCount+1;
-				for(set .@i,0; .@i < .MaxPlayers; set .@i,.@i+1){
-					if(PKCOUNT > $TOPPK[.@i]){
-						if($TOPPK$[.@i] != strcharinfo(0)){
-							setarray $TOPPK$[.@i+1],$TOPPK$[.@i];
-							setarray $TOPPK[.@i+1],$TOPPK[.@i];
-						}
-					setarray $TOPPK$[.@i],strcharinfo(0);
-					setarray $TOPPK[.@i],PKCOUNT;
-					if(.Options&4) Announce ""+strcharinfo(0)+" Now Holds the The number "+.@i+" spot on the Pvp Ladder";
+			if(.Options&1 || strcharinfo(3) == .Map$){
+				if(.Options&32){
+					for(set .@i,.RepeatCount; .@i > 0; set .@i, .@i-1){
+						set @PKedID[.@i+1], @PKedID[.@i];
 					}
-				sleep 1;
+					set @PKedID,killedrid;
 				}
+				for(set .@i,1; .@i < .RepeatCount; set .@i,.@i + 1){
+					if(@PKedID[0] == @PKedID[.@i]){ set .@s, .@s + 1;
+					} else { set .@i, .RepeatCount + 1; }
+				}
+				if(.@s < .RepeatCount){
+					set PkCount,PkCount+1;
+					if(.Options&16) setd getd(.PointType$),getd(.PointType$) + .PvpEarned;
+					for(set .@i,0; .@i < .MaxPlayers; set .@i, .@i + 1){
+						if(PKCOUNT > $TOPPK[.@i]){
+							if($TOPPK$[.@i] != strcharinfo(0)){
+								setarray $TOPPK$[.@i + 1], $TOPPK$[.@i];
+								setarray $TOPPK[.@i + 1], $TOPPK[.@i];
+							}
+						setarray $TOPPK$[.@i],strcharinfo(0);
+						setarray $TOPPK[.@i],PKCOUNT;
+						if(.Options&4) Announce ""+strcharinfo(0)+" Now Holds the The number "+.@i+" spot on the Pvp Ladder",bc_all;
+						}
+					sleep 1;
+					}
+				} else { if(.Options&64) warp "Save",0,0; }
 			}
 		}
 	}
 end;
 OnInit:
-	set .MaxPlayers,10;	// Number of Players held in Records
-	set .GmLvl,1;		// Highest GM level Able to Hold a Record, if Option 8 is Disabled
-	set .Map$,"prontera";	// Map Pvp Must Take Place on in order to Count, if Option 1 is Disabled
-	set .Options,7;		// Bitwise Variable
-				//   1: Only Counts Kills on .Map$ if enabled
-				//   2: Disables Record Holding during WOE
-				//   4: Announce When Someone Takes a Rank
-				//   8: Allow Gms Above level .GmLvl To Be on Ladder
-				// Example: "1+2+4 = 7" No Forced Map, Disables Record Holding during WOE and Announces New Record Holders		
+	set .GM,99;
+	set .MaxPlayers,10;		// Number of Players held in Records
+	set .GmLvl,1;			// Highest GM level Able to Hold a Record, if Option 8 is Disabled
+	set .Map$,"prontera";		// Map Pvp Must Take Place on in order to Count, if Option 1 is Disabled
+	set .RepeatCount,5;		// Number of kills on same person before it detects abuse, max of 128
+	set .PointType$,"#PvpPoints";	// Name of points earned, E.G. #Cash Points
+	set .PvpEarned,1;		// Number of Pvp Points Earned
+	set .Options,7;			// Bitwise Variable
+					//   1:  Only Counts Kills on .Map$ if Disabled
+					//   2:  Disables Record Holding during WOE
+					//   4:  Announce When Someone Takes a Rank
+					//   8:  Allow Gms Above level .GmLvl To Be on Ladder
+					//   16: Gain PvP Points on Kills (#PvpPoints)
+					//   32: Repeat Kill Protection
+					//   64: Warp to Save on abuse
+					// Example: "1+2+4 = 7" No Forced Map, Disables Record Holding during WOE and Announces New Record Holders
+	bindatcmd("PvpLadder"	,"Pvp_Ladder::OnPvpLadder",0,99);		
 end;
 }
