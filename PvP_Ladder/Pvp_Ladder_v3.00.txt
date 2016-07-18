@@ -1,0 +1,463 @@
+//===== EinherjarRo Scripts ==================================
+//= PvP Ladder
+//===== Author ===============================================
+//= Stolao
+//===== Current Version: =====================================
+//= 3.00
+//===== Compatible With: =====================================
+//= rAthena SVN
+//===== Description: =========================================
+// Configurable Pvp Ladder
+//===== Comments: ============================================
+//= [Stolao]
+//===== Additional Comments: =================================
+//= 3.00 Overhaul
+//===== Todo: ================================================
+//= Condence repeat queries
+//===== Contact Ifo: =========================================
+//= [Stolao]
+// Email: Taingram11@gmail.com
+//============================================================
+prontera,161,196,2	script	Ladder	837,{
+OnPvpLadder:
+	mes "[Ranking]";
+	.@i = select(((getarraysize(.MapName$))?"Enter PvP Map:":":")+
+			((.Options&1)?"Pvp Ladder:":":")+
+			((.Options&2)?"GvG Ladder:":":")+
+			((.Options&8)?"Top Guild:":":")+
+			((.Options&16)?"PvP Shops:":":")+
+			((.Options&1 || .Options&2 || .Options&8)?"Personal Stats:":":")+
+			((getgmlevel() >= 99)?"Reset PVP Stats":""));
+	switch(.@i){ 
+		case 2:
+			if(.Options&256){
+				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+				for(.@x = 0; .@x < getarraysize(.@cid); .@x++) {
+					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+";",.@j$);
+					.@name$[.@x] = .@j$;
+				}
+				next;
+				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"PvP Ladder^000000 ~";
+				if (!getarraysize(.@cid)){ mes "The rankings are empty.";
+				} else {
+					for(.@i = 0; .@i<getarraysize(.@cid); .@i++){
+						mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 "+.@value[.@i];
+					}
+				}
+			} else {
+				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_pkcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'pl_pkcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
+					.@name$[.@i] = .@j$;
+					if(.Option&128){	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_dthcount';",.@j);
+							} else 	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'pl_dthcount';",.@j);
+					.@Death[.@i] = .@j;
+				}
+				next;
+				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"PvP Ladder^000000 ~";
+				if (!getarraysize(.@cid)){ mes "The rankings are empty.";
+				} else {
+					for(set .@i,0; .@i<getarraysize(.@cid); set .@i,.@i+1){
+						if((.@i+1) % 10 == 0){
+							mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 [^00EE00"+callfunc("F_InsertPlural",.@value[.@i],"~ kill")+"] [^EE0000"+callfunc("F_InsertPlural",.@Death[.@i],"~ death")+"]";
+						} else next;
+					}
+				}
+			}
+			close;
+		case 3:
+			if(.Options&256){
+				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_gvg_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'gvg_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+				for(.@x = 0; .@x<getarraysize(.@cid); .@x++) {
+					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+";",.@j$);
+					.@name$[.@x] = .@j$;
+				}
+				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"GvG Ladder^000000 ~";
+				if (!getarraysize(.@cid)){
+					mes "The rankings are empty.";
+				} else {
+					for(.@i = 0; .@i<getarraysize(.@cid); .@i++){
+						if((.@i+1) % 10 == 0){
+							mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 "+.@value[.@i];
+						} else next;
+					}
+				}
+			} else {
+				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'gvg_kcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
+					.@name$[.@i] = .@j$;
+					if(.Option&128){	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_gvg_dcount';",.@j);
+							} else 	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'gvg_dcount';",.@j);
+					.@Death[.@i] = .@j;
+				}
+				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"GvG Ladder^000000 ~";
+				if (!getarraysize(.@cid)){
+					mes "The rankings are empty.";
+				} else {
+					for(set .@i,0; .@i<getarraysize(.@cid); set .@i,.@i+1){
+						if((.@i+1) % 10 == 0){
+							mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 [^00EE00"+callfunc("F_InsertPlural",.@value[.@i],"~ kill")+"] [^EE0000"+callfunc("F_InsertPlural",.@Death[.@i],"~ death")+"]";
+						} else next;
+					}
+				}
+			}
+			close;
+		case 4:
+			mes "not done yet";
+			if(.Options&256){
+				if(.Options&128){ query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$M_Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
+				} else { query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value); }
+			} else {
+				if(.Options&128){ query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$M_Guild_Kills' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
+				} else { query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$Guild_Kills' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value); }
+			}
+			if (!getarraysize(.@gid)){
+				mes "The rankings are empty.";
+			} else {
+				for(.@i = 0; .@i < getarraysize(.@gid); .@i++){
+					query_sql("SELECT `value` FROM `global_acc_reg_num` WHERE `index` = "+.@gid[.@i]+";",.@j$);
+					mes "#"+(.@i+1)+" ^0000EE["+getguildname(.@gid[.@i])+"]^000000 with [^00EE00"+callfunc("F_InsertPlural",$Guild_Kills[.@gid[.@i]],"~ kill")+"] and [^EE0000"+callfunc("F_InsertPlural",$Guild_Deaths[.@gid[.@i]],"~ death")+"]";
+				}
+			}
+			close;
+		case 5:
+			close2;
+			callshop "PvP_C_Shop",1;
+			end;
+		case 6:
+			next;
+			if(.Options&1){
+				mes "[PvP]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",pl_pkcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",pl_dthcount,"death") + ((.Options&256)?" - ^0000EE"+ kda +" Total":"") +"^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",m_pkcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",m_dthcount,"death") + ((.Options&256)?" - ^0000EE"+ m_kda +" Total":"") +"^000000";
+			}
+			if(.Options&16) mes "You Have "+ getd(.PointType$) +" Spendable Points";
+			if(.Options&2){
+				if(.Options&1) next;
+				mes "[GvG]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",gvg_kcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",gvg_dcount,"death")+((.Options&256)?" - ^0000EE"+ gvg_kda +" Total":"")+"^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",m_gvg_kcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",m_gvg_dcount,"death") + ((.Options&256)?" - ^0000EE"+ m_gvg_kda +" Total":"") +"^000000";
+			}
+			if(.Options&8 && getcharid(2)){
+				if(.Options&2 || .Options&3) next;
+				mes "[Guild Stats]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",$Guild_Kills[getcharid(2)],"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",$Guild_Deaths[getcharid(2)],"death") + ((.Options&256)?" - ^0000EE"+ $Guild_Kda[getcharid(2)] +" Total":"")+ "^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",$M_Guild_Kills[getcharid(2)],"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",$M_Guild_Deaths[getcharid(2)],"death") + ((.Options&256)?" - ^0000EE"+ $M_Guild_Kda[getcharid(2)] +" Total":"") +"^000000";
+			}
+			close;
+		case 7: //this can be condenced but im feeling lazy
+			switch(select("Monthly:Lifetime")){
+				case 1:
+					switch(select(((.Options&1)?"Pvp Ladder:":":") + ((.Options&2)?"GvG Ladder:":":") + ((.Options&8)?"Top Guild:":":"))){
+						case 1:
+							mes "Are you sure you want to reset this the Monthly PvP Ladder?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_kda'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_dthcount'");
+							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
+								if(attachrid(.@aid[.@i])){
+									m_pkcount = 0;
+									m_kda = 0;
+									m_dthcount = 0;
+								}
+							}
+						end;
+						case 2:
+							mes "Are you sure you want to reset this the Monthly GvG Ladder?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kda'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_dcount'");
+							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
+								if(attachrid(.@aid[.@i])){
+									m_gvg_kcount = 0;
+									m_gvg_kda = 0;	
+									m_gvg_dcount = 0;
+								}
+							}
+						end;
+						case 3:
+							mes "Are you sure you want to reset this the Monthly Top Guild?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
+							cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
+							cleararray $M_Guild_Deaths[0],0,getarraysize($M_Guild_Deaths);
+						end;
+					}
+				break;
+				case 2:
+					switch(select(((.Options&1)?"Pvp Ladder:":":") + ((.Options&2)?"GvG Ladder:":":") + ((.Options&8)?"Top Guild:":":"))){
+						case 1:
+							mes "Are you sure you want to reset this the Lifetime PvP Ladder?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'kda'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_dthcount'");
+							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
+								if(attachrid(.@aid[.@i])){
+									pl_pkcount = 0;
+									kda = 0;
+									pl_dthcount = 0;
+								}
+							}
+						end;
+						case 2:
+							mes "Are you sure you want to reset this the Lifetime GvG Ladder?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kda'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_dcount'");
+							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
+								if(attachrid(.@aid[.@i])){
+									gvg_kcount = 0;
+									gvg_kda = 0;	
+									gvg_dcount = 0;
+								}
+							}
+						end;
+						case 3:
+							mes "Are you sure you want to reset this the Lifetime Top Guild?";
+							if(select("No:Yes")!=2) close;
+							close2;
+							cleararray $Guild_Kills[0],0,getarraysize($Guild_Kills);
+							cleararray $Guild_Kda[0],0,getarraysize($Guild_Kda);
+							cleararray $Guild_Deaths[0],0,getarraysize($Guild_Deaths);
+						end;
+					}
+				break;
+			}
+			close;
+		case 1:
+			.@m = select(implode(.MapList$,":")) - 1;
+			if(.MapMode[.@m]&2){
+				mes "You are about to enter NIGHTMARE PvP, on death you will lose gear randomly.";
+				if(select("Nevermind:Continue") == 1) close;
+			} else	if(.MapMode[.@m]&8 && (countitem(607) || countitem(608))){
+				mes "No "+getitemname(607)+" or "+getitemname(608)+" Allowed.";
+				close;
+			} else 	if(.MapMode[.@m]&16){
+				mes "No 3rd Classes Allowed.";
+				close;
+			} else	if(.MapMode[.@m]&32){
+				mes "No Trans Classes Allowed.";
+				close;
+			} else {
+				announce "[ PvP Warper ] "+strcharinfo(0)+" has entered in "+((.MapMode[.@m]&1)?"GvG":"PvP")+" Room",0,((.MapMode[.@m]&1)?0x00CC99:0xEE0000);
+				warp .MapName$[.@m],0,0;
+			}
+	}
+close;
+OnPCKillEvent:
+	if(!getgmlevel() || .Options&512){
+		if(LastPK == killedrid) RepeatKill += 1;
+		else {	LastPK = killedrid;
+			RepeatKill = 0;	}
+		if(.Options&4) announce "[PVP]: "+strcharinfo(0)+" has slain "+ rid2name(LastPK) + ((RepeatKill)?" for the "+callfunc("F_GetNumSuffix",RepeatKill)+" time in a row":"") +".",bc_all;
+		if((RepeatKill < .RepeatCount && .Options&32) || !.Options&32){
+			if(.Options&1) pl_pkcount += 1;
+			if(.Options&129) m_pkcount += 1;
+			if(.Options&257) kda += 1;
+			if(.Options&385) m_kda += 1;
+			if(.Options&16) set getd(.PointType$), getd(.PointType$) + 1;
+			if((getmapflag(strcharinfo(3),MF_GVG) || getmapflag(strcharinfo(3),MF_GVG_NOPARTY)) && (agitcheck() || agitcheck2()) && getcharid(2) && .Options&2){
+				gvg_kcount += 1;
+				if(.Options&128) m_gvg_kcount += 1;
+				if(.Options&256) gvg_kda += 1;
+				if(.Options&384) m_gvg_kda += 1;
+				if(.Options&8) $Guild_Kills[getcharid(2)] += 1;
+				if(.Options&136) $M_Guild_Kills[getcharid(2)] += 1;
+				if(.Options&256) $Guild_Kda[getcharid(2)] += 1;
+				if(.Options&264) $M_Guild_Kda[getcharid(2)] += 1;
+			}
+			attachrid(LastPK);
+			if(.Options&1) pl_dthcount += 1;
+			if(.Options&129) m_dthcount += 1;
+			if(.Options&257) kda -= 1;
+			if(.Options&385) m_kda -= 1;
+			if((getmapflag(strcharinfo(3),MF_GVG) || getmapflag(strcharinfo(3),MF_GVG_NOPARTY)) && (agitcheck() || agitcheck2()) && getcharid(2) && .Options&2){
+				gvg_dcount += 1;
+				if(.Options&128) m_gvg_dcount += 1;
+				if(.Options&258) gvg_kda -= 1;
+				if(.Options&384) m_gvg_kda -= 1;
+				if(.Options&8) $Guild_Deaths[getcharid(2)] += 1;
+				if(.Options&136) $M_Guild_Deaths[getcharid(2)] += 1;
+				if(.Options&256) $Guild_Kda[getcharid(2)] -= 1;
+				if(.Options&264) $M_Guild_Kda[getcharid(2)] -= 1;
+			}
+		} else if(.Options&1024) atcommand "@request [PvP Ladder]: "+strcharinfo(0)+" is showing signs of abusing the PvP Ladder Please Investigate";
+		if(.Options&64) warp "Save",0,0;
+	}
+	end;
+OnHour00:
+	if(gettime(5) == 1 && .Options&128){
+		if(.RewardType&1 && .Options&1){
+			query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+				query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
+				set .@name$[.@i], .@j$;
+			}
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+				query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
+					"'no-reply',"+.@cid[.@i]+",'** PVP Ranking **',"+
+					"'Congratulations! You "+.@name$[.@i]+" have successfully placed #"+(.@i+1)+"                                            [ Your reward is attached. ]',"+
+					.PMonth_Rewards[.@i * 3]+","+.PMonth_Rewards[.@i * 3 + 1]+",0,"+.PMonth_Rewards[.@i * 3 + 2]+",UNIX_TIMESTAMP(NOW()))");
+			}
+			announce "[PVP Ranking]: Rewards have been mailed to the top 10 in PvP~!",bc_blue|bc_all;
+			announce "[PVP Ranking]: Relog to refresh mail.",bc_blue|bc_all;
+		}
+		sleep 10000;
+		if(.RewardType&2 && .Options&2){
+			query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+				query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
+				set .@name$[.@i], .@j$;
+			}
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+				query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
+					"'no-reply',"+.@cid[.@i]+",'** GVG Ranking **',"+
+					"'Congratulations! You "+.@name$[.@i]+" have successfully placed #"+(.@i+1)+"                                            [ Your reward is attached. ]',"+
+					.GMonth_Rewards[.@i * 3]+","+.GMonth_Rewards[.@i * 3 + 1]+",0,"+.GMonth_Rewards[.@i * 3 + 2]+",UNIX_TIMESTAMP(NOW()))");
+			}
+			announce "[GVG Ranking]: Rewards have been mailed to the top 10 in PvP~!",bc_blue|bc_all;
+			announce "[GVG Ranking]: Relog to refresh mail.",bc_blue|bc_all;
+		}	
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_kda'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_dthcount'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kda'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_dcount'");
+		cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
+		cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
+		cleararray $M_Guild_Deaths[0],0,getarraysize($M_Guild_Deaths);
+		set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
+		for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
+			if(attachrid(.@aid[.@i])){
+				m_pkcount = 0;
+				m_kda = 0;
+				m_dthcount = 0;
+				m_gvg_kcount = 0;
+				m_gvg_kda = 0;	
+				m_gvg_dcount = 0;
+			}
+		}
+	}
+OnInit:
+	// Bitwise Variable
+	// 1: Record PvP
+	// 2: Record GvG (agit on and gvg map)
+	// 4: Announce When Someone gets a kill
+	// 8: Record Total Guild Stats
+	// 16: Gain PvP Points on Kills (#PvpPoints)
+	// 32: Repeat Kill Protection
+	// 64: Warp to Save on abuse
+	// 128: Monthly Stats
+	// 256: Order by KDA instead of most kills
+	// 512: Allow GMs to Join PvP
+	// 1024: Request a GM on Abuse
+	.Options = 1|2|4|8|16|32|128|256|1024;
+
+	// Monthly Reward Types
+	// 1: Pvp
+	// 2: Gvg
+	.RewardType = 1|2;
+
+	// PVP Rewards
+	// Item,Qnt,Zeny
+	setarray .PMonth_Rewards,
+		501,10,1000000,//1st
+		501,9,500000,
+		501,8,250000,
+		501,7,125000,
+		501,6,62500,
+		501,5,31250,
+		501,4,15620,
+		501,3,7810,
+		501,2,3905,
+		501,1,1952;//10th
+
+	// GVG Rewards
+	// Item,Qnt,Zeny
+	setarray .GMonth_Rewards,
+		501,10,1000000,//1st
+		501,9,500000,
+		501,8,250000,
+		501,7,125000,
+		501,6,62500,
+		501,5,31250,
+		501,4,15620,
+		501,3,7810,
+		501,2,3905,
+		501,1,1952;//10th
+
+	// Number of kills on same person before it detects abuse
+	.RepeatCount = 5;
+
+	// Name of points earned, E.G. #Cash Points
+	.PointType$ = "#PvpPoints";
+
+	// Players Shown in PvP Ladder
+	.MaxRank = 10;
+
+	// Map Names
+	setarray .MapName$,"guild_vs1","guild_vs2","guild_vs3","guild_vs4","guild_vs5";
+
+	// Pvp Mode
+	// Modes are Addative
+	//	0 = Normal Pvp
+	//	1 = Gvg
+	//	2 = Nightmare
+	//	4 = Party
+	//	8 = No Ygg
+	//	16 = No 3rds
+	//	32 = No Trans
+	setarray .MapMode,0,1,2,4,56;
+
+	// Mapflags for all PvP maps
+	// regardless of Mode
+	setarray .mapflag,
+		mf_nowarp,	mf_nowarpto,		mf_nosave,
+		mf_nomemo,	mf_noteleport,		mf_nopenalty,
+		mf_noreturn,	mf_nobranch,		mf_nomobloot,
+		mf_nomvploot,	MF_NOZENYPENALTY,	MF_NOTRADE,
+		MF_NOCOMMAND;
+
+//===== Dont Touch - Menu & Mapflag Generation =============
+	for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
+		.MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"^EE3333Nightmare ":"") + ((.MapMode[.@i]&4)?"Party ":"") + ((.MapMode[.@i]&1)?"GvG":"PvP") +"^000000] "+ ((.MapMode[.@i] > 8)?"No ":"") + ((.MapMode[.@i]&8)?"Ygg ":"") + ((.MapMode[.@i]&16)?"3rds ":"") + ((.MapMode[.@i]&32)?"Trans ":"");
+		for ( .@f = 0; .@f < .@size; .@f++ )
+			setmapflag .MapName$[.@i], .mapflag[.@f];
+		if(.MapMode[.@i]&4) setmapflag .MapName$[.@i], mf_partylock;
+		if(.MapMode[.@i]&2) setmapflag .MapName$[.@i], MF_NIGHTMAREDROP;
+		if(.MapMode[.@i]&1){
+			setmapflag .MapName$[.@i], MF_GUILDLOCK;
+			setmapflag .MapName$[.@i], MF_GVG;
+		} else{
+			setmapflag .MapName$[.@i], MF_PVP_NOGUILD;
+			setmapflag .MapName$[.@i], MF_PVP;
+		}
+		if(!.MapMode[.@i]&4){
+			if(.MapMode[.@i]&1) setmapflag .MapName$[.@i], MF_GVG_NOPARTY;
+				else	setmapflag .MapName$[.@i], MF_NOPARTY;
+		}
+	}
+//==========================================================
+	bindatcmd("PvpLadder" ,"Ladder::OnPvpLadder",0,99);
+end;
+}
+-	pointshop	PvP_C_Shop	-1,#PvpPoints,501:1,502:2
