@@ -1,0 +1,31 @@
+//===== EinherjarRO Scripts ================================== 
+//= F_ItemLink
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Displays an Item Link / Blue Text depeding on settings
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+Function	Script	F_ItemLink	{
+// callfunc("F_ItemLink",<Item ID>{,Link/Blue};
+// [0] Item ID
+//	Duh?
+// [1] Link/Blue
+//	Toggle: 1 = Link, 0 = Blue
+
+// Default Setting for Link/Blue
+	.@Link = 1;
+
+	return ((getarg(1,.Link))?"<ITEM>"+getitemname(getarg(0))+"<INFO>"+.getarg(0)+"</INFO></ITEM>":"^0000FF"+getitemname(getarg(0)+"^000000");
+}
