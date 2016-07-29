@@ -3,13 +3,15 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.75
+//= 1.76
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
 //= A reward system for players who play more frequently
-//===== Comments: ============================================
+//===== Todo: ================================================
 //= Maybe make .MinWait an array mins,days,weeks,months,years;
+//= Show time till login rewards, if .Rest is defined
+//= Make Logging out then it continue count
 //===== Additional Comments: =================================
 //= For Older See Old Versions
 //= 1.51 Changed set .@g formula and move lower into script
@@ -34,6 +36,7 @@
 //= 1.73 Added .Rest Option
 //= 1.74 Added Cutin Support
 //= 1.75 Fixed Typos (Thanks Everade)
+//= 1.76 Fixed Bug with skipping 1st day on first time through
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -48,9 +51,9 @@ OnPCLoginEvent:
 		sleep2 1000 + .Rest * 60000;
 		if(.@i < #LastDailyReward + .MaxWait){
 			#DRewardCon += 1;
-		} else { #DRewardCon = 0; }
+		} else { #DRewardCon = 1; }
 		if(#DRewardCon >= getarraysize(.Rewards$)){
-			if(.Reset){ #DRewardCon = 0; }
+			if(.Reset){ #DRewardCon = 1; }
 			else { .@g = getarraysize(.Rewards$)-1; }
 		} else {	.@g = #DRewardCon;	}
 		explode(.@XT$,.Rewards$[.@g],",");
@@ -95,6 +98,7 @@ OnPCLoginEvent:
 		}
 		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",(#DRewardCon + 1),"day")+" in a row.";
 		#LastDailyReward = .@i;
+		@Login_Time = 0;
 	} else {
 		.@days = (#LastDailyReward + .MinWait - .@i)/60/24;
 		.@hours = ((#LastDailyReward + .MinWait - .@i)/60)%24;
@@ -164,7 +168,7 @@ OnInit:
 	// Total length of any days string must be 255 or shorter
 	// * If players login longer than the last set
 	//   day, they will keep getting the last prize.
-	setarray .Rewards$,
+	setarray .Rewards$[1],
 		"0,0,0,0,503,5,506,5",			// Day 0: 5 White Potion + 5 Green Potion
 		"100",					// Day 1: 100 Zeny
 		"0,0,0,0,501,5",			// Day 2: 5 Red Potion
