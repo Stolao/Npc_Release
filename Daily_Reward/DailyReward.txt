@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.76
+//= 1.78
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -37,6 +37,8 @@
 //= 1.74 Added Cutin Support
 //= 1.75 Fixed Typos (Thanks Everade)
 //= 1.76 Fixed Bug with skipping 1st day on first time through
+//= 1.77 Wrong Day in Mes
+//= 1.78 Fixed Cutins Being a Day Off
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -96,7 +98,7 @@ OnPCLoginEvent:
 					sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
 			}
 		}
-		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",(#DRewardCon + 1),"day")+" in a row.";
+		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" in a row.";
 		#LastDailyReward = .@i;
 		@Login_Time = 0;
 	} else {
@@ -169,15 +171,20 @@ OnInit:
 	// * If players login longer than the last set
 	//   day, they will keep getting the last prize.
 	setarray .Rewards$[1],
-		"0,0,0,0,503,5,506,5",			// Day 0: 5 White Potion + 5 Green Potion
-		"100",					// Day 1: 100 Zeny
-		"0,0,0,0,501,5",			// Day 2: 5 Red Potion
-		"0,0,0,0,503,5,506,5";			// Day 3: 5 White Potion + 5 Green Potion
+		"0,0,0,0,503,5,506,5",			// Day 1: 5 White Potion + 5 Green Potion
+		"100",					// Day 2: 100 Zeny
+		"0,0,0,0,501,5",			// Day 3: 5 Red Potion
+		"0,0,0,0,503,5,506,5",			// Day 4: 5 White Potion + 5 Green Potion
+		"100",					// Day 5: 100 Zeny
+		"0,0,0,0,501,5",			// Day 6: 5 Red Potion
+		"1000",					// Day 7: 100 Zeny
+		"1000",					// Day 8: 100 Zeny
+		"0,0,0,0,503,5,506,5";			// Day 9: 5 White Potion + 5 Green Potion
 
 	// Cutin Array
 	//	Shows a cuting for each date
 	//	
-	setarray .Cutins$,
+	setarray .Cutins$[1],
 			"kafra_01",
 			"kafra_02",
 			"kafra_03",
