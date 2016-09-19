@@ -22,6 +22,7 @@
 //= 1.06 Added @getskill
 //= 1.07 Added a string check to @getskill to allow skillID
 //= 1.08 Fixed missng )
+//= 1.09 Added @coins
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -74,6 +75,20 @@ OnGetSkillCmnd:
 	} else {
 		dispbottom "@getskill <skill_name>/<skillID> <skill level>";
 	}
+OnCoins:
+
+	for(.@i = 0; .@i < getarraysize(.item); .@i++){
+		while(zeny / .zeny && checkweight(.item[.@i],1)){
+			zeny -= .zeny;
+			getitem .item[.@i],1;
+		}
+	}
+	for(.@i = getarraysize(.item); .@i > 0; .@i--){
+		while(countitem(.item[.@i]) >= 10 && checkweight(.item[.@i - 1],1)){
+			delitem .item[.@i],10;
+			getitem .item[.@i -1],1;
+		}
+	}
 OnInit:
 	bindatcmd("getskill","atcmnd::OnGetSkillCmnd",60,99);
 	bindatcmd("boom","atcmnd::OnHomeCmnd",99,99);
@@ -84,5 +99,10 @@ OnInit:
 	bindatcmd("BGM","atcmnd::OnBGMCmnd",0,99);
 	bindatcmd("bgmall","atcmnd::OnBGMAllCmnd",99,99);
 	bindatcmd("BGMALL","atcmnd::OnBGMAllCmnd",99,99);
+	bindatcmd("coins","atcmnd::OnCoins",0,99);
+
+
+	setarray .item,35512,35513,35514,35515,35516;
+	setarray .zeny,1000000000,100000000,10000000,1000000,100000;
 end;
 }

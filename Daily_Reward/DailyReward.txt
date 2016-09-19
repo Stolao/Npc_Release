@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.78
+//= 1.7B
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -14,22 +14,6 @@
 //= Make Logging out then it continue count
 //===== Additional Comments: =================================
 //= For Older See Old Versions
-//= 1.51 Changed set .@g formula and move lower into script
-//= 1.52 Replace all disbottom -> message
-//= 1.53 Changed format to include minutes instead of just hours
-//= 1.54 Made time till next rewards display dynamic
-//= 1.55 Changed a forgotten  .PointType$ -> getd(.@TT[1])
-//= 1.56 Changed .@XT -> .@XT$
-//= 1.57 Added Atoi where necessary
-//= 1.58 Fixed a swapped .@x and .@x+1
-//= 1.59 Serveral edit undocumented to fix
-//= 1.5A Fixed a logic bug, day 1 skipped
-//= 1.5B Fixed a [-1] bug
-//= 1.5C Actually fixed a logic bug, day 1 skipped
-//= 1.5D Added a .Rest notification
-//= 1.5E Moved Sleep2 after the day check
-//= 1.5F Added '[Daily Rewards]:' to all messages
-//= 1.6x Removed to fix errors
 //= 1.70 Removed all "set"
 //= 1.71 Added CheckWeight
 //= 1.72 Fixed Tabulation
@@ -39,6 +23,9 @@
 //= 1.76 Fixed Bug with skipping 1st day on first time through
 //= 1.77 Wrong Day in Mes
 //= 1.78 Fixed Cutins Being a Day Off
+//= 1.79 No Rewards for Autotraders option added
+//= 1.7A No Rewards for Autotraders option added
+//= 1.7B Tabulation Cleanup
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -51,17 +38,21 @@ OnPCLoginEvent:
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
 	if(.@i >= (#LastDailyReward + .MinWait)){
 		sleep2 1000 + .Rest * 60000;
-		if(.@i < #LastDailyReward + .MaxWait){
-			#DRewardCon += 1;
-		} else { #DRewardCon = 1; }
-		if(#DRewardCon >= getarraysize(.Rewards$)){
-			if(.Reset){ #DRewardCon = 1; }
-			else { .@g = getarraysize(.Rewards$)-1; }
-		} else {	.@g = #DRewardCon;	}
-		explode(.@XT$,.Rewards$[.@g],",");
-		for(.@x = 0; .@x < getarraysize(.@XT$); .@x++){
-			.@TT[.@x] = atoi(.@XT$[.@x]);
+		if(checkvending() & 2 && .Mode & 64){
+			message strcharinfo(0),"[Daily Rewards]: Venders cannot recive rewards.";
+			end;
 		}
+		if(.@i < #LastDailyReward + .MaxWait)
+			#DRewardCon += 1;
+		else	#DRewardCon = 1;
+		if(#DRewardCon >= getarraysize(.Rewards$)){
+			if(.Reset)
+				#DRewardCon = 1;
+			else	.@g = getarraysize(.Rewards$)-1;
+		} else	.@g = #DRewardCon;
+		explode(.@XT$,.Rewards$[.@g],",");
+		for(.@x = 0; .@x < getarraysize(.@XT$); .@x++)
+			.@TT[.@x] = atoi(.@XT$[.@x]);
 		if(.Mode & 1 && .@TT[4] > 0){
 			for(.@x = 4; .@x <= getarraysize(.@TT) - 1 ; .@x += 2){
 				.@itms[getarraysize(.@itms)] = .@TT[.@x];
@@ -69,7 +60,9 @@ OnPCLoginEvent:
 			}
 			if(checkweight2(.@itms,.@qnts)){
 				for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
-					getitem  .@itms[.@x], .@qnts[.@x];
+					if(.Mode & 32)
+						getitembound  .@itms[.@x], .@qnts[.@x], Bound_Account;
+					else	getitem  .@itms[.@x], .@qnts[.@x];
 				}
 			} else {
 				message strcharinfo(0),"[Daily Rewards]: You cannot carry the prizes, please use storage and relog.";
@@ -112,9 +105,10 @@ OnInit:
 	// Basic Settings
 	//   1: Item | 2: Points | 4: Exp  
 	//   8: Gain Buffs Every X Consecutive Days logged in
-	//   16: Show Cutins
+	//   16: Show Cutins | 32: Account Bound Items
+	//   64: No Rewards ffor Autotraders
 	//     (a bit value, e.g. 3 = Items & Points from Multi)
-	.Mode = 1|2|4|8|16;
+	.Mode = 1|2|4|8|16|64;
 
 	// To disable the command '@loginreward' comment the next lines
 	// * Needs extra commands for typos
