@@ -108,7 +108,6 @@ OnPvpLadder:
 			}
 			close;
 		case 4:
-			mes "not done yet";
 			if(.Options&256){
 				if(.Options&128){ query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$M_Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
 				} else { query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value); }
