@@ -3,13 +3,14 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Description: =========================================
 //= Usable Empty Bottles
 //===== Changelogs: ==========================================
 //= 1.00 First version.
+//= 1.01 Fixed Item Edit
 //============================================================
-// 713,Empty_Bottle,Empty Bottle,11,6,,20,,,,,,,,,,,,,{ doevent "Click_Bottle::OnBottleClick"; },{},{}
+// 713,Empty_Bottle,Empty Bottle,11,6,,20,,,,,0xFFFFFFFF,63,2,,,,,,{ doevent "Click_Bottle::OnBottleClick"; },{},{}
 
 -	script	Click_Bottle	-1,{
 OnBottleClick:
