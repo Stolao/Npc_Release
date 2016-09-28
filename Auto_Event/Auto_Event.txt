@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.00
+//= 2.01
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -30,6 +30,7 @@
 //= Add Ranking System
 //===== Additional Comments: =================================
 //= 2.00 Remake
+//= 2.01 Fix bug in Lucky Pick
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -544,7 +545,7 @@ OnLuckyStart:	//-- Lucky Event
 	delwaitingroom;
 	$@CurrentEvent = -8;
 	if(.@waitingroom_usercount >= .MinPlayers[8])
-		Func_Prizes(getcharid(0),.EventName$[8]);
+		Func_Prizes(.@waitingroom_users[rand(.@waitingroom_usercount)],.EventName$[8]);
 	else	Announce "Event Stopped! Not Enough Players Joined the "+.EventName$[8]+"!",bc_blue|bc_area;
 	$@CurrentEvent = 0;
 	end;
