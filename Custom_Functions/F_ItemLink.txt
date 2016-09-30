@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -12,6 +12,7 @@
 //= Optmize more?
 //===== Additional Comments: =================================
 //= 1.00 Original Make
+//= 1.01 Typo Fix
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -26,6 +27,5 @@ Function	Script	F_ItemLink	{
 
 // Default Setting for Link/Blue
 	.@Link = 1;
-
-	return ((getarg(1,.Link))?"<ITEM>"+getitemname(getarg(0))+"<INFO>"+.getarg(0)+"</INFO></ITEM>":"^0000FF"+getitemname(getarg(0)+"^000000");
+	return ((getarg(1,.Link))?"<ITEM>"+getitemname(getarg(0))+"<INFO>"+getarg(0)+"</INFO></ITEM>":"^0000FF"+getitemname(getarg(0))+"^000000");
 }
