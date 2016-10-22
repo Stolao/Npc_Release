@@ -26,6 +26,7 @@
 //= 1.79 No Rewards for Autotraders option added
 //= 1.7A No Rewards for Autotraders option added
 //= 1.7B Tabulation Cleanup
+//= 1.7C Added custom item binding mode [Secretdataz]
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -61,7 +62,7 @@ OnPCLoginEvent:
 			if(checkweight2(.@itms,.@qnts)){
 				for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
 					if(.Mode & 32)
-						getitembound  .@itms[.@x], .@qnts[.@x], Bound_Account;
+						getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
 					else	getitem  .@itms[.@x], .@qnts[.@x];
 				}
 			} else {
@@ -110,6 +111,13 @@ OnInit:
 	//     (a bit value, e.g. 3 = Items & Points from Multi)
 	.Mode = 1|2|4|8|16|64;
 
+	// Item Binding Mode
+	//	 Bound_Account : Account Bound item
+	//	 Bound_Guild   : Guild Bound item
+	//	 Bound_Party   : Party Bound item
+	//	 Bound_Char    : Character Bound item
+	.Bound_Mode = Bound_Account;
+	
 	// To disable the command '@loginreward' comment the next lines
 	// * Needs extra commands for typos
 	bindatcmd("relog"	,"LOGIN::OnLoginCmnd",0,99);
