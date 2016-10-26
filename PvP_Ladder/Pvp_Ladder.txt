@@ -435,7 +435,7 @@ OnInit:
 	setarray .MapMode,0,1,2,4,56;
 
 	// Max Players Per Map
-	setattay .MaxPlayers,0,50,10,36,50;
+	setarray .MaxPlayers,0,50,10,36,50;
 
 	// Mapflags for all PvP maps
 	// regardless of Mode
