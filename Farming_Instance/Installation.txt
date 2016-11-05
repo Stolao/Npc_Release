@@ -1,0 +1,479 @@
+
+================ Installation Steps =============
+-------------------------------------------------
+Client Side
+-------------------------------------------------
+1) Download Farming.grf
+2) Check your Sprite IDs as they might vary for you
+3) Update /data(grf)/luafiles514/lua files/datainfo/jobidentity.lub
+4) Update /data(grf)/luafiles514/lua files/datainfo/jobname.lub
+5) Update /system/itemInfo.lua(lub)
+-------------------------------------------------
+Server Side
+-------------------------------------------------
+1)  Update /scr/map/npc.h
+2)  Recompile
+3)  Update /db/const.txt
+4)  Update /conf/maps_athena.conf
+5)  Update /db/import/map_index.txt
+6)  Run mapcache
+7)  Update /db/import/instance_db.txt
+8)  Update /db/import/item_db.txt
+9)  Change .@BS (in this file) to match JT_Bush-01 id in the jobidentity/const
+10) If you change item ids also edit the array .@seedid
+
+
+
+-------------------------------------------------
+/data(grf)/luafiles514/lua files/datainfo/jobidentity.lub
+-------------------------------------------------
+=================================================
+Check your Sprite IDs to make sure you don't 
+overwrite used ones. as these change all the time
+=================================================
+	JT_Bush_01 = 10206,
+	JT_Bush_02 = 10207,
+	JT_Bush_03 = 10208,
+	JT_Bush_P04 = 10209,
+	JT_Bush_R04 = 10210,
+	JT_Bush_P05 = 10211,
+	JT_Bush_R05 = 10212,
+	JT_Dead_Bush = 10213,
+	JT_Snow_Bush_01 = 10214,
+	JT_Snow_Bush_02 = 10215,
+	JT_Snow_Bush_03 = 10216,
+	JT_Snow_Bush_P04 = 10217,
+	JT_Snow_Bush_R04 = 10218,
+	JT_Snow_Bush_P05 = 10219,
+	JT_Snow_Bush_R05 = 10220,
+	JT_Dead_Herb = 10221,
+	JT_Herb_01 = 10222,
+	JT_Herb_02 = 10223,
+	JT_Herb_B03 = 10224,
+	JT_Herb_R03 = 10225,
+	JT_Herb_W03 = 10226,
+	JT_Herb_Y03 = 10227,
+	JT_Herb_B04 = 10228,
+	JT_Herb_R04 = 10229,
+	JT_Herb_W04 = 10230,
+	JT_Herb_Y04 = 10231,
+	JT_Snow_Herb_01 = 10232,
+	JT_Snow_Herb_02 = 10233,
+	JT_Snow_Herb_B03 = 10234,
+	JT_Snow_Herb_R03 = 10235,
+	JT_Snow_Herb_W03 = 10236,
+	JT_Snow_Herb_Y03 = 10237,
+	JT_Snow_Herb_B04 = 10238,
+	JT_Snow_Herb_R04 = 10239,
+	JT_Snow_Herb_W04 = 10240,
+	JT_Snow_Herb_Y04 = 10241,
+	JT_Dead_Root = 10242,
+	JT_Root_01 = 10243,
+	JT_Root_02 = 10244,
+	JT_Root_03 = 10245,
+	JT_Root_04 = 10246,
+	JT_Root_05 = 10247,
+	JT_Snow_Root_01 = 10248,
+	JT_Snow_Root_02 = 10249,
+	JT_Snow_Root_03 = 10250,
+	JT_Snow_Root_04 = 10251,
+	JT_Snow_Root_05 = 10252,
+	JT_Sprout = 10253,
+	JT_Green_Sprout = 10254,
+	JT_Orange_Sprout = 10255,
+	JT_Poison_Sprout = 10256,
+	JT_Red_Sprout = 10257,
+	JT_White_Sprout = 10258,
+	JT_YellowSprout = 10259,
+	JT_Dead_Tree = 10260,
+	JT_Snow_Tree_01 = 10261,
+	JT_Snow_Tree_02 = 10262,
+	JT_Snow_Tree_03 = 10263,
+	JT_Snow_Tree_04 = 10264,
+	JT_Snow_Tree_05 = 10265,
+	JT_Snow_Tree_05 = 10266,
+	JT_Tree_01 = 10267,
+	JT_Tree_02 = 10268,
+	JT_Tree_03 = 10269,
+	JT_Tree_04 = 10270,
+	JT_Tree_P05 = 10271,
+	JT_Tree_R05 = 10272,
+
+
+-------------------------------------------------
+/data(grf)/luafiles514/lua files/datainfo/jobname.lub
+-------------------------------------------------
+
+	[jobtbl.JT_Bush_01] = "Bush_01",
+	[jobtbl.JT_Bush_02] = "Bush_02",
+	[jobtbl.JT_Bush_03] = "Bush_03",
+	[jobtbl.JT_Bush_P04] = "Bush_P04",
+	[jobtbl.JT_Bush_R04] = "Bush_R04",
+	[jobtbl.JT_Bush_P05] = "Bush_P05",
+	[jobtbl.JT_Bush_R05] = "Bush_R05",
+	[jobtbl.JT_Dead_Bush] = "Dead_Bush",
+	[jobtbl.JT_Snow_Bush_01] = "Snow_Bush_01",
+	[jobtbl.JT_Snow_Bush_02] = "Snow_Bush_02",
+	[jobtbl.JT_Snow_Bush_03] = "Snow_Bush_03",
+	[jobtbl.JT_Snow_Bush_P04] = "Snow_Bush_P04",
+	[jobtbl.JT_Snow_Bush_R04] = "Snow_Bush_R04",
+	[jobtbl.JT_Snow_Bush_P05] = "Snow_Bush_P05",
+	[jobtbl.JT_Snow_Bush_R05] = "Snow_Bush_R05",
+	[jobtbl.JT_Dead_Herb] = "Dead_Herb",
+	[jobtbl.JT_Herb_01] = "Herb_01",
+	[jobtbl.JT_Herb_02] = "Herb_01",
+	[jobtbl.JT_Herb_B03] = "Herb_B03",
+	[jobtbl.JT_Herb_R03] = "Herb_R03",
+	[jobtbl.JT_Herb_W03] = "Herb_W03",
+	[jobtbl.JT_Herb_Y03] = "Herb_Y03",
+	[jobtbl.JT_Herb_B04] = "Herb_B04",
+	[jobtbl.JT_Herb_R04] = "Herb_R04",
+	[jobtbl.JT_Herb_W04] = "Herb_0W4",
+	[jobtbl.JT_Herb_Y04] = "Herb_0Y4",
+	[jobtbl.JT_Snow_Herb_01] = "Snow_Herb_01",
+	[jobtbl.JT_Snow_Herb_02] = "Snow_Herb_02",
+	[jobtbl.JT_Snow_Herb_B03] = "Snow_Herb_B03",
+	[jobtbl.JT_Snow_Herb_R03] = "Snow_Herb_R03",
+	[jobtbl.JT_Snow_Herb_W03] = "Snow_Herb_W03",
+	[jobtbl.JT_Snow_Herb_Y03] = "Snow_Herb_Y03",
+	[jobtbl.JT_Snow_Herb_B04] = "Snow_Herb_B04",
+	[jobtbl.JT_Snow_Herb_R04] = "Snow_Herb_R04",
+	[jobtbl.JT_Snow_Herb_W04] = "Snow_Herb_W04",
+	[jobtbl.JT_Snow_Herb_Y04] = "Snow_Herb_Y04",
+	[jobtbl.JT_Dead_Root] = "Dead_Root",
+	[jobtbl.JT_Root_01] = "Root_01",
+	[jobtbl.JT_Root_02] = "Root_02",
+	[jobtbl.JT_Root_03] = "Root_03",
+	[jobtbl.JT_Root_04] = "Root_04",
+	[jobtbl.JT_Root_05] = "Root_05",
+	[jobtbl.JT_Snow_Root_01] = "Snow_Root_01",
+	[jobtbl.JT_Snow_Root_02] = "Snow_Root_02",
+	[jobtbl.JT_Snow_Root_03] = "Snow_Root_03",
+	[jobtbl.JT_Snow_Root_04] = "Snow_Root_04",
+	[jobtbl.JT_Snow_Root_05] = "Snow_Root_05",
+	[jobtbl.JT_Sprout] = "Blue_Sprout",
+	[jobtbl.JT_Green_Sprout] = "Green_Sprout",
+	[jobtbl.JT_Orange_Sprout] = "Orange_Sprout",
+	[jobtbl.JT_Poison_Sprout] = "Poison_Sprout",
+	[jobtbl.JT_Red_Sprout] = "Red_Sprout",
+	[jobtbl.JT_White_Sprout] = "White_Sprout",
+	[jobtbl.JT_Yellow_Sprout] = "Yellow_Sprout",
+	[jobtbl.JT_Dead_Tree] = "Dead_Tree",
+	[jobtbl.JT_Snow_Tree_01] = "Snow_Tree_01",
+	[jobtbl.JT_Snow_Tree_02] = "Snow_Tree_02",
+	[jobtbl.JT_Snow_Tree_03] = "Snow_Tree_03",
+	[jobtbl.JT_Snow_Tree_04] = "Snow_Tree_04",
+	[jobtbl.JT_Snow_Tree_P05] = "Snow_Tree_P05",
+	[jobtbl.JT_Snow_Tree_R05] = "Snow_Tree_R05",
+	[jobtbl.JT_Tree_01] = "Tree_01",
+	[jobtbl.JT_Tree_02] = "Tree_02",
+	[jobtbl.JT_Tree_03] = "Tree_03",
+	[jobtbl.JT_Tree_04] = "Tree_04",
+	[jobtbl.JT_Tree_P05] = "Tree_P05",
+	[jobtbl.JT_Tree_R05] = "Tree_R05",
+
+
+-------------------------------------------------
+/system/itemInfo.lub
+-------------------------------------------------
+
+
+	[47081] = {
+		unidentifiedDisplayName = "Grape Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Grape Bush",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Grape Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Grape Bush",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47082] = {
+		unidentifiedDisplayName = "Strawberry Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Strawberry Bush",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Strawberry Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Strawberry Bush",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47083] = {
+		unidentifiedDisplayName = "Blue Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Blue Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Blue Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Blue Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47084] = {
+		unidentifiedDisplayName = "Red Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Red Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Red Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Red Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47085] = {
+		unidentifiedDisplayName = "White Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a White Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "White Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a White Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47086] = {
+		unidentifiedDisplayName = "Yellow Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Yellow Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Yellow Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Yellow Herb",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47087] = {
+		unidentifiedDisplayName = "Carrot Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Carrot Plant",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Carrot Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Carrot Plant",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47088] = {
+		unidentifiedDisplayName = "Potatoe Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Potatoe Plant",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Potatoe Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Potatoe Plant",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47089] = {
+		unidentifiedDisplayName = "Samara Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Samara Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Samara Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Samara Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47090] = {
+		unidentifiedDisplayName = "Plum Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Plum Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Plum Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Plum Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[47091] = {
+		unidentifiedDisplayName = "Apple Seed",
+		unidentifiedResourceName = "惯酒货较",
+		unidentifiedDescriptionName = {
+			"The Seed of a Apple Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		identifiedDisplayName = "Apple Seed",
+		identifiedResourceName = "惯酒货较",
+		identifiedDescriptionName = {
+			"The Seed of a Apple Tree",
+			"Weight: ^7777770.1^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+
+
+
+-------------------------------------------------
+/scr/map/npc.h
+-------------------------------------------------
+=================================================
+Adjust as needed
+=================================================
+#define MAX_NPC_CLASS2_END 10275
+
+-------------------------------------------------
+/db/const.txt
+-------------------------------------------------
+
+Bush_01	10206
+Bush_02	10207
+Bush_03	10208
+Bush_P04	10209
+Bush_R04	10210
+Bush_P05	10211
+Bush_R05	10212
+Dead_Bush	10213
+Snow_Bush_01	10214
+Snow_Bush_02	10215
+Snow_Bush_03	10216
+Snow_Bush_P04	10217
+Snow_Bush_R04	10218
+Snow_Bush_P05	10219
+Snow_Bush_R05	10220
+Dead_Herb	10221
+Herb_01	10222
+Herb_02	10223
+Herb_B03	10224
+Herb_R03	10225
+Herb_W03	10226
+Herb_Y03	10227
+Herb_B04	10228
+Herb_R04	10229
+Herb_W04	10230
+Herb_Y04	10231
+Snow_Herb_01	10232
+Snow_Herb_02	10233
+Snow_Herb_B03	10234
+Snow_Herb_R03	10235
+Snow_Herb_W03	10236
+Snow_Herb_Y03	10237
+Snow_Herb_B04	10238
+Snow_Herb_R04	10239
+Snow_Herb_W04	10240
+Snow_Herb_Y04	10241
+Dead_Root	10242
+Root_01	10243
+Root_02	10244
+Root_03	10245
+Root_04	10246
+Root_05	10247
+Snow_Root_01	10248
+Snow_Root_02	10249
+Snow_Root_03	10250
+Snow_Root_04	10251
+Snow_Root_05	10252
+Sprout	10253
+Green_Sprout	10254
+Orange_Sprout	10255
+Poison_Sprout	10256
+Red_Sprout	10257
+White_Sprout	10258
+YellowSprout	10259
+Dead_Tree	10260
+Snow_Tree_01	10261
+Snow_Tree_02	10262
+Snow_Tree_03	10263
+Snow_Tree_04	10264
+Snow_Tree_P05	10265
+Snow_Tree_R05	10266
+Tree_01	10267
+Tree_02	10268
+Tree_03	10269
+Tree_04	10270
+Tree_P05	10271
+Tree_R05	10272
+
+-------------------------------------------------
+/conf/maps_athena.conf
+-------------------------------------------------
+map: xmas_farm
+map: rachel_farm
+map: prt_farm
+map: pay_farm
+
+-------------------------------------------------
+/db/import/map_index.txt
+-------------------------------------------------
+
+xmas_farm
+rachel_farm
+prt_farm
+pay_farm
+
+-------------------------------------------------
+/db/import/instance_db.txt
+-------------------------------------------------
+25,Payon Farm,900,300,pay_farm,45,36
+26,Rachel Farm,900,300,rachel_farm,34,51
+27,Xmas Farm,900,300,xmas_farm,33,35
+28,Prontera Farm,900,300,prt_farm,
+
+-------------------------------------------------
+/db/import/item_db.txt
+-------------------------------------------------
+
+47081,Grape Seed,Grape Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47082,Strawberry Seed,Strawberry Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47083,Blue Seed,Blue Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47084,Red Seed,Red Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47085,White Seed,White Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47086,Yellow Seed,Yellow Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47087,Carrot Seed,Carrot Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47088,Potato Seed,Potato Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47089,Samara Seed,Samara Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47090,Plum Seed,Plum Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
+47091,Apple Seed,Apple Seed,3,1000,,1,,,,,,,,,,,,,{},{},{}
