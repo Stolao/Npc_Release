@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.7F
+//= 1.80
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -29,6 +29,7 @@
 //= 1.7D Added cutin for next day option + command
 //= 1.7E Added IP Check
 //= 1.7F Moved .Rest Message to after .MinWait Check
+//= 1.80 Added MacAddress check for those using Gepard Shield (disabled by default)
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -45,6 +46,17 @@ OnPCLoginEvent:
 			end;
 		}
 	}
+	if(.MacCheck){
+		query_sql("SELECT last_unique_id FROM `login` WHERE account_id = "+getcharid(3)+"", .@last_unique_id$);
+		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
+		if(getarraysize(.@AccountId2) > .MacCheck){
+			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.IPCheck+" per computer sorry.";
+			end;
+		}
+	}
+
+
+
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
 	if(.@i >= (#LastDailyReward + .MinWait)){
 		if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collect reward you must remain logged in for "+ .Rest +" minutes";
@@ -133,6 +145,10 @@ OnInit:
 	// Number of times same IP can recive rewards
 	//   0 = unlimited
 	.IPCheck = 1;
+
+	// Number of times same Computer (MacAdress) can recive rewards
+	//   0 = unlimited
+	.MacCheck = 0;
 
 	// Item Binding Mode
 	//	 Bound_Account : Account Bound item
