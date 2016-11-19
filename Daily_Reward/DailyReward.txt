@@ -3,14 +3,13 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.7B
+//= 1.7E
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
 //= A reward system for players who play more frequently
 //===== Todo: ================================================
 //= Maybe make .MinWait an array mins,days,weeks,months,years;
-//= Show time till login rewards, if .Rest is defined
 //= Make Logging out then it continue count
 //===== Additional Comments: =================================
 //= For Older See Old Versions
@@ -27,6 +26,9 @@
 //= 1.7A No Rewards for Autotraders option added
 //= 1.7B Tabulation Cleanup
 //= 1.7C Added custom item binding mode [Secretdataz]
+//= 1.7D Added cutin for next day option + command
+//= 1.7E Added IP Check
+//= 1.7F Moved .Rest Message to after .MinWait Check
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -35,9 +37,17 @@
 OnWhisperGlobal:
 OnLoginCmnd:
 OnPCLoginEvent:
-	if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collect reward you must remain logged in for "+  .Rest +" minutes";
+	if(.IPCheck){
+		query_sql("SELECT last_ip FROM `login` WHERE account_id = "+getcharid(3)+"", .@LastIp$);
+		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
+		if(getarraysize(.@AccountId) > .IPCheck){
+			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.IPCheck+" per IP sorry.";
+			end;
+		}
+	}
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
 	if(.@i >= (#LastDailyReward + .MinWait)){
+		if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collect reward you must remain logged in for "+ .Rest +" minutes";
 		sleep2 1000 + .Rest * 60000;
 		if(checkvending() & 2 && .Mode & 64){
 			message strcharinfo(0),"[Daily Rewards]: Venders cannot recive rewards.";
@@ -95,21 +105,34 @@ OnPCLoginEvent:
 		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" in a row.";
 		#LastDailyReward = .@i;
 		@Login_Time = 0;
-	} else {
-		.@days = (#LastDailyReward + .MinWait - .@i)/60/24;
-		.@hours = ((#LastDailyReward + .MinWait - .@i)/60)%24;
-		.@mins = (#LastDailyReward + .MinWait - .@i)%60;
-		message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") +""+ ((.@hours) ? .@hours +" Hours " : "") +""+ ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
+		end;
 	}
-end;
+OnNextCmnd:
+	.@days = (#LastDailyReward + .MinWait - .@i)/60/24;
+	.@hours = ((#LastDailyReward + .MinWait - .@i)/60)%24;
+	.@mins = (#LastDailyReward + .MinWait - .@i)%60;
+	message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") +""+ ((.@hours) ? .@hours +" Hours " : "") +""+ ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
+	if(.Mode & 128){
+		if(#DRewardCon + 1 >= getarraysize(.Rewards$)){
+			if(.Reset)	.@DRewardCon = 1;
+			else	.@g = getarraysize(.Rewards$)-1;
+		} else	.@g = #DRewardCon + 1;
+		cutin .Cutins$[.@g],4;
+	}
+	end;
 OnInit:
 	// Basic Settings
 	//   1: Item | 2: Points | 4: Exp  
 	//   8: Gain Buffs Every X Consecutive Days logged in
 	//   16: Show Cutins | 32: Account Bound Items
 	//   64: No Rewards ffor Autotraders
+	//   128: Show Next Day Cutin
 	//     (a bit value, e.g. 3 = Items & Points from Multi)
 	.Mode = 1|2|4|8|16|64;
+
+	// Number of times same IP can recive rewards
+	//   0 = unlimited
+	.IPCheck = 1;
 
 	// Item Binding Mode
 	//	 Bound_Account : Account Bound item
@@ -120,7 +143,8 @@ OnInit:
 	
 	// To disable the command '@loginreward' comment the next lines
 	// * Needs extra commands for typos
-	bindatcmd("relog"	,"LOGIN::OnLoginCmnd",0,99);
+	bindatcmd("relog","LOGIN::OnLoginCmnd",0,99);
+	bindatcmd("nextreward","LOGIN::OnNextCmnd",0,99);
 
 	// Minimum minutes between collecting daily reward
 	//   Day: 22*60 - 24*60
