@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.08
+//= 1.0C
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -23,6 +23,9 @@
 //= 1.07 Added a string check to @getskill to allow skillID
 //= 1.08 Fixed missng )
 //= 1.09 Added @coins
+//= 1.0A Fixed Typo disabling @Boom
+//= 1.0B Fixed Missing end;
+//= 1.0C Tabulation
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -31,21 +34,25 @@
 OnMainCmnd:
 	progressbar "0xFFFFFF",3;
 	warp "prontera",155,181;
-end;
+	end;
+
 OnMarketCmnd:
 	progressbar "0xFFFFFF",3;
 	warp "market",100,111;
-end;
+	end;
+
 OnHomeCmnd:
 	progressbar "0xFFFFFF",3;
 	warp "SavePoint",0,0;
-end;
+	end;
+
 OnBoomCmnd:
 	addrid(1,1);
 	announce "You have been Doomed to Die!!!",bc_blue|bc_self;
 	sleep2 rand(1000,60000);
 	atcommand "@nuke "+strcharinfo(0);
-end;
+	end;
+
 OnBGMCmnd:
 	mes "[BGM]";
 	mes "Whats the file number";
@@ -53,7 +60,8 @@ OnBGMCmnd:
 	input .@bgm$;
 	close2;
 	playBGM .@bgm$;
-end;
+	end;
+
 OnBGMAllCmnd:
 	mes "[BGM-All]";
 	mes "Whats the file number";
@@ -61,22 +69,22 @@ OnBGMAllCmnd:
 	input .@bgm$;
 	close2;
 	playBGMall .@bgm$;
-end;
+	end;
+
 OnGetSkillCmnd:
 	if(.@atcmd_numparameters == 2){
 		if(getstrlen(.@atcmd_parameters$[0] > 4)){
 			skill .@atcmd_parameters$[0],atoi(.@atcmd_parameters$[1]),SKILL_PERM;
-			if(!getskilllv(.@atcmd_parameters$[0])) dispbottom "@getskill Unkown Skill";
+			if(!getskilllv(.@atcmd_parameters$[0]))
+				dispbottom "@getskill Unkown Skill";
 		} else {
 			skill atoi(.@atcmd_parameters$[0]),atoi(.@atcmd_parameters$[1]),SKILL_PERM;
-			if(!getskilllv(atoi(.@atcmd_parameters$[0]))) dispbottom "@getskill Unkown Skill";
+			if(!getskilllv(atoi(.@atcmd_parameters$[0])))
+				dispbottom "@getskill Unkown Skill";
 		}
-		
-	} else {
-		dispbottom "@getskill <skill_name>/<skillID> <skill level>";
-	}
+	} else	dispbottom "@getskill <skill_name>/<skillID> <skill level>";
+	end;
 OnCoins:
-
 	for(.@i = 0; .@i < getarraysize(.item); .@i++){
 		while(zeny / .zeny && checkweight(.item[.@i],1)){
 			zeny -= .zeny;
@@ -89,9 +97,11 @@ OnCoins:
 			getitem .item[.@i -1],1;
 		}
 	}
+	end;
 OnInit:
+	// Atcommands
 	bindatcmd("getskill","atcmnd::OnGetSkillCmnd",60,99);
-	bindatcmd("boom","atcmnd::OnHomeCmnd",99,99);
+	bindatcmd("boom","atcmnd::OnBoomCmnd",99,99);
 	bindatcmd("home","atcmnd::OnHomeCmnd",0,99);
 	bindatcmd("main","atcmnd::OnMainCmnd",0,99);
 	bindatcmd("market","atcmnd::OnMarketCmnd",0,99);
@@ -101,7 +111,7 @@ OnInit:
 	bindatcmd("BGMALL","atcmnd::OnBGMAllCmnd",99,99);
 	bindatcmd("coins","atcmnd::OnCoins",0,99);
 
-
+	// Coins Settings
 	setarray .item,35512,35513,35514,35515,35516;
 	setarray .zeny,1000000000,100000000,10000000,1000000,100000;
 end;
