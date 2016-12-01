@@ -3,16 +3,18 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.01
+//= 1.02
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
 //= Porings are more fun~
 //===== Comments: ============================================
-//= N/A
+//= Suggestions?
+//= Apply to other "Poring"
 //===== Additional Comments: =================================
 //= 1.00 Initial Make
 //= 1.01 Coverted to new areamob format
+//= 1.02 Tabulation
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -21,18 +23,21 @@
 OnEventPor1:
 	Getmapxy(.@m$,.@x,.@y,0);
 	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor2",0,0;
-End;
+	end;
+
 OnEventPor2:
 	Getmapxy(.@m$,.@x,.@y,0);
 	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor3",1,0;
-End;
+	end;
+
 OnEventPor3:
 	Set .count,.count+1;
 	If(.count == 4){
 		areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,1,"porsize::OnEventPor1",2,0;
 		Set .count,0;
 	}
-End;
+	end;
+
 OnInit:
 	Set .TotalBig,100;
 	Set .PlayMap$,"prt_fild08";
@@ -43,5 +48,5 @@ OnInit:
 	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.B,"porsize::OnEventPor1",2,0;
 	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.M*2,"porsize::OnEventPor2",0,0;
 	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.S*4,"porsize::OnEventPor3",1,0;
-End;
+	end;
 }
