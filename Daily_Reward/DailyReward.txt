@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.83
+//= 1.84
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -30,6 +30,7 @@
 //= 1.81 Fixed Typo in .MacCheck
 //= 1.82 Replace sleep2 with addtimer
 //= 1.83 Replace "LOGIN:: with strnpcinfo(3)+"::
+//= 1.84 Missing ; fixed
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -75,7 +76,7 @@ OnNextCmnd:
 	}
 	end;
 OnWait:
-	deltimer strnpcinfo(3)+"::OnWait"
+	deltimer strnpcinfo(3)+"::OnWait";
 	if(checkvending() & 2 && .Mode & 64){
 		message strcharinfo(0),"[Daily Rewards]: Venders cannot recive rewards.";
 		end;
