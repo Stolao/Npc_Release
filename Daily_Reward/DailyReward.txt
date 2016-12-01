@@ -11,15 +11,11 @@
 //===== Todo: ================================================
 //= Maybe make .MinWait an array mins,days,weeks,months,years;
 //= Make Logging out then it continue count
-//= Overweight Commands
+//= Make a Overweight easy collect
+//= Remove use of sleep2
 //= Suggestions?
 //===== Additional Comments: =================================
 //= For Older See Old Versions
-//= 1.75 Fixed Typos (Thanks Everade)
-//= 1.76 Fixed Bug with skipping 1st day on first time through
-//= 1.77 Wrong Day in Mes
-//= 1.78 Fixed Cutins Being a Day Off
-//= 1.79 No Rewards for Autotraders option added
 //= 1.7A No Rewards for Autotraders option added
 //= 1.7B Tabulation Cleanup
 //= 1.7C Added custom item binding mode [Secretdataz]
@@ -28,9 +24,11 @@
 //= 1.7F Moved .Rest Message to after .MinWait Check
 //= 1.80 Added MacAddress check for those using Gepard Shield (disabled by default)
 //= 1.81 Fixed Typo in .MacCheck
-//= 1.82 Replace sleep2 with addtimer
-//= 1.83 Replace "LOGIN:: with strnpcinfo(3)+"::
-//= 1.84 Missing ; fixed
+//= 1.82 Moved .Rest Check before rewards check to prevent bug
+//= 1.83 Added strnpcinfo(3) for bindatcomands
+//= 1.84 Rephrased some conf settings
+//= 1.85 Fixed Capilazation
+//= 1.86 Small Tabulation Tweaks
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -43,7 +41,7 @@ OnPCLoginEvent:
 		query_sql("SELECT last_ip FROM `login` WHERE account_id = "+getcharid(3)+"", .@LastIp$);
 		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
 		if(getarraysize(.@AccountId) > .IPCheck){
-			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.IPCheck+" per IP sorry.";
+			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.IPCheck+" per IP sorry.";
 			end;
 		}
 	}
@@ -51,18 +49,74 @@ OnPCLoginEvent:
 		query_sql("SELECT last_unique_id FROM `login` WHERE account_id = "+getcharid(3)+"", .@last_unique_id$);
 		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
 		if(getarraysize(.@AccountId2) > .MacCheck){
-			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.MacCheck+" per computer sorry.";
+			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.MacCheck+" per computer sorry.";
 			end;
 		}
 	}
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2);
+	if(.@i >= (#LastDailyReward + .MinWait) && .Rest){
+		message strcharinfo(0),"[Daily Rewards]: To collect reward you must remain logged in for "+ .Rest +" minutes";
+		sleep2 1000 + .Rest * 60000;
+	}
 	if(.@i >= (#LastDailyReward + .MinWait)){
-		if(.Rest) message strcharinfo(0),"[Daily Rewards]: to collect reward you must remain logged in for "+ .Rest +" minutes";
-		addtimer 1000 + .Rest * 60000,strnpcinfo(3)+"::OnWait";
+		if(checkvending() & 2 && .Mode & 64){
+			message strcharinfo(0),"[Daily Rewards]: Venders cannot recive rewards.";
+			end;
+		}
+		if(.@i < #LastDailyReward + .MaxWait)
+			#DRewardCon += 1;
+		else	#DRewardCon = 1;
+		if(#DRewardCon >= getarraysize(.Rewards$)){
+			if(.Reset)
+				#DRewardCon = 1;
+			else	.@g = getarraysize(.Rewards$)-1;
+		} else	.@g = #DRewardCon;
+		explode(.@XT$,.Rewards$[.@g],",");
+		for(.@x = 0; .@x < getarraysize(.@XT$); .@x++)
+			.@TT[.@x] = atoi(.@XT$[.@x]);
+		if(.Mode & 1 && .@TT[4] > 0){
+			for(.@x = 4; .@x <= getarraysize(.@TT) - 1 ; .@x += 2){
+				.@itms[getarraysize(.@itms)] = .@TT[.@x];
+				.@qnts[getarraysize(.@qnts)] = .@TT[.@x + 1];
+			}
+			if(checkweight2(.@itms,.@qnts)){
+				for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
+					if(.Mode & 32)
+						getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
+					else	getitem  .@itms[.@x], .@qnts[.@x];
+				}
+			} else {
+				message strcharinfo(0),"[Daily Rewards]: You can not carry the prizes, please use storage and relog.";
+				if(#DRewardCon) #DRewardCon -= 1;
+				end;
+			}
+		}
+		if(.Mode & 16)
+			cutin .Cutins$[#DRewardCon],4;
+		if(.Mode & 2){
+			if(.@TT[0]){
+				zeny += .@TT[0];
+				message strcharinfo(0),"[Daily Rewards]: Recieved "+ .@TT[0] +"z";
+			}
+			if(.@TT[1]){
+				setd getd(.Points$[0]),getd(.Points$[0]) + .@TT[1];
+				message strcharinfo(0),"[Daily Rewards]: Recieved "+ .@TT[1] +" "+.Points$[1];
+			}
+		}
+		if(.Mode & 4 && (.@TT[3] || .@TT[4]))
+			getexp .@TT[3], .@TT[4];
+		if(.Mode & 8){
+			for(.@x = 0; .@x < getarraysize(.BuffInfo); .@x += 4){
+				if(#DRewardCon % .BuffInfo[.@x + 1] == 0)
+					sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
+			}
+		}
+		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" in a row.";
+		#LastDailyReward = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2) - .Rest;
 		end;
 	}
 OnNextCmnd:
-	if(!.@i) .@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2);
+	if(!.@i) .@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2) - .Rest;
 	.@days = (#LastDailyReward + .MinWait - .@i)/60/24;
 	.@hours = ((#LastDailyReward + .MinWait - .@i)/60)%24;
 	.@mins = (#LastDailyReward + .MinWait - .@i)%60;
@@ -74,65 +128,6 @@ OnNextCmnd:
 		} else	.@g = #DRewardCon + 1;
 		cutin .Cutins$[.@g],4;
 	}
-	end;
-OnWait:
-	deltimer strnpcinfo(3)+"::OnWait";
-	if(checkvending() & 2 && .Mode & 64){
-		message strcharinfo(0),"[Daily Rewards]: Venders cannot recive rewards.";
-		end;
-	}
-	if(.@i < #LastDailyReward + .MaxWait)
-		#DRewardCon += 1;
-	else	#DRewardCon = 1;
-	if(#DRewardCon >= getarraysize(.Rewards$)){
-		if(.Reset)
-			#DRewardCon = 1;
-		else	.@g = getarraysize(.Rewards$)-1;
-	} else	.@g = #DRewardCon;
-	explode(.@XT$,.Rewards$[.@g],",");
-	for(.@x = 0; .@x < getarraysize(.@XT$); .@x++)
-		.@TT[.@x] = atoi(.@XT$[.@x]);
-	if(.Mode & 1 && .@TT[4] > 0){
-		for(.@x = 4; .@x <= getarraysize(.@TT) - 1 ; .@x += 2){
-			.@itms[getarraysize(.@itms)] = .@TT[.@x];
-			.@qnts[getarraysize(.@qnts)] = .@TT[.@x + 1];
-		}
-		if(checkweight2(.@itms,.@qnts)){
-			for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
-				if(.Mode & 32)
-					getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
-				else	getitem  .@itms[.@x], .@qnts[.@x];
-			}
-		} else {
-			message strcharinfo(0),"[Daily Rewards]: You cannot carry the prizes, please use storage and relog.";
-			if(#DRewardCon) #DRewardCon -= 1;
-			end;
-		}
-	}
-	if(.Mode & 16){
-		cutin .Cutins$[#DRewardCon],4;
-	}
-	if(.Mode & 2){
-		if(.@TT[0]){
-			zeny += .@TT[0];
-			message strcharinfo(0),"[Daily Rewards]: Recieved "+ .@TT[0] +"z";
-		}
-		if(.@TT[1]){
-			setd getd(.Points$[0]),getd(.Points$[0]) + .@TT[1];
-			message strcharinfo(0),"[Daily Rewards]: Recieved "+ .@TT[1] +" "+.Points$[1];
-		}
-	}
-	if(.Mode & 4 && (.@TT[3] || .@TT[4]))
-		getexp .@TT[3], .@TT[4];
-	if(.Mode & 8){
-		for(.@x = 0; .@x < getarraysize(.BuffInfo); .@x += 4){
-			if(#DRewardCon % .BuffInfo[.@x + 1] == 0)
-				sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
-		}
-	}
-	message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" in a row.";
-	#LastDailyReward = .@i;
-	@Login_Time = 0;
 	end;
 OnInit:
 	// Basic Settings
@@ -201,8 +196,7 @@ OnInit:
 	//  Days is days buff is applied, in this example 7, so every 7th day, 14,21,28....
 	//  Duration is buff duration is Minuits, in this example 45 mins
 	//  Rate is buff strength, in this example player gains 3 Str
-	setarray .BuffInfo
-				,260,2,360,1	// Life Insurance for 360 Mins Every 2nd Day
+	setarray .BuffInfo	,260,2,360,1	// Life Insurance for 360 Mins Every 2nd Day
 				,198,3,120,10	// +10% Hp for 120 Mins Every 3th Day
 				,196,5,120,25	// +25 Flee for 120 Mins Every 5th Day
 				,257,7,240,50;	// +50% Exp for 240 Mins Every 7th Day
