@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.03
+//= 1.04
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -12,13 +12,15 @@
 //= Apply party / Guild buffs via npc or item (autobonus)
 //===== Comments: ============================================
 //= [Stolao]
-//= Optimize]
+//= Optimize
+//= Sugestions?
 //= Map Check?
 //===== Additional Comments: =================================
 //= 1.00 Origional Make
 //= 1.01 Changed Group to bitwise
 //= 1.02 Made buffs editable via callfunc
 //= 1.03 Typo Fixed thanks to ??
+//= 1.04 Tabulation
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -65,55 +67,55 @@ Function	Script	Aegis	{
 			sc_end SC_SPCOST_RATE;
 			sc_end SC_S_LIFEPOTION;
 			percentheal -3,-3;
-		break;
+			break;
 		case 1:
 			specialeffect2 EF_SPELLBREAKER; 
 			sc_start SC_MDEF_RATE,getarg(2,5)*1000,getarg(3,5);
-		break;
+			break;
 		case 2:
 			specialeffect2 EF_GUARD;
 			sc_start SC_DEF_RATE,getarg(2,5)*1000,getarg(3,5);
-		break;
+			break;
 		case 3:
 			specialeffect2 EF_BLOODDRAIN;
 			sc_start SC_ASPDPOTION0,getarg(2,9)*1000,0;
-		break;
+			break;
 		case 4:
 			specialeffect2 EF_POTION_BERSERK;
 			sc_start SC_ASPDPOTION1,getarg(2,9)*1000,0;
-		break;
+			break;
 		case 5:
 			specialeffect2 EF_HASTEUP;
 			sc_start SC_ASPDPOTION2,getarg(2,9)*1000,0;
-		break;
+			break;
 		case 6:
 			specialeffect2 EF_HASTEUP;
 			sc_start SC_ASPDPOTION3,getarg(2,9)*1000,0;
-		break;
+			break;
 		case 7:
 			specialeffect2 EF_FIRESPLASHHIT; 
 			sc_start SC_ATKPOTION,getarg(2,5)*1000,getarg(3,30);
-		break;
+			break;
 		case 8:
 			specialeffect2 EF_ENHANCE;
 			sc_start SC_MATKPOTION,getarg(2,5)*1000,getarg(3,30);
-		break;
+			break;
 		case 9:
 			specialeffect2 EF_MAGICALATTHIT;
 			percentheal getarg(3,3),0;
-		break;
+			break;
 		case 10:
 			specialeffect2 EF_MAGICALATTHIT;
 			percentheal 0,getarg(3,3);
-		break;
+			break;
 		case 11:
 			specialeffect2 EF_FREEZED;
 			sc_start SC_SPCOST_RATE,getarg(2,9)*1000,getarg(3,-15);
-		break;
+			break;
 		case 12:
 			specialeffect2 EF_HEAL3;
 			sc_start4 SC_S_LIFEPOTION,getarg(2,15)*1000,getarg(4,-1),getarg(3,7),0,0;
-		break;
+			break;
 	}
 end;
 }
