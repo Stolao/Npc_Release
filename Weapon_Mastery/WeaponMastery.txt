@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.31
+//= 1.32
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -14,39 +14,7 @@
 //===== Comments: ============================================
 //= Masteries can go up to level 999 with curve of 2100
 //===== Additional Comments: =================================
-//= 1.00 Origioanal Make
-//= 1.01 +33% Mastery >> Atk
-//= 1.02 +50% Mastery >> Matk
-//= 1.03 Rename Masteries
-//= 1.04 Redistibute Weapons into new masteries
-//= 1.05 Wiped Mastery Bonuses
-//= 1.06 Added Starting Bonuses
-//= 1.07 Made OnPCStatCalcEvent for Mastery System
-//= 1.08 Added mastery Bonueses for Lvl 1, 2, 4, 8, 16, 32 ,64, and 128
-//= 1.09 Changed Mysticals MaxSPRate for MaxSp
-//= 1.0A Added @wi (see bindatcmd.txt)
-//= 1.0B Added @wlvl (see bindatcmd.txt)
-//= 1.0C Removed dependency from bindatcmd.txt
-//= 1.0D Rebalanced a few formulas for differant masteries
-//= 1.0E Combined with old Sect System
-//= 1.0F Added Sect give +10 total on varried stats
-//= 1.10 Added 10% Resistance to sects Element
-//= 1.11 Added 10% more damage with sects element
-//= 1.12 Changed Sect Stats from +10 -> +3
-//= 1.13 Changed Wm Stat bonus from M/9 -> M/32
-//= 1.14 Removed Wm Booster item
-//= 1.15 Lowered Wm Max Level to 99
-//= 1.16 Rewrote Onslaught Formulas for lower effect
-//= 1.17 Rewrote Switfness Formulas for lower effect
-//= 1.18 Rewrote Safegaurd Formulas for lower effect
-//= 1.19 Rewrote Ranged Formulas for lower effect
-//= 1.1A Rewrote Mystical Formulas for lower effect
-//= 1.1B Added Exprates = job_exp_rate
-//= 1.1C Changed Exp Curve to reflect new Exp Rates
-//= 1.1D Added Debugmes on Overflow
-//= 1.1E Added Increased Exp from SC_JEXPBOOST,2
-//= 1.1F Fixed Spacing/ Readability in OnInit
-//= 1.20 Fixed Typos
+//= Older Verions On Github
 //= 1.21 Fixed Bug with No gear On
 //= 1.22 Fixed Missing )
 //= 1.23 Convert to new formatting to allow both hand to recive buffs
@@ -64,6 +32,7 @@
 //= 1.2F Moved Level 0 Effects to top for consistant reading
 //= 1.30 Fixed a bug with @wlvl
 //= 1.31 Fixed bug where you would recive bonus from no gear
+//= 1.32 Tabulation
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -181,7 +150,7 @@ OnWeaponInfo:
 			if(.@X >= 32)dispbottom "Crit Damage +"+(.@X/8+3)+"%";
 			if(.@X >= 64)dispbottom "Aspd +"+.@X/16+"%";
 			if(.@X >= 128)dispbottom "Splash attack radius +1";
-		break;
+			break;
 		case 2:	
 			dispbottom "Swiftness Lv: "+.@X+" "+SwiftnessExp+" / "+((SwiftnessMaster*SwiftnessMaster*.expcurve)+.FirstLevel+SwiftnessMaster*100)+"xp";
 			dispbottom "Agi +"+(1+.@X/32)+"";
@@ -194,7 +163,7 @@ OnWeaponInfo:
 			if(.@X >= 32)dispbottom "Crit Damage +"+(.@X/9-1)+"%";
 			if(.@X >= 64)dispbottom "Critical Chance +"+(1+.@X/10)+"";
 			if(.@X >= 128)dispbottom ""+(1+SwiftnessMaster)/10+"."+((1+SwiftnessMaster)%10)+"% chance of healing for "+(.@X/24+1)+"% of damage dealt with each normal attack";
-		break;
+			break;
 		case 3:
 			dispbottom "Safegaurd Lv: "+.@X+" "+SafegaurdExp+" / "+((SafegaurdMaster*SafegaurdMaster*.expcurve)+.FirstLevel+SafegaurdMaster*100)+"xp";
 			dispbottom "Vit +"+(1+.@X/32)+"";
@@ -207,7 +176,7 @@ OnWeaponInfo:
 			if(.@X >= 32)dispbottom "Adds "+(.@X/21+1)+" damage reduction against melee physical attacks";
 			if(.@X >= 64)dispbottom "Adds "+(.@X/22+1)+" damage reduction against ranged physical";
 			if(.@X >= 128)dispbottom "Adds "+(.@X/23+1)+" damage reduction against magical attacks";
-		break;
+			break;
 		case 4:
 			dispbottom "Ranged Lv: "+.@X+" "+RangedExp+" / "+((RangedMaster*RangedMaster*2500)+10+RangedMaster)+"xp";
 			dispbottom "Dex +"+(1+.@X/32)+"";
@@ -220,7 +189,7 @@ OnWeaponInfo:
 			if(.@X >= 32)dispbottom "Increases damage of ranged attacks by "+(.@X/11)+"%";
 			if(.@X >= 64)dispbottom "Crit Damage +"+(4+.@X/9)+"%";
 			if(.@X >= 128)dispbottom "Atk Range +"+(1+.@X/99)+"";
-		break;
+			break;
 		case 5:
 			dispbottom "Mystical Lv: "+.@X+" "+MysticalExp+" / "+((MysticalMaster*MysticalMaster*.expcurve)+.FirstLevel+MysticalMaster*100)+"xp";
 			dispbottom "Int +"+(1+.@X/32)+"";
@@ -233,13 +202,14 @@ OnWeaponInfo:
 			if(.@X >= 32)dispbottom "Increase heal amount of all heal skills by "+(1+.@X/2)+"%";
 			if(.@X >= 64)dispbottom "Weapon magical attack power +"+(.@X+1)+"";
 			if(.@X >= 128)dispbottom "Prevents casting from being interrupted when hit";
-		break;
+			break;
 		default:
 			dispbottom "@wi <Type> <Level>";
 			dispbottom "Type: Onslaught, Swiftness, Safegaurd, Ranged, Mystical";
-		break;
+			break;
 	}
-end;
+	end;
+
 OnWeaponLevel:
 	set .@M$,.@atcmd_parameters$[0];
 	set .@X,atoi(.@atcmd_parameters$[1]);
@@ -263,10 +233,8 @@ OnWeaponLevel:
 			setd ""+.@M$+"Exp",0;
 			dispbottom ""+.@M$+" Mastery has advanced to Lv "+.@X+"!";
 		}
-	} else {
-		dispbottom "Sorry. Your "+.@M$+" Mastery has reached its limit!";
-	}
-end;
+	} else	dispbottom "Sorry. Your "+.@M$+" Mastery has reached its limit!";
+	end;
 
 OnPCStatCalcEvent:
 	if(.Weapon){
@@ -288,7 +256,7 @@ OnPCStatCalcEvent:
 				case 1: 	case 16:	case 22:			Swiftness_M(SwiftnessMaster/2);	Break;
 				case 2: 	case 4: 	case 5:		default:	Safegaurd_M(SafegaurdMaster/2);	Break;
 				case 11:	case 13:	case 14:	case 17:
-				case 18:	case 19:	case 20:	case 21:	Ranged_M(RangedMaster/2);		Break;
+				case 18:	case 19:	case 20:	case 21:	Ranged_M(RangedMaster/2);	Break;
 				case 10:	case 15:	case 23:	case 24:	Mystical_M(MysticalMaster/2);	Break;
 			}
 		}
@@ -338,7 +306,8 @@ OnNPCKillEvent:
 			}
 		}
 	}
-end;
+	end;
+
 OnInit:
 	bindatcmd("wi"		,"PCSTATCALC::OnWeaponInfo",0,99);
 	bindatcmd("weaponinfo"	,"PCSTATCALC::OnWeaponInfo",0,99);
