@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.02
+//= 1.03
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -74,6 +74,7 @@
 //= 1.00 Origional Make
 //= 1.01 Fixed 2 missing "
 //= 1.02 Added a Magnify Glass
+//= 1.03 Tabulation 
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -81,28 +82,34 @@
 
 -	script	atbfw	-1,{
 OnBFW:
-	if(@bfw){	set @bfw,0; 
-	} else {	set @bfw,1; }
+	if(@bfw)
+		@bfw = 0; 
+	else	@bfw = 1;
 	message strcharinfo(0),"[Butterfly Wing]: Count Messages "+((@bfw)?"Enabled":"Disabled");
 	message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining";
-end;
+	end;
+
 OnFW:
-	if(@fw){	set @fw,0;
-	} else {	set @fw,1; }
+	if(@fw)
+		@fw = 0;
+	else	@fw + 1;
 	message strcharinfo(0),"[Fly Wing]: Count Messages "+((@fw)?"Enabled":"Disabled");
 	message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining";
-end;
+	end;
+
 OnMFG:
-	if(@MFG){	set @fw,0;
-	} else {	set @fw,1; }
+	if(@mfg)
+		@mfg = 0;
+	else	@mfg = 1;
 	message strcharinfo(0),"[Magnifier]: Count Messages "+((@MFG)?"Enabled":"Disabled");
 	message strcharinfo(0),"[Magnifier]: "+#Magnifier+" Uses Remaining";
-end;
+	end;
+
 OnInit:
 	bindatcmd("fw","atbfw::OnFW",0,99);
 	bindatcmd("bfw","atbfw::OnBFW",0,99);
 	bindatcmd("mfg","atbfw::OnMFG",0,99);
-end;
+	end;
 }
 
 
