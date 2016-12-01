@@ -127,8 +127,6 @@ prontera,164,171,3	script	MvP Speed Run	56,{
 	.party_id = .round = 0;
 	end;
 
-
-
 OnMvpDead:
 	awake strnpcinfo(0);
 	end;
@@ -136,8 +134,8 @@ OnMvpDead:
 OnPCLogoutEvent:
 	if ( hp > 0 )
 		.@less_one = 1;
-	else
-		end;
+	else	end;
+
 OnPCDieEvent:
 	if ( strcharinfo(3) != .eventmap$ || !getcharid(1) ) end;
 	if ( getcharid(1) != .party_id ) end;
