@@ -26,6 +26,7 @@
 //= 1.07 Fixed Set -> setarray
 //= 1.08 Added @setrates
 //= 1.09 Fixed typo with rates with .01 - .09% at end
+//= 1.0A Tabulation
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -47,7 +48,8 @@ OnMinute30:
 	Announce "[Server]: Rates are now "+getbattleflag("base_exp_rate")/100+((getbattleflag("base_exp_rate")%100)?"."+((getbattleflag("base_exp_rate")%100 < 10)?"0":"")+getbattleflag("base_exp_rate")%100:"")+
 			"x / "+getbattleflag("job_exp_rate")/100+((getbattleflag("job_exp_rate")%100)?"."+((getbattleflag("job_exp_rate")%100 < 10)?"0":"")+getbattleflag("job_exp_rate")%100:"")+
 			"x / "+getbattleflag("item_rate_common")/100+((getbattleflag("item_rate_common")%100)?"."+((getbattleflag("item_rate_common")%100 < 10)?"0":"")+getbattleflag("item_rate_common")%100:"")+"x !",8;
-end;
+	end;
+
 OnInit:
 	bindatcmd("setrates","floating_rate::OnSetRate",0,99);
 
@@ -73,13 +75,13 @@ OnInit:
 	// [0] = Min
 	// [1] = Max
 	setarray .Random,0,100;
-end;
+	end;
 
 OnInterIfInitOnce:
 	// Dont Touch
 	// Used to collect the base rates
 	setarray $R, getbattleflag("base_exp_rate"), getbattleflag("job_exp_rate"), getbattleflag("item_rate_common"), getbattleflag("item_rate_heal"), getbattleflag("item_rate_use"), getbattleflag("item_rate_equip");
-end;
+	end;
 }
 
 
