@@ -297,7 +297,7 @@ OnNPCKillEvent:
 				Setd ""+.@M$+"Exp",getd(""+.@M$+"Exp") + .@exp  * (.Rates * (getstatus(SC_JEXPBOOST,3)?3:2) / 2) + .@wLv * .@wLv * .wLvBonus;
 				if(getd(""+.@M$+"Exp") > .NeededExp[.@master]){
 					setd ""+.@M$+"Master",.@master + 1;
-					announce ""+.@M$+" Mastery has advanced to Lv "+.@master + 1+"!",bc_blue|bc_self;
+					announce ""+.@M$+" Mastery has advanced to Lv "+(.@master + 1)+"!",bc_blue|bc_self;
 					Setd ""+.@M$+"Exp",0;
 				}
 			}
@@ -322,7 +322,7 @@ OnNPCKillEvent:
 				Setd ""+.@M$+"Exp",getd(""+.@M$+"Exp") + .@exp  * (.Rates * (getstatus(SC_JEXPBOOST,3)?3:2) / 4) + .@wLv * .@wLv * .wLvBonus;
 				if(getd(""+.@M$+"Exp") > .NeededExp[.@master]){
 					setd ""+.@M$+"Master",.@master + 1;
-					announce ""+.@M$+" Mastery has advanced to Lv "+.@master + 1+"!",bc_blue|bc_self;
+					announce ""+.@M$+" Mastery has advanced to Lv "+(.@master + 1)+"!",bc_blue|bc_self;
 					Setd ""+.@M$+"Exp",0;
 				}
 			}
