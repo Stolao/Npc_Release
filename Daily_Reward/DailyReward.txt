@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.84
+//= 1.8C
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -11,13 +11,11 @@
 //===== Todo: ================================================
 //= Maybe make .MinWait an array mins,days,weeks,months,years;
 //= Make Logging out then it continue count
-//= Make a Overweight easy collect
+//= Seperate Timer from script for optional go collect reward
 //= Remove use of sleep2
 //= Suggestions?
 //===== Additional Comments: =================================
 //= For Older See Old Versions
-//= 1.7A No Rewards for Autotraders option added
-//= 1.7B Tabulation Cleanup
 //= 1.7C Added custom item binding mode [Secretdataz]
 //= 1.7D Added cutin for next day option + command
 //= 1.7E Added IP Check
@@ -29,6 +27,12 @@
 //= 1.84 Rephrased some conf settings
 //= 1.85 Fixed Capilazation
 //= 1.86 Small Tabulation Tweaks
+//= 1.87 Noted Changes to Reward Farmatting
+//= 1.88 Added 'fixreward' Command for those who get negative wait times ( not sure of issues still)
+//= 1.89 Changed soeme Messaging Formatting
+//= 1.8A Made Fix Command GM 99 Only, to use on others do '#fixreward'
+//= 1.8B Added Overwieght Collection
+//= 1.8C Added 'collectreward', 'collectdaily' and 'dailyreward' commands
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -54,7 +58,7 @@ OnPCLoginEvent:
 		}
 	}
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2);
-	if(.@i >= (#LastDailyReward + .MinWait) && .Rest){
+	if(.@i >= (#LastDailyReward + .MinWait) && .Rest && !#DROverweight){
 		message strcharinfo(0),"[Daily Rewards]: To collect reward you must remain logged in for "+ .Rest +" minutes";
 		sleep2 1000 + .Rest * 60000;
 	}
@@ -85,9 +89,11 @@ OnPCLoginEvent:
 						getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
 					else	getitem  .@itms[.@x], .@qnts[.@x];
 				}
+				#DROverweight = 0;
 			} else {
-				message strcharinfo(0),"[Daily Rewards]: You can not carry the prizes, please use storage and relog.";
+				message strcharinfo(0),"[Daily Rewards]: You can not carry the prizes, please use storage and type @relog.";
 				if(#DRewardCon) #DRewardCon -= 1;
+				#DROverweight = 1;
 				end;
 			}
 		}
@@ -111,23 +117,35 @@ OnPCLoginEvent:
 					sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
 			}
 		}
-		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" in a row.";
+		message strcharinfo(0),"[Daily Rewards]: You have collected your daily reward, for "+callfunc("F_InsertPlural",#DRewardCon,"day")+" now.";
 		#LastDailyReward = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2) - .Rest;
 		end;
 	}
 OnNextCmnd:
 	if(!.@i) .@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2) - .Rest;
-	.@days = (#LastDailyReward + .MinWait - .@i)/60/24;
-	.@hours = ((#LastDailyReward + .MinWait - .@i)/60)%24;
-	.@mins = (#LastDailyReward + .MinWait - .@i)%60;
-	message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") +""+ ((.@hours) ? .@hours +" Hours " : "") +""+ ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
-	if(.Mode & 128){
-		if(#DRewardCon + 1 >= getarraysize(.Rewards$)){
-			if(.Reset)	.@DRewardCon = 1;
-			else	.@g = getarraysize(.Rewards$)-1;
-		} else	.@g = #DRewardCon + 1;
-		cutin .Cutins$[.@g],4;
+	if(#LastDailyReward + .MinWait - .@i < 0){
+		message strcharinfo(0),"[Daily Rewards]: Your rewards should be available.";
+	} else {
+		.@days = (#LastDailyReward + .MinWait - .@i) / 60 / 24;
+		.@hours = ((#LastDailyReward + .MinWait - .@i) / 60) % 24;
+		.@mins = (#LastDailyReward + .MinWait - .@i) % 60;
+		message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") + ((.@hours) ? .@hours +" Hours " : "") + ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
+		if(.Mode & 128){
+			if(#DRewardCon + 1 >= getarraysize(.Rewards$)){
+				if(.Reset)	.@DRewardCon = 1;
+				else	.@g = getarraysize(.Rewards$)-1;
+			} else	.@g = #DRewardCon + 1;
+			cutin .Cutins$[.@g],4;
+		}
 	}
+	end;
+OnFixCmnd:
+	#LastDailyReward = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2);
+	message strcharinfo(0),"[Daily Rewards]: Next reward has be forcively reset.";
+	.@days = .MinWait / 60 / 24;
+	.@hours = .MinWait / 60 % 24;
+	.@mins = .MinWait % 60;
+	message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") + ((.@hours) ? .@hours +" Hours " : "") + ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
 	end;
 OnInit:
 	// Basic Settings
@@ -157,7 +175,15 @@ OnInit:
 	// To disable the command '@loginreward' comment the next lines
 	// * Needs extra commands for typos
 	bindatcmd("relog",strnpcinfo(3)+"::OnLoginCmnd",0,99);
+	bindatcmd("collectreward",strnpcinfo(3)+"::OnLoginCmnd",0,99);
+	bindatcmd("dailyreward",strnpcinfo(3)+"::OnLoginCmnd",0,99);
+	bindatcmd("collectdaily",strnpcinfo(3)+"::OnLoginCmnd",0,99);
 	bindatcmd("nextreward",strnpcinfo(3)+"::OnNextCmnd",0,99);
+
+	// GM Command to fix the negative time till reward issue
+	// #fixreward <playername>
+	// * Needs extra commands for typos
+	bindatcmd("fixreward",strnpcinfo(3)+"::OnFixCmnd",99,99);
 
 	// Minimum minutes between collecting daily reward
 	//   Day: 22*60 - 24*60
@@ -202,8 +228,8 @@ OnInit:
 				,257,7,240,50;	// +50% Exp for 240 Mins Every 7th Day
 
 	// Daily Prize items (max 128 days):
-	//   "<Zeny>|<Points>|<BaseExp>|<JobExp>|<itemID-1>|<amount-1>|<itemID-2>|<amount-2>...etc", // Day 1
-	//   "<Zeny>|<Points>|<BaseExp>|<JobExp>|<itemID-1>|<amount-1>|<itemID-2>|<amount-2>...etc"  // Day 2
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc", // Day 1
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc"  // Day 2
 	//   ...;
 	// Total length of any days string must be 255 or shorter
 	// * If players login longer than the last set
