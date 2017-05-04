@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.06
+//= 2.08
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -27,7 +27,7 @@
 //= Add MVP Arena
 //= Add Dead Branch Event
 //= Add Requested Events
-//= Add Ranking System
+//= Add Prizes to Monthly Ranking System?
 //===== Additional Comments: =================================
 //= 2.00 Remake
 //= 2.01 Fix bug in Lucky Pick
@@ -36,6 +36,8 @@
 //= 2.04 Fixed Infinite Reward bug in Maze
 //= 2.05 Removed 'enablenpc ManhuntPrize' from older version
 //= 2.06 Fixed Sunday Dislay bug
+//= 2.07 Added Ranking System
+//= 2.08 Added Mothly Ranking Option
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -65,6 +67,8 @@ OnMenu:		//-- Click Menus
 	switch(select((($@CurrentEvent > 0)?" ~ Join event...:":":")+
 			((.@e)?" ~ Check schedule...:":":")+
 			((getgmlevel()<.GMAccess)?"":" ~ Manage events...")+
+			(($@EventRanking & 1)?" ~ Monthly Ranking:":":")+
+			(($@EventRanking & 2)?" ~ Lifetime Ranking:":":")+
 			": ~ ^777777Cancel^000000")) {
 		case 2:
 			for(.@i = 0; .@i < 168; .@i++){
@@ -75,6 +79,24 @@ OnMenu:		//-- Click Menus
 				if($EVENT_CONTROL[.@i])
 					mes .ColorName$[$EVENT_CONTROL[.@i]] +" ~ "+ Func_Add_Time(.@i % 24);
 			}	
+			close;
+		case 4:
+			query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'MWonEvents' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+		case 5:
+			if(!.@cid)
+				query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'WonEvents' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
+			for(.@x = 0; .@x < getarraysize(.@cid); .@x++) {
+				query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+";",.@j$);
+				.@name$[.@x] = .@j$;
+			}
+			next;
+			mes "~ ^990000"+((.@m)?"Monthly ":"") +"Event Ladder^000000 ~";
+			if (!getarraysize(.@cid))
+				mes "The rankings are empty.";
+			else {
+				for(.@i = 0; .@i<getarraysize(.@cid); .@i++)
+					mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 "+.@value[.@i];
+			}
 			close;
 		case 3:
 		while(1){
@@ -150,7 +172,7 @@ OnMenu:		//-- Click Menus
 					goto OnMenu;
 			}
 		}
-		case 4: close;
+		case 6: close;
 		case 1:
 			next;
 			break;
@@ -241,6 +263,8 @@ function Func_Countdown {
 
 function Func_Prizes {
 	announce "Congrats "+strcharinfo(0,getarg(0))+", a winner in the "+getarg(1)+" Event.",bc_all|bc_blue;
+	WonEvents++;
+	MWonEvents++;
 	if($@Mail){
 		query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
 			"'no-reply',"+getarg(0)+",'** "+getarg(1)+" **',"+
@@ -257,7 +281,8 @@ function Func_Prizes {
 //==================================
 OnMinute00:	//- Start Events
 //==================================
-
+	if(gettime(DT_DAYOFMONTH) == 1 && gettime(DT_HOUR) == 1)
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'MWonEvents'");
 	if(agitcheck() || agitcheck2() || $@CurrentEvent) end;
 	sleep .StartTime * 60000 + 1000;
 	.@Time = gettime(4) * 24 + gettime(3);
@@ -735,6 +760,17 @@ OnInit:		//-- Config
 	$@Mail = 1;	// Toggle [1] = Mail [0] = Direct to inv
 
 // -------------------
+//  Rewards
+// -------------------
+
+	// Enable Event Ranking
+	// Bitwise
+	// [1] = Liftime
+	// [2] = Mothly
+	// [3] = Both
+	$@EventRanking = 3;
+
+// -------------------
 //  At Commands
 // -------------------
 
@@ -801,7 +837,7 @@ OnInit:		//-- Config
 	// Fake Poring Names
 	setarray .Poring$,"Porjng","P0ring","Porlng","Porimg","Porinq","Poporing","This One","Right","Kill Me","Poning","qoring","Pooring","Pouring","Polling","~Poring~","Winner","Prize","Porirg","Paring";
 
-	// Bombring Mapflags
+	// Bombring / Poring Mapflags
 	setarray .bombflag,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption;
 
 	// Mushroom Event Possible Maps
@@ -884,6 +920,8 @@ maze,369,162,4	script	Event_Agent#Maze	405,4,4,{
 OnTouch_:
 	if($@CurrentEvent == -5){
 		announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event.",bc_all|bc_blue;
+		WonEvents++;
+		MWonEvents++;
 		if($@Mail){
 			query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
 				"'no-reply',"+getcharid(0)+",'** Maze Event **',"+
@@ -928,6 +966,8 @@ prontera,155,227,4	script	Cluckers	800,{
 					npctalk "WOOF!...........";
 					specialeffect2 EF_SPHERE;
 					announce "Congrats "+strcharinfo(0)+", a winner in the Cluckers Event.",bc_all|bc_blue;
+					WonEvents++;
+					MWonEvents++;
 					if($@Mail){
 						query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
 							"'no-reply',"+getcharid(0)+",'** Cluckers **',"+
