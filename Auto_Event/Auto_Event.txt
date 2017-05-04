@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.02
+//= 2.06
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -32,6 +32,10 @@
 //= 2.00 Remake
 //= 2.01 Fix bug in Lucky Pick
 //= 2.02 Added Conf for Mail
+//= 2.03 Added Bombring Mapflags to Poring Event
+//= 2.04 Fixed Infinite Reward bug in Maze
+//= 2.05 Removed 'enablenpc ManhuntPrize' from older version
+//= 2.06 Fixed Sunday Dislay bug
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -63,15 +67,13 @@ OnMenu:		//-- Click Menus
 			((getgmlevel()<.GMAccess)?"":" ~ Manage events...")+
 			": ~ ^777777Cancel^000000")) {
 		case 2:
-			next;
-			mes "[ Sunday Event Schedule ]";
 			for(.@i = 0; .@i < 168; .@i++){
-				if($EVENT_CONTROL[.@i])
-					mes .ColorName$[$EVENT_CONTROL[.@i]] +" ~ "+ Func_Add_Time(.@i % 24);
-				if( !( ( .@i + 1 ) % 24 ) && .@i < 144){
+				if( !( ( .@i ) % 24 ) && .@i < 144){
 					next;
 					mes "[ "+ .Days$[.@i / 24 + 1] +" Event Schedule ]";
 				}
+				if($EVENT_CONTROL[.@i])
+					mes .ColorName$[$EVENT_CONTROL[.@i]] +" ~ "+ Func_Add_Time(.@i % 24);
 			}	
 			close;
 		case 3:
@@ -164,15 +166,29 @@ OnJoinEvent:	//-- Join Event
 		mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Want to join the "+ .ColorName$[$@CurrentEvent] +"?";
 		if($@CurrentEvent == 2)
 			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Must be a Novice Level 10/10 or lower.";
+		if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7)
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Will have any Carts or Pets Removed.";
 		if(select("Yes:No") == 2)
 			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Ok come back later.",bc_self|bc_blue;
-		else if((Baselevel > 10 || JobLevel > 10 || Class != Job_Novice ) && $@CurrentEvent == 2){
+		else if((Baselevel > 10 || JobLevel > 10 || Class != Job_Novice ) && $@CurrentEvent == 2)
 			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Sorry you must be a Novice Level 10/10 or lower.";
-		} else if($@CurrentEvent < 1){
+		else if($@CurrentEvent < 1)
 			mes "[ Event Management ]","Sorry event closed before you hit yes.";
-		} else {
+		else {
+			if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7){
+				setmadogear 0;
+				setdragon 0;
+				if (checkwug())
+					setoption Option_Wugrider,0;
+				if(ismounting())
+					setmounting;
+				setriding 0;
+				setfalcon 0;
+				setcart 0;
+				callfunc("dispell");
+			} else if($@CurrentEvent == 2)
+				callfunc("dispell");
 			warp .EnterMap$[$@CurrentEvent],.EnterX[$@CurrentEvent],.EnterY[$@CurrentEvent];
-			end;
 		}
 	}
 	close;
@@ -497,12 +513,14 @@ OnPoringStart:	//-- Poring Event
 	mapwarp "pvp_n_1-5","prontera",155,181;
 	$@CurrentEvent = 6;
 	pvpoff "pvp_n_1-5";
-	setmapflag "pvp_n_1-5",mf_noskill;
+	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+		setmapflag "quiz_02", .bombflag[.@i];
 	Func_Countdown;
 	$@CurrentEvent = -6;
 	if(getmapusers("pvp_n_1-5") < .MinPlayers[6]){
 		mapannounce "pvp_n_1-5","Event Stopped! Not Enough Players Joined the "+.EventName$[6]+"!",bc_blue;
 	} else {
+
 		mapannounce "pvp_n_1-5","Rules are simple",bc_blue;
 		sleep 3000;
 		mapannounce "pvp_n_1-5","Kill the 'Poring' with the correct name, and get a warped to town with a prize.",bc_blue;
@@ -512,9 +530,8 @@ OnPoringStart:	//-- Poring Event
 		mapannounce "pvp_n_1-5","There are 2 right poring and a 30 min timer.",bc_blue;
 		sleep 4000;
 		mapannounce "pvp_n_1-5","Event will now Begin~",bc_blue;
-		for(.@i = 0; .@i < getarraysize(.Poring$); .@i++){
+		for(.@i = 0; .@i < getarraysize(.Poring$); .@i++)
 			monster "pvp_n_1-5",0,0,.Poring$[.@i],1725,5,strnpcinfo(1)+"::OnKillWrong";
-		}
 		monster "pvp_n_1-5",0,0,"--ja--",1725,2,strnpcinfo(1)+"::OnKillRight";
  		for(.@poring = 30; .@poring > 0; .@poring--){
 			if(getmapusers("pvp_n_1-5") < 1) .@poring = 0;
@@ -524,7 +541,8 @@ OnPoringStart:	//-- Poring Event
 	}
 	mapannounce "pvp_n_1-5","Time Is up",bc_blue;
 	killmonsterall "pvp_n_1-5";
-	removemapflag "pvp_n_1-5",mf_noskill;
+	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag "quiz_02", .bombflag[.@i];
 	$@CurrentEvent = 0;
 	sleep 5000;
 	mapwarp "pvp_n_1-5","prontera",155,181;
@@ -612,7 +630,6 @@ OnHuntStart:	//-- Man Hunt Event
 //==================================
 
 	mapwarp "pvp_n_1-5","prontera",155,181;
-	enablenpc "ManhuntPrize";
 	$@CurrentEvent = 10;
 	Func_Countdown;
 	$@CurrentEvent = -10;
@@ -785,7 +802,7 @@ OnInit:		//-- Config
 	setarray .Poring$,"Porjng","P0ring","Porlng","Porimg","Porinq","Poporing","This One","Right","Kill Me","Poning","qoring","Pooring","Pouring","Polling","~Poring~","Winner","Prize","Porirg","Paring";
 
 	// Bombring Mapflags
-	setarray .bombflag,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot;
+	setarray .bombflag,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption;
 
 	// Mushroom Event Possible Maps
 	setarray .ShroomMaps$[0],"izlude","geffen","morocc","prontera";
@@ -865,20 +882,22 @@ maze,369,162,4	script	Event_Agent#Maze	405,4,4,{
 	close;
 
 OnTouch_:
-	announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event.",bc_all|bc_blue;
-	if($@Mail){
-		query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
-			"'no-reply',"+getcharid(0)+",'** Maze Event **',"+
-			"'Congratulations!% You have won % in the Maze Event% % % % % % % %   [ Your reward is attached. ]',"+
-			$@RewardID+","+$@RewardQNT+",0,"+$@RewardZeny+",UNIX_TIMESTAMP(NOW()))");
-		announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-		mapwarp "maze","prontera",155,181;
-		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-	} else {
-		getitem $@RewardID,$@RewardQNT;
-		zeny += $@RewardZeny;
+	if($@CurrentEvent == -5){
+		announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event.",bc_all|bc_blue;
+		if($@Mail){
+			query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
+				"'no-reply',"+getcharid(0)+",'** Maze Event **',"+
+				"'Congratulations!% You have won % in the Maze Event% % % % % % % %   [ Your reward is attached. ]',"+
+				$@RewardID+","+$@RewardQNT+",0,"+$@RewardZeny+",UNIX_TIMESTAMP(NOW()))");
+			announce "Rewards hava been sent via mail.",bc_self|bc_blue;
+			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
+		} else {
+			getitem $@RewardID,$@RewardQNT;
+			zeny += $@RewardZeny;
+		}
+		$@CurrentEvent = 0;
 	}
-	$@CurrentEvent = 0;
+	mapwarp "maze","prontera",155,181;
 	end;
 }
 
