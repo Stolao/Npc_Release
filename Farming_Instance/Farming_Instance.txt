@@ -6,7 +6,7 @@
 //= Azura Skyy (Maps)
 //= Chemical Crush (Maps)
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -16,6 +16,7 @@
 //= Sprites and Maps have been tested
 //===== Additional Comments: =================================
 //= 1.00 Initial release
+//= 1.01 Minor Tabulation Fixes and removing of 'set'
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -23,7 +24,7 @@
 
 prontera,136,171,4	script	Farm_Core	123,{
 	if(!instance_id()){
-		set .@i,select("Payon Farm::Rachel Farm:Xmas Farm");
+		.@i = select("Payon Farm::Rachel Farm:Xmas Farm");
 		setarray .@md_name$[1],"Payon Farm","Prontera Farm","Rachel Farm","Xmas Farm";
 	} else {
 		 switch(Farm_Instance){
@@ -37,7 +38,7 @@ prontera,136,171,4	script	Farm_Core	123,{
 		message strcharinfo(0),"^0000ff"+.@md_name$[.@i]+" ^000000 - Reservation Failed.";
 		end;
 	} else {
-		set Farm_Instance,.@i;
+		Farm_Instance = .@i;
 		message strcharinfo(0),"^0000ff"+.@md_name$+"^000000- Attempting to book an entrance";
 		message strcharinfo(0),"After making a reservation, you have to select 'Enter the Dungeon' from the menu if you wish to enter the "+.@md_name$[.@i]+".";
 		switch(Farm_Instance){
@@ -63,7 +64,7 @@ prontera,136,171,4	script	Farm_Core	123,{
 			break;
 		}
 	}
-	set Farm_Instance,0;
+	Farm_Instance = 0;
 	message strcharinfo(0),"Your Already Attached to an Instance";
 	end;
 OnInit:
@@ -204,8 +205,8 @@ Function	Script	F_OpenFarm	{
 		for(.@i = 0; .@i < getarraysize(.@pnames$); .@i++){
 			set .@menu$, .@menu$ + ((countitem(.@seedid[.@i]))?"Plant "+ .@pnames$[.@i] +":":":");
 		}
-		set .@menu$, .@menu$ + "Cancel";
-		set .@i, select(.@menu$);
+		.@menu$, += "Cancel";
+		.@i = select(.@menu$);
 		if(.@i < getarraysize(.@pnames$) + 1){
 			delitem .@seedid[.@i-1],1;
 			setarray getd("#Farm_"+getarg(0)), .@i, 0, ((gettime(7)-2000) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
@@ -243,9 +244,7 @@ Function	Script	F_CheckGrowth	{
 			setnpcdisplay(getarg(0), $@PantName$[.@end + 62], $@PlantSprite[.@end + 62]);
 		else	setnpcdisplay(getarg(0), $@PantName$[.@end], $@PlantSprite[.@end]);
 		setd("#Farm_"+getarg(4)+"[1]"),.@end;
-	} else {
-		setnpcdisplay(getarg(0), "Fertile Soil", 111);
-	}
+	} else	setnpcdisplay(getarg(0), "Fertile Soil", 111);
 	return;
 }
 
@@ -258,7 +257,8 @@ OnTouch:
 
 -	script	Storage	-1,{
 OnTouch:
-	if(select("Open Storage:Leave")==1) openstorage;
+	if(select("Open Storage:Leave")==1)
+		openstorage;
 	end;
 }
 
