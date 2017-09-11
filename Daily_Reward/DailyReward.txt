@@ -33,6 +33,7 @@
 //= 1.8A Made Fix Command GM 99 Only, to use on others do '#fixreward'
 //= 1.8B Added Overwieght Collection
 //= 1.8C Added 'collectreward', 'collectdaily' and 'dailyreward' commands
+//= 1.8D Fix MacAddress and IP Check [sader1992]
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -44,17 +45,23 @@ OnPCLoginEvent:
 	if(.IPCheck){
 		query_sql("SELECT last_ip FROM `login` WHERE account_id = "+getcharid(3)+"", .@LastIp$);
 		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
-		if(getarraysize(.@AccountId) > .IPCheck){
+		for(.@i=0;.@i<getarraysize(.@AccountId);.@i++){
+			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId[.@i]+"' AND `key` = '#LastDailyReward'",.@LastIp2);
+			if(#LastDailyReward < .@LastIp2){
 			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.IPCheck+" per IP sorry.";
 			end;
+			}
 		}
 	}
 	if(.MacCheck){
 		query_sql("SELECT last_unique_id FROM `login` WHERE account_id = "+getcharid(3)+"", .@last_unique_id$);
 		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
-		if(getarraysize(.@AccountId2) > .MacCheck){
+		for(.@i=0;.@i<getarraysize(.@AccountId2);.@i++){
+			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId2[.@i]+"' AND `key` = '#LastDailyReward'",.@MacCheck2);
+			if(#LastDailyReward < .@MacCheck2){
 			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.MacCheck+" per computer sorry.";
 			end;
+			}
 		}
 	}
 	.@i = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2);
