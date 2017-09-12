@@ -47,7 +47,7 @@ OnPCLoginEvent:
 		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
 		for(.@i=0;.@i<getarraysize(.@AccountId);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId[.@i]+"' AND `key` = '#LastDailyReward'",.@LastIp2);
-			if(#LastDailyReward < .@LastIp2){
+			if(#LastDailyReward < .@LastIp2){ //it should be getarraysize(.@LastIp2) //testing
 			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.IPCheck+" per IP sorry.";
 			end;
 			}
@@ -58,7 +58,7 @@ OnPCLoginEvent:
 		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
 		for(.@i=0;.@i<getarraysize(.@AccountId2);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId2[.@i]+"' AND `key` = '#LastDailyReward'",.@MacCheck2);
-			if(#LastDailyReward < .@MacCheck2){
+			if(#LastDailyReward < .@MacCheck2){ //it should be getarraysize(.@MacCheck2) //testing
 			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.MacCheck+" per computer sorry.";
 			end;
 			}
