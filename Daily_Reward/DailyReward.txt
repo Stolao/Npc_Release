@@ -48,7 +48,7 @@ OnPCLoginEvent:
 		for(.@i=0;.@i<getarraysize(.@AccountId);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId[.@i]+"' AND `key` = '#LastDailyReward'",.@LastIp2);
 			if(#LastDailyReward < .@LastIp2){
-			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.IPCheck+" per IP sorry.";
+				message strcharinfo(0),"[Daily Rewards]: Rewards are limited to 1 per IP sorry.";
 			end;
 			}
 		}
@@ -59,7 +59,7 @@ OnPCLoginEvent:
 		for(.@i=0;.@i<getarraysize(.@AccountId2);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId2[.@i]+"' AND `key` = '#LastDailyReward'",.@MacCheck2);
 			if(#LastDailyReward < .@MacCheck2){
-			message strcharinfo(0),"[Daily Rewards]: Rewards are limited to "+.MacCheck+" per computer sorry.";
+				message strcharinfo(0),"[Daily Rewards]: Rewards are limited to 1 per computer sorry.";
 			end;
 			}
 		}
@@ -164,12 +164,12 @@ OnInit:
 	//     (a bit value, e.g. 3 = Items & Points from Multi)
 	.Mode = 1|2|4|8|16|64;
 
-	// Number of times same IP can recive rewards
-	//   0 = unlimited
+	// Which if IP limit Enabled or not
+	//   0 = Disable | 1 = Enable
 	.IPCheck = 1;
 
-	// Number of times same Computer (MacAdress) can recive rewards
-	//   0 = unlimited
+	// Which if (Mac Address) limit Enabled or not [You would need External application like Gepard Shield for that]
+	//   0 = Disable | 1 = Enable
 	.MacCheck = 0;
 
 	// Item Binding Mode
