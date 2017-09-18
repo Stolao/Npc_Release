@@ -43,8 +43,7 @@ OnWhisperGlobal:
 OnLoginCmnd:
 OnPCLoginEvent:
 	if(.IPCheck){
-		query_sql("SELECT last_ip FROM `login` WHERE account_id = "+getcharid(3)+"", .@LastIp$);
-		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
+		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+getcharip()+"'", .@AccountId);
 		for(.@i=0;.@i<getarraysize(.@AccountId);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId[.@i]+"' AND `key` = '#LastDailyReward'",.@LastIp2);
 			if(#LastDailyReward < .@LastIp2){
