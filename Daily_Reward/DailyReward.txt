@@ -42,11 +42,12 @@
 OnWhisperGlobal:
 OnLoginCmnd:
 OnPCLoginEvent:
+	.@t = (gettime(7) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) + gettime(2) - .Rest;
 	if(.IPCheck){
 		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+getcharip()+"'", .@AccountId);
 		for(.@i=0;.@i<getarraysize(.@AccountId);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId[.@i]+"' AND `key` = '#LastDailyReward'",.@LastIp2);
-			if(#LastDailyReward < .@LastIp2){
+			if(.@t < (.@LastIp2 + .MinWait)){
 				message strcharinfo(0),"[Daily Rewards]: Rewards are limited to 1 per IP sorry.";
 			end;
 			}
@@ -57,7 +58,7 @@ OnPCLoginEvent:
 		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
 		for(.@i=0;.@i<getarraysize(.@AccountId2);.@i++){
 			query_sql("SELECT `value` FROM `acc_reg_num` WHERE `account_id` = '"+.@AccountId2[.@i]+"' AND `key` = '#LastDailyReward'",.@MacCheck2);
-			if(#LastDailyReward < .@MacCheck2){
+			if(.@t < (.@MacCheck2 + .MinWait)){
 				message strcharinfo(0),"[Daily Rewards]: Rewards are limited to 1 per computer sorry.";
 			end;
 			}
