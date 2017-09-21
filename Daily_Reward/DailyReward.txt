@@ -70,21 +70,25 @@ OnPCLoginEvent:
 		if(.@i < #LastDailyReward + .MaxWait)
 			#DRewardCon += 1;
 		else	#DRewardCon = 1;
-		if(#DRewardCon >= getarraysize(.Rewards$)){
+		.@size = getarraysize(.Rewards$);
+		if(#DRewardCon >= .@size){
 			if(.Reset)
 				#DRewardCon = 1;
-			else	.@g = getarraysize(.Rewards$)-1;
-		} else	.@g = #DRewardCon;
-		explode(.@XT$,.Rewards$[.@g],",");
-		for(.@x = 0; .@x < getarraysize(.@XT$); .@x++)
+			else	#DRewardCon = .@size-1;
+		}
+		explode(.@XT$,.Rewards$[#DRewardCon],",");
+		.@size = getarraysize(.@XT$);
+		for(.@x = 0; .@x < .@size; .@x++)
 			.@TT[.@x] = atoi(.@XT$[.@x]);
 		if(.Mode & 1 && .@TT[4] > 0){
-			for(.@x = 4; .@x <= getarraysize(.@TT) - 1 ; .@x += 2){
-				.@itms[getarraysize(.@itms)] = .@TT[.@x];
-				.@qnts[getarraysize(.@qnts)] = .@TT[.@x + 1];
+			.@size = getarraysize(.@TT);
+			for(.@x = 4; .@x <= .@size - 1 ; .@x += 2){
+				.@itms[.@y] = .@TT[.@x];
+				.@qnts[.@y] = .@TT[.@x + 1];
+				.@y++;
 			}
 			if(checkweight2(.@itms,.@qnts)){
-				for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
+				for(.@x = 0; .@x < .@y; .@x++){
 					if(.Mode & 32)
 						getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
 					else	getitem  .@itms[.@x], .@qnts[.@x];
@@ -112,7 +116,8 @@ OnPCLoginEvent:
 		if(.Mode & 4 && (.@TT[3] || .@TT[4]))
 			getexp .@TT[3], .@TT[4];
 		if(.Mode & 8){
-			for(.@x = 0; .@x < getarraysize(.BuffInfo); .@x += 4){
+			.@size = getarraysize(.BuffInfo);
+			for(.@x = 0; .@x < .@size; .@x += 4){
 				if(#DRewardCon % .BuffInfo[.@x + 1] == 0)
 					sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
 			}
@@ -131,10 +136,11 @@ OnNextCmnd:
 		.@mins = (#LastDailyReward + .MinWait - .@i) % 60;
 		message strcharinfo(0),"[Daily Rewards]: You have "+ ((.@days) ? .@days +" Days " : "") + ((.@hours) ? .@hours +" Hours " : "") + ((.@mins) ? .@mins +" Minutes " : "") +"till your next reward.";
 		if(.Mode & 128){
-			if(#DRewardCon + 1 >= getarraysize(.Rewards$)){
-				if(.Reset)	.@DRewardCon = 1;
-				else	.@g = getarraysize(.Rewards$)-1;
-			} else	.@g = #DRewardCon + 1;
+			set .@size,getarraysize(.Rewards$);
+			if(#DRewardCon + 1 >= .@size){
+				if(.Reset) .@g = 1;
+				else	   .@g = .@size-1;
+			} else		   .@g = #DRewardCon + 1;
 			cutin .Cutins$[.@g],4;
 		}
 	}

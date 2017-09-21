@@ -3,6 +3,7 @@ Stolao's Script Collection
 
 Usage Policy
 =======
+* These scripts are designed with rAthenas codebase, if your using any other emulator these most likely will not work
 * You may use, modify, and host all of my released scripts.
 * You may not sell them, re-release them in any way (modified or otherwise), or remove the credits.
 * My scripts are not to be used for donation purposes, but soly for the betterment of a server.
