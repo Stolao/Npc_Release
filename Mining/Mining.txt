@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 4.47
+//= 4.48
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -32,6 +32,7 @@
 //= 4.45 Changed mob ids to 3900+
 //= 4.46 Tabulation
 //= 4.47 More Tabulation fixes
+//= 4.48 Removed extra {
 //===== Extras: ==============================================
 //= db/import/mob_avail.txt
 //= Mining Crystals
@@ -434,7 +435,7 @@ OnInit:
 		for(set .@i,getarg(0,1); .@i > 0; set .@i,.@i-1){
 			set .@lv,getarg(1,rand(0,6));
 			set .@s,getarg(2,rand(getarraysize(getd(".Tier"+ .@lv +"_M$"))));
-			if(getd(".Tier"+.@lv+"_X1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_X2["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y2["+.@s+"]") < 0){
+			if(getd(".Tier"+.@lv+"_X1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_X2["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y2["+.@s+"]") < 0)
 				monster getd(".Tier"+.@lv+"_M$["+.@s+"]"),0,0,getd(".Tier"+.@lv+"_N$["+.@s+"]")+" Deposit",rand(.MobIds[0],.MobIds[1]) + 2*.@lv,1,"Mining::"+(getd(".Tier"+.@lv+"_T$["+.@s+"]"))+"";
 			else	areamonster getd(".Tier"+.@lv+"_M$["+.@s+"]"),getd(".Tier"+.@lv+"_X1["+.@s+"]"),getd(".Tier"+.@lv+"_Y1["+.@s+"]"),getd(".Tier"+.@lv+"_X2["+.@s+"]"),getd(".Tier"+.@lv+"_Y2["+.@s+"]"),getd(".Tier"+.@lv+"_N$["+.@s+"]")+" Deposit",rand(.MobIds[0],.MobIds[1]) + 2*.@lv,1,"Mining::"+(getd(".Tier"+.@lv+"_T$["+.@s+"]"))+"";
 		}
