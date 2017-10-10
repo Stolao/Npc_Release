@@ -56,9 +56,9 @@ OnPvpLadder:
 				query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT " + .MaxRank,.@cid,.@name$,.@value);
 				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
 					if(.Options&128)
-						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_dthcount';",.@j);
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'm_dthcount';",.@j);
 					else
-						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'pl_dthcount';",.@j);
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'pl_dthcount';",.@j);
 					.@Death[.@i] = .@j;
 				}
 				next;
@@ -98,9 +98,9 @@ OnPvpLadder:
 				query_sql("SELECT char_id,`char`.name, CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` on `char`.char_id = `char_reg_num`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@name$,.@value);
 				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
 					if(.Options&128)
-						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_gvg_dcount';",.@j);
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'm_gvg_dcount';",.@j);
 					else
-						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'gvg_dcount';",.@j);
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'gvg_dcount';",.@j);
 					.@Death[.@i] = .@j;
 				}
 				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"GvG Ladder^000000 ~";
