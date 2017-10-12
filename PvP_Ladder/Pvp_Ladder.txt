@@ -34,12 +34,11 @@ OnPvpLadder:
 	switch(.@i){ 
 		case 2:
 			if(.Options&256){
-				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
-						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
-				for(.@x = 0; .@x < getarraysize(.@cid); .@x++) {
-					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+";",.@j$);
-					.@name$[.@x] = .@j$;
-				}
+				if(.Options&128)
+					.@key$ = "m_kda";
+				else
+					.@key$ = "kda";
+				query_sql("SELECT char_id, `char`.name, CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char_reg_num`.char_id = `char`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT " + .MaxRank,.@cid, .@name$, .@value);
 				next;
 				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"PvP Ladder^000000 ~";
 				if (!getarraysize(.@cid)){ mes "The rankings are empty.";
@@ -49,13 +48,17 @@ OnPvpLadder:
 					}
 				}
 			} else {
-				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_pkcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
-						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'pl_pkcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+				if(.Options&128)
+					.@key$ = "m_pkcount";
+				else
+					.@key$ = "pl_pkcount";
+					
+				query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT " + .MaxRank,.@cid,.@name$,.@value);
 				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
-					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
-					.@name$[.@i] = .@j$;
-					if(.Option&128){	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_dthcount';",.@j);
-							} else 	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'pl_dthcount';",.@j);
+					if(.Options&128)
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'm_dthcount';",.@j);
+					else
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'pl_dthcount';",.@j);
 					.@Death[.@i] = .@j;
 				}
 				next;
@@ -72,12 +75,11 @@ OnPvpLadder:
 			close;
 		case 3:
 			if(.Options&256){
-				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_gvg_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
-						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'gvg_kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
-				for(.@x = 0; .@x<getarraysize(.@cid); .@x++) {
-					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+";",.@j$);
-					.@name$[.@x] = .@j$;
-				}
+				if(.Options&128)
+					.@key$ = "gvg_kda";
+				else
+					.@key$ = "m_gvg_kda";
+				query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT " + .MaxRank,.@cid,.@name$,.@value);
 				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"GvG Ladder^000000 ~";
 				if (!getarraysize(.@cid)){
 					mes "The rankings are empty.";
@@ -89,13 +91,16 @@ OnPvpLadder:
 					}
 				}
 			} else {
-				if(.Option&128){	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
-						} else 	query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = 'gvg_kcount' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@value);
+				if(.Options&128)
+					.@key$ = "m_gvg_kcount";
+				else
+					.@key$ = "gvg_kcount";
+				query_sql("SELECT char_id,`char`.name, CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` on `char`.char_id = `char_reg_num`.char_id WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+.MaxRank+"",.@cid,.@name$,.@value);
 				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
-					query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
-					.@name$[.@i] = .@j$;
-					if(.Option&128){	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'm_gvg_dcount';",.@j);
-							} else 	query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@x]+" AND `key` = 'gvg_dcount';",.@j);
+					if(.Options&128)
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'm_gvg_dcount';",.@j);
+					else
+						query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = 'gvg_dcount';",.@j);
 					.@Death[.@i] = .@j;
 				}
 				mes "~ ^990000"+((.Options&128)?"Monthly ":"") +"GvG Ladder^000000 ~";
@@ -111,18 +116,20 @@ OnPvpLadder:
 			}
 			close;
 		case 4:
-			if(.Options&256){
-				if(.Options&128){ query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$M_Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
-				} else { query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$Guild_Kda' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value); }
-			} else {
-				if(.Options&128){ query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$M_Guild_Kills' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
-				} else { query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '$Guild_Kills' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value); }
-			}
+			if(.Options&256)
+				.@key$ = "Guild_Kda";
+			else
+				.@key$ = "Guild_Kills";
+			if(.Options&128)
+				.@key$ = "$M_" + .@key$;
+			else
+				.@key$ = "$" + .@key$;
+			query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
 			if (!getarraysize(.@gid)){
 				mes "The rankings are empty.";
 			} else {
 				for(.@i = 0; .@i < getarraysize(.@gid); .@i++){
-					query_sql("SELECT `value` FROM `global_acc_reg_num` WHERE `index` = "+.@gid[.@i]+";",.@j$);
+					//query_sql("SELECT `value` FROM `global_acc_reg_num` WHERE `index` = "+.@gid[.@i]+";",.@j$); // ??? [Secret]
 					mes "#"+(.@i+1)+" ^0000EE["+getguildname(.@gid[.@i])+"]^000000 with [^00EE00"+callfunc("F_InsertPlural",$Guild_Kills[.@gid[.@i]],"~ kill")+"] and [^EE0000"+callfunc("F_InsertPlural",$Guild_Deaths[.@gid[.@i]],"~ death")+"]";
 				}
 			}
@@ -160,9 +167,7 @@ OnPvpLadder:
 							mes "Are you sure you want to reset this the Monthly PvP Ladder?";
 							if(select("No:Yes")!=2) close;
 							close2;
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_kda'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_dthcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount' OR `key` = 'm_kda' OR `key` = 'pl_dthcount'");
 							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
 							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
 								if(attachrid(.@aid[.@i])){
@@ -176,9 +181,7 @@ OnPvpLadder:
 							mes "Are you sure you want to reset this the Monthly GvG Ladder?";
 							if(select("No:Yes")!=2) close;
 							close2;
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kda'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_dcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount' OR `key` = 'm_gvg_kda' OR `key` = 'm_gvg_dcount'");
 							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
 							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
 								if(attachrid(.@aid[.@i])){
@@ -204,9 +207,7 @@ OnPvpLadder:
 							mes "Are you sure you want to reset this the Lifetime PvP Ladder?";
 							if(select("No:Yes")!=2) close;
 							close2;
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'kda'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_dthcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount' OR `key` = 'kda' OR `key` = 'pl_dthcount'");
 							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
 							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
 								if(attachrid(.@aid[.@i])){
@@ -220,9 +221,7 @@ OnPvpLadder:
 							mes "Are you sure you want to reset this the Lifetime GvG Ladder?";
 							if(select("No:Yes")!=2) close;
 							close2;
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kcount'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kda'");
-							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_dcount'");
+							query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kcount' OR `key` = 'gvg_kda' OR `key` = 'gvg_dcount'");
 							set .@size, query_sql("select account_id from `char` where online = 1", .@aid);
 							for(.@i = 0; .@i<.@size; .@i++) { // Deletes kills of online players
 								if(attachrid(.@aid[.@i])){
@@ -311,11 +310,7 @@ OnPCKillEvent:
 OnHour00:
 	if(gettime(5) == 1 && .Options&128){
 		if(.RewardType&1 && .Options&1){
-			query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
-			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
-				query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
-				set .@name$[.@i], .@j$;
-			}
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@name$,.@value);
 			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
 				query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
 					"'no-reply',"+.@cid[.@i]+",'** PVP Ranking **',"+
@@ -327,11 +322,7 @@ OnHour00:
 		}
 		sleep 10000;
 		if(.RewardType&2 && .Options&2){
-			query_sql("SELECT char_id, CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@value);
-			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
-				query_sql("SELECT `name` FROM `char` WHERE char_id = "+.@cid[.@i]+";",.@j$);
-				set .@name$[.@i], .@j$;
-			}
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@name$,.@value);
 			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
 				query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
 					"'no-reply',"+.@cid[.@i]+",'** GVG Ranking **',"+
@@ -341,12 +332,7 @@ OnHour00:
 			announce "[GVG Ranking]: Rewards have been mailed to the top 10 in PvP~!",bc_blue|bc_all;
 			announce "[GVG Ranking]: Relog to refresh mail.",bc_blue|bc_all;
 		}	
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount'");
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_kda'");
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_dthcount'");
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount'");
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kda'");
-		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_dcount'");
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount' OR `key` = 'm_kda' OR `key` = 'm_dthcount' OR `key` = 'm_gvg_kcount' OR `key` = 'm_gvg_kda' OR `key` = 'm_gvg_dcount'");
 		cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
 		cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
 		cleararray $M_Guild_Deaths[0],0,getarraysize($M_Guild_Deaths);
