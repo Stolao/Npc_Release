@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: =====================================
-//= 2.1B
+//= 2.1C
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -39,6 +39,7 @@
 //= 2.19 Optimized Slightly
 //= 2.1A Fixed a bug with VIP getting bonus rewards in normal rewards
 //= 2.1B Fixed some documentaion
+//= 2.1C Fixed extra '['
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -116,7 +117,7 @@ OnLoginCmnd:
 					continue;
 				}	
 			}
-			deletearray .@XT$[[0],getarraysize(.@XT$);
+			deletearray .@XT$[0],getarraysize(.@XT$);
 			.@NextDay = #DRewardCon + 1;
 			explode(.@XT$,.Rewards$[.@NextDay],",");
 		}
