@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.0E
+//= 2.0F
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -42,6 +42,7 @@
 //= 2.0C Added at_endevent
 //= 2.0D Readded Old Mail support (in case somone uses)
 //= 2.0E Added a 'BugTest' Event to test rewards (at_runevent only)
+//= 2.0F Fixed 'at_runevent' being 'at_endevent'
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -823,8 +824,8 @@ OnInit:		//-- Config
 	// Run Event Command to manually run event
 	bindatcmd("runevent",strnpcinfo(1)+"::OnRunEvent",60,99);
 
-	// End Event Command to manually run event
-	bindatcmd("runevent",strnpcinfo(1)+"::OnEndEvent",60,99);
+	// End Event Command to manually end event
+	bindatcmd("endevent",strnpcinfo(1)+"::OnEndEvent",60,99);
 
 	// Join Event Command
 	bindatcmd("joinevent",strnpcinfo(1)+"::OnJoinEvent",0,99);
