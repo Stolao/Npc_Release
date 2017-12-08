@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.0F
+//= 2.11
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -43,6 +43,8 @@
 //= 2.0D Readded Old Mail support (in case somone uses)
 //= 2.0E Added a 'BugTest' Event to test rewards (at_runevent only)
 //= 2.0F Fixed 'at_runevent' being 'at_endevent'
+//= 2.10 Fied Typo in menus
+//= 2.11 Added 'at_randomizeevents' to create a random scedule, disabled by default
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -71,7 +73,7 @@ OnMenu:		//-- Click Menus
 	if(!.@e) mes "Auto Events Disabled.";
 	switch(select((($@CurrentEvent > 0)?" ~ Join event...:":":")+
 			((.@e)?" ~ Check schedule...:":":")+
-			((getgmlevel()<.GMAccess)?"":" ~ Manage events...")+
+			((getgmlevel()<.GMAccess)?":":" ~ Manage events...:")+
 			(($@EventRanking & 1)?" ~ Monthly Ranking:":":")+
 			(($@EventRanking & 2)?" ~ Lifetime Ranking:":":")+
 			": ~ ^777777Cancel^000000")) {
@@ -182,6 +184,30 @@ OnMenu:		//-- Click Menus
 			next;
 			break;
 	}
+//==================================
+OnRandomize:	//-- Randomize Event
+//==================================
+
+	mes "[ Randomize Event ]";
+	mes "Chance of no event?";
+	input(.@j,0,100);
+	freeloop(1);
+	for(.@i = 0; .@i < 168; .@i++){
+		if(rand(100) < .@j){
+			$EVENT_CONTROL[.@i] = 0;
+			continue;
+		}
+		$EVENT_CONTROL[.@i] = rand(getarraysize(.EventName$));
+		if($EVENT_CONTROL[.@i] == .@lastevent)
+			$EVENT_CONTROL[.@i] = rand(getarraysize(.EventName$));
+		.@lastevent = $EVENT_CONTROL[.@i];
+	}
+	freeloop(0);
+	next;
+	mes "[ Randomize Event ]";
+	mes "Events set.";
+	close;
+	
 //==================================
 OnEndEvent:	//-- End Event
 //==================================
@@ -826,6 +852,9 @@ OnInit:		//-- Config
 
 	// End Event Command to manually end event
 	bindatcmd("endevent",strnpcinfo(1)+"::OnEndEvent",60,99);
+
+	// Randomize Event Command to randomize event scedule
+	bindatcmd("randomizeevent",strnpcinfo(1)+"::OnRandomize",60,99);
 
 	// Join Event Command
 	bindatcmd("joinevent",strnpcinfo(1)+"::OnJoinEvent",0,99);
