@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.11
+//= 2.12
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -45,6 +45,7 @@
 //= 2.0F Fixed 'at_runevent' being 'at_endevent'
 //= 2.10 Fied Typo in menus
 //= 2.11 Added 'at_randomizeevents' to create a random scedule, disabled by default
+//= 2.12 Fixed Display Day of week
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -79,9 +80,9 @@ OnMenu:		//-- Click Menus
 			": ~ ^777777Cancel^000000")) {
 		case 2:
 			for(.@i = 0; .@i < 168; .@i++){
-				if( !( ( .@i ) % 24 ) && .@i < 144){
+				if( !( ( .@i ) % 24 )){
 					next;
-					mes "[ "+ .Days$[.@i / 24 + 1] +" Event Schedule ]";
+					mes "[ "+ .Days$[.@i / 24] +" Event Schedule ]";
 				}
 				if($EVENT_CONTROL[.@i])
 					mes .ColorName$[$EVENT_CONTROL[.@i]] +" ~ "+ Func_Add_Time(.@i % 24);
