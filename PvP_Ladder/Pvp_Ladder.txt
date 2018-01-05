@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.10
+//= 3.16
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -31,6 +31,9 @@
 //= 3.11 Fixed a logic bug in GM reset
 //= 3.12 Added Waiting Room
 //= 3.13 Added Dynamic Waiting Room
+//= 3.14 Moved and added more At_Commands
+//= 3.15 Dynamic Waiting Room (&4096) require Waiting Room (&2048) to work
+//= 3.16 Increased Waiting Room Rotation Time
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
@@ -39,7 +42,6 @@
 //============================================================
 prontera,161,196,2	script	Ladder	837,{
 OnPvpLadder:
-	mes "[Ranking]";
 	.@i = select(((getarraysize(.MapName$))?"Enter PvP Map:":":")+
 			((.Options&1)?"Pvp Ladder:":":")+
 			((.Options&2)?"GvG Ladder:":":")+
@@ -325,6 +327,15 @@ OnHour00:
 		end;
 	}
 OnInit:
+	// Gets NPC Name
+	// Lets you change NPC name without breaking anything
+	.NPC$ = strnpcinfo(0);
+
+	// At_Commands
+	bindatcmd("PvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("Pvpladder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("pvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
+
 	// Bitwise Variable
 	// 1: Record PvP
 	// 2: Record GvG (agit on and gvg map)
@@ -414,10 +425,9 @@ OnInit:
 		mf_nomvploot,	MF_NOZENYPENALTY,	MF_NOTRADE,
 		MF_NOCOMMAND;
 
+//===== Dont Touch - Mapflag & Waiting Room Generation =====
 	if(.Options&2048)
 		waitingroom "PvP Ladder",0;
-
-//===== Dont Touch - Mapflag & Waiting Room Generation =====
 	for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
 		for ( .@f = 0; .@f < .@size; .@f++ )
 			setmapflag .MapName$[.@i], .mapflag[.@f];
@@ -435,9 +445,8 @@ OnInit:
 				else	setmapflag .MapName$[.@i], MF_NOPARTY;
 		}
 	}
-	bindatcmd("PvpLadder" ,"Ladder::OnPvpLadder",0,99);
 	freeloop(1);
-	while(.Options&4096) {
+	while(.Options&6144) {
 		for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
 			.@MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"Nightmare ":"") + 
 				((.MapMode[.@i]&4)?"Party ":"") + 
@@ -450,7 +459,7 @@ OnInit:
 				((.MaxPlayers[.@i])?"["+getmapusers(.MapName$[.@i])+"/"+.MaxPlayers[.@i]+"]":"");
 			delwaitingroom;
 			waitingroom .@MapList$[.@i],0;
-			sleep 2500;
+			sleep 3000;
 		}
 	}
 //==========================================================
