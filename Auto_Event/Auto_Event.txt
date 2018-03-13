@@ -746,20 +746,20 @@ OnHuntStart:	//-- Man Hunt Event
 				deletearray .@AID[0],getarraysize(.@AID);
 				addrid(5,0,"quiz_02");
 				.@AID[getarraysize(.@AID)] = getcharid(3);
-				$@Target = rand(getarraysize(.@AID));
+				$@Target = .@AID[rand(getarraysize(.@AID))];
 
 				sleep 10000;
 				mapannounce "pvp_n_1-5","[Round "+.@round+"] Our target is "+rid2name($@Target)+"!",bc_blue;
-				atcommand "killable "+rid2name($@Target);
-				atcommand "size "+rid2name($@Target)+" 2";
+				charcommand "#killable "+rid2name($@Target);
+				charcommand "#size "+rid2name($@Target)+" 2";
 				sleep 60000;
 				if($@Target != -1){
 					if(attachrid($@Target) && strcharinfo(3) == "pvp_n_1-5")
 						Func_Prizes(getcharid(0),.EventName$[10]);
 				}
-				atcommand "alive "+rid2name($@Target);
-				atcommand "killable "+rid2name($@Target);
-				atcommand "size "+rid2name($@Target)+" 0";
+				charcommand "#alive "+rid2name($@Target);
+				charcommand "#killable "+rid2name($@Target);
+				charcommand "#size "+rid2name($@Target)+" 0";
 			}
 		}
 	}
