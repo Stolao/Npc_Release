@@ -746,7 +746,7 @@ OnHuntStart:	//-- Man Hunt Event
 				deletearray .@AID[0],getarraysize(.@AID);
 				addrid(5,0,"quiz_02");
 				.@AID[getarraysize(.@AID)] = getcharid(3);
-				$@Target = .@AID[rand(getarraysize(.@AID))];
+				$@Target = rand(getarraysize(.@AID));
 
 				sleep 10000;
 				mapannounce "pvp_n_1-5","[Round "+.@round+"] Our target is "+rid2name($@Target)+"!",bc_blue;
