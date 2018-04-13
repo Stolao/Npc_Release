@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.2A
+//= 2.2F
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -48,6 +48,11 @@
 //= 2.28 Fixed? Lucky Event
 //= 2.29 Replaced "mapnames" with .EnterMap$[#] in most cases
 //= 2.2A Fixed minor tabulation
+//= 2.2B Fixed an extra {
+//= 2.2C Converted to use new mail script commands
+//= 2.2D Added Mutiple item support for RoDex
+//= 2.2E Fixed 'Event Event' typo
+//= 2.2F Added more GM menus if dont want commands enabled
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -110,7 +115,15 @@ OnMenu:		//-- Click Menus
 			close;
 		case 3:
 		while(1){
-			switch(select(" ~ Add a event...: ~ Delete a event...: ~ ^777777Go back^000000")) {
+			switch(select(" ~ Add a event...: ~ Delete a event...: ~ End Event: ~ Randomize Event: ~ Reset Queue:~ ^777777Go back^000000")) {
+				case 3:	next;
+					goto OnEndEvent;
+				case 4:	next;
+					goto OnRandomize;
+				case 5:	next;
+					goto OnClear;
+				case 6:	next;
+					goto OnMenu;
 				case 1:
 					next;
 					mes "[ Add Event ]";
@@ -177,8 +190,6 @@ OnMenu:		//-- Click Menus
 						mes "Event Removed.";
 					}
 					break;
-				case 3:	next;
-					goto OnMenu;
 			}
 		}
 		case 6: close;
@@ -219,7 +230,7 @@ OnClear:	//-- Clear Event
 	if(select("No:Yes")== 1)
 		close;
 	freeloop(1);
-	for(.@i = 0; .@i < 168; .@i++){
+	for(.@i = 0; .@i < 168; .@i++)
 		$EVENT_CONTROL[.@i] = 0;
 	freeloop(0);
 	next;
@@ -313,7 +324,7 @@ OnRunEvent:	//-- GM Run
 		case 9: donpcevent strnpcinfo(1)+"::OnBombStart";	break;
 		case 10: donpcevent strnpcinfo(1)+"::OnHuntStart";	break;
 		case 11: donpcevent strnpcinfo(1)+"::OnShroomStart";	break;
-		case 12: Func_Prizes(getcharid(0),"+Bug Test+");	break;
+		case 12: Func_Prizes(getcharid(0),"Bug Test");	break;
 	}
 	close;
 
@@ -340,20 +351,7 @@ function Func_Prizes {
 	WonEvents++;
 	MWonEvents++;
 	if($@Mail == 2){
-		query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-			"'no-reply',0,'"+strcharinfo(0,getarg(0))+"',"+getarg(0)+",'** "+getarg(1)+" **',"+
-			"'Congratulations!% You have won % in the "+getarg(1)+" % % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+$@RewardZeny+",0)");
-		query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-		query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-			""+.@id+", '0', "+$@RewardID+", "+$@RewardQNT+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-		announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-	} else if($@Mail == 1){
-		query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
-			"'no-reply',"+getarg(0)+",'** "+getarg(1)+" **',"+
-			"'Congratulations!% You have won % in the "+getarg(1)+" % % % % % % % %   [ Your reward is attached. ]',"+
-			$@RewardID+","+$@RewardQNT+",1,"+$@RewardZeny+",UNIX_TIMESTAMP(NOW()))");
-		announce "Rewards hava been sent via mail.",bc_self|bc_blue;
+		mail getarg(0), "no-reply", getarg(1), "Congratulations!% You have won in the "+getarg(1)+" % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
 		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 	} else {
 		getitem $@RewardID,$@RewardQNT;
@@ -644,9 +642,8 @@ OnPoringStart:	//-- Poring Event
 		mapannounce .EnterMap$[6],"There are 2 right poring and a 30 min timer.",bc_blue;
 		sleep 4000;
 		mapannounce .EnterMap$[6],"Event will now Begin~",bc_blue;
-		for(.@i = 0; .@i < getarraysize(.Poring$); .@i++){
+		for(.@i = 0; .@i < getarraysize(.Poring$); .@i++)
 			monster .EnterMap$[6],0,0,.Poring$[.@i],1725,5,strnpcinfo(1)+"::OnKillWrong";
-		}
 		monster .EnterMap$[6],0,0,"--ja--",1725,2,strnpcinfo(1)+"::OnKillRight";
  		for(.@poring = 30; .@poring > 0; .@poring--){
 			if(getmapusers(.EnterMap$[6]) < 1) .@poring = 0;
@@ -848,15 +845,20 @@ OnInit:		//-- Config
 //  Rewards
 // -------------------
 
+	// Recive rewards via
+	// [0] = Direct to inv
+	// [1] = Mail / RoDex
+	$@Mail = 1;	
+
 	// Does not support multiple item rewards
 	// Rewards are Mailed to winners
-	$@RewardID = 33001;
-	$@RewardQNT = 1;
+	// Ro Dex Supports 5 Items
+	// Old Mail & Direct DO NOT support multiple items
+	setarray $@RewardID	,33001,0,0,0,0;
+	setarray $@RewardQNT	,    1,0,0,0,0;
 	$@RewardZeny = 10000;
-	// [0] = Direct to inv
-	// [1] = Old Mail
-	// [2] = RoDex
-	$@Mail = 2;	
+
+	// Not Adding Card / Random Bonus Support Yet, bug me if you really want it.
 
 // -------------------
 //  Ranking
@@ -877,13 +879,13 @@ OnInit:		//-- Config
 	bindatcmd("runevent",strnpcinfo(1)+"::OnRunEvent",60,99);
 
 	// End Event Command to manually end event
-	bindatcmd("endevent",strnpcinfo(1)+"::OnEndEvent",60,99);
+	bindatcmd("stopevent",strnpcinfo(1)+"::OnEndEvent",60,99);
 
 	// Randomize Event Command to randomize event scedule
-	bindatcmd("randomizeevent",strnpcinfo(1)+"::OnRandomize",60,99);
+	bindatcmd("randevent",strnpcinfo(1)+"::OnRandomize",60,99);
 
 	// Clear Event Command to wipe event scedule
-	bindatcmd("cleareventqueue",strnpcinfo(1)+"::OnClear",60,99);
+	bindatcmd("wipeevent",strnpcinfo(1)+"::OnClear",60,99);
 
 	// Join Event Command
 	bindatcmd("joinevent",strnpcinfo(1)+"::OnJoinEvent",0,99);
@@ -954,7 +956,6 @@ OnInit:		//-- Config
 
 	// Mushroom Event Possible Maps
 	setarray .ShroomMaps$[0],"izlude","geffen","morocc","prontera";
-
 
 // -------------------
 //  Don't Touch Ever
@@ -1035,22 +1036,8 @@ OnTouch_:
 		announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event.",bc_all|bc_blue;
 		WonEvents++;
 		MWonEvents++;
-		if($@Mail == 2){
-			announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event Event.",bc_all|bc_blue;
-			query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-				"'no-reply',0,'"+strcharinfo(0,getcharid(0))+"',"+getcharid(0)+",'** Maze Event **',"+
-				"'Congratulations!% You have won % in the Maze Event% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+$@RewardZeny+",0)");
-			query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-			query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-				""+.@id+", '0', "+$@RewardID+", "+$@RewardQNT+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-			announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-		} else if($@Mail == 1){
-			query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
-				"'no-reply',"+getcharid(0)+",'** Maze Event **',"+
-				"'Congratulations!% You have won % in the Maze Event% % % % % % % %   [ Your reward is attached. ]',"+
-				$@RewardID+","+$@RewardQNT+",0,"+$@RewardZeny+",UNIX_TIMESTAMP(NOW()))");
-			announce "Rewards hava been sent via mail.",bc_self|bc_blue;
+		if($@Mail){
+			mail getcharid(0), "no-reply", "Maze Event", "Congratulations!% You have won in the Maze Event % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
 			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 		} else {
 			getitem $@RewardID,$@RewardQNT;
@@ -1092,21 +1079,8 @@ prontera,155,227,4	script	Cluckers	800,{
 					announce "Congrats "+strcharinfo(0)+", a winner in the Cluckers Event.",bc_all|bc_blue;
 					WonEvents++;
 					MWonEvents++;
-					if($@Mail == 2){
-						query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-							"'no-reply',0,'"+strcharinfo(0,getcharid(0))+"',"+getcharid(0)+",'** Cluckers Event **',"+
-							"'Congratulations!% You have won % in the Cluckers Event% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+$@RewardZeny+",0)");
-						query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-						query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-							""+.@id+", '0', "+$@RewardID+", "+$@RewardQNT+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-						announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-						query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-					} else if($@Mail == 1){
-						query_sql("INSERT INTO `mail` (send_name,dest_id,title,message,nameid,amount,identify,zeny,time) VALUES ("+
-							"'no-reply',"+getcharid(0)+",'** Cluckers **',"+
-							"'Congratulations!% You have won % in the Cluckers Event% % % % % % % %   [ Your reward is attached. ]',"+
-							$@RewardID+","+$@RewardQNT+",0,"+$@RewardZeny+",UNIX_TIMESTAMP(NOW()))");
-						announce "Rewards hava been sent via mail.",bc_self|bc_blue;
+					if($@Mail){
+						mail getcharid(0), "no-reply", "Cluckers Event", "Congratulations!% You have won in the Cluckers Event % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
 						query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 					} else {
 						getitem $@RewardID,$@RewardQNT;
