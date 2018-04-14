@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.18
+//= 3.1A
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -36,20 +36,14 @@
 //= 3.16 Increased Waiting Room Rotation Time
 //= 3.17 Fixed Typos in Reset PVP Stats
 //= 3.18 Removed unnessisary next, creating hang screens
+//= 3.19 Made compatable with new mail command
+//= 3.1A Reformatted Rewards in conf to support 5 items
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
 //= [Stolao]
 // Email: Taingram11@gmail.com
 //============================================================
-
-//==================================
-		//-- Call Shop
-//==================================
-
--	pointshop	PvP_Cash_Shop	-1,#PvpPoints,501:1,502:2
-
-
 prontera,161,196,2	script	Ladder	837,{
 //==================================
 OnPvpLadder:	//-- Menus
@@ -230,7 +224,10 @@ OnPvpLadder:	//-- Menus
 	}
 	end;
 
-OnPCKillEvent:
+//==================================
+OnPCKillEvent:	//-- Adding Stats
+//==================================
+
 	if(!getgmlevel() || .Options&512){
 		if(LastPK == killedrid) RepeatKill++;
 		else {
@@ -274,56 +271,26 @@ OnPCKillEvent:
 		if(.Options&64) warp "Save",0,0;
 	}
 	end;
-OnHour00:
+
+//==================================
+OnHour00:	//-- Monthly Rewards
+//==================================
+
 	if(gettime(5) == 1 && .Options&128 && .MailType){
 		if(.RewardType&1 && .Options&1){
-			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@name$,.@value);
-			for(.@i = 0; .@i< getarraysize(.@cid); .@i++) {
-				if(.MailType == 2){
-					query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-						"'no-reply',0,'"+strcharinfo(0,.@cid[.@i])+"',"+.@cid[.@i]+",'** PvP Ranking **',"+
-						"'Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+.PMonth_Rewards[.@i * 3 + 2]+",0)");
-					query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-					query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-						""+.@id+", '0', "+.PMonth_Rewards[.@i * 3]+", "+.PMonth_Rewards[.@i * 3 + 1]+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-					announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-					query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-				} else if(.MailType == 1){
-					query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-						"'no-reply',0,'"+strcharinfo(0,.@cid[.@i])+"',"+.@cid[.@i]+",'** PvP Ranking **',"+
-						"'Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+.PMonth_Rewards[.@i * 3 + 2]+",0)");
-					query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-					query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-						""+.@id+", '0', "+.PMonth_Rewards[.@i * 3]+", "+.PMonth_Rewards[.@i * 3 + 1]+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-				}
-			}
-			announce "[PVP Ranking]: Rewards have been mailed to the top 10 in PvP~!",bc_blue|bc_all;
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+getarraysize(.PVP_Items$)+"",.@cid,.@name$,.@value);
+			for(.@i = 0; .@i< getarraysize(.@cid); .@i++)
+				mail .@cid[.@i], "no-reply", "PvP Ranking", "Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month % % %[ Your reward is attached. ]", .PVP_Zeny[.@i], getd(".Pitem"+.@i), getd(".Pqnt"+.@i);
+			announce "[PVP Ranking]: Rewards have been mailed to the top "+getarraysize(.PVP_Items$)+" in PvP~!",bc_blue|bc_all;
+			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 		}
 		sleep 10000;
 		if(.RewardType&2 && .Options&2){
-			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@cid,.@name$,.@value);
-			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
-
-				if(.MailType == 2){
-					query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-						"'no-reply',0,'"+strcharinfo(0,.@cid[.@i])+"',"+.@cid[.@i]+",'** GvG Ranking **',"+
-						"'Congratulations!% You have placed #"+(.@i+1)+" in the GvG Raning this Month% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+.GMonth_Rewards[.@i * 3 + 2]+",0)");
-					query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-					query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-						""+.@id+", '0', "+.GMonth_Rewards[.@i * 3]+", "+.GMonth_Rewards[.@i * 3 + 1]+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-					announce "Rewards hava been sent via mail.",bc_self|bc_blue;
-					query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-				} else if(.MailType == 1){
-					query_sql("INSERT INTO `mail` (send_name,send_id,dest_name,dest_id,title,message,time,status,zeny,type) VALUES ("+
-						"'no-reply',0,'"+strcharinfo(0,.@cid[.@i])+"',"+.@cid[.@i]+",'** GvG Ranking **',"+
-						"'Congratulations!% You have placed #"+(.@i+1)+" in the GvG Raning this Month% % % % % % % %   [ Your reward is attached. ]',UNIX_TIMESTAMP(NOW()),1,"+.GMonth_Rewards[.@i * 3 + 2]+",0)");
-					query_sql("SELECT `id`, CAST(`id` AS SIGNED) FROM `mail` WHERE `send_name` = 'no-reply' ORDER BY CAST(`id` AS SIGNED) DESC LIMIT 1",.@id);
-					query_sql("INSERT INTO `mail_attachments` (`id`, `index`, `nameid`, `amount`, `refine`, `attribute`, `identify`, `card0`, `card1`, `card2`, `card3`, `option_id0`, `option_val0`, `option_parm0`, `option_id1`, `option_val1`, `option_parm1`, `option_id2`, `option_val2`, `option_parm2`, `option_id3`, `option_val3`, `option_parm3`, `option_id4`, `option_val4`, `option_parm4`, `unique_id`, `bound`) VALUES ("+
-						""+.@id+", '0', "+.GMonth_Rewards[.@i * 3]+", "+.GMonth_Rewards[.@i * 3 + 1]+", '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')");
-					query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-				}
-			}
-			announce "[GVG Ranking]: Rewards have been mailed to the top 10 in PvP~!",bc_blue|bc_all;
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+getarraysize(.GVG_Items$)+"",.@cid,.@name$,.@value);
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) 
+				mail .@cid[.@i], "no-reply", "PvP Ranking", "Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month % % %[ Your reward is attached. ]", .GVG_Zeny[.@i], getd(".Gitem"+.@i), getd(".Gqnt"+.@i);
+			announce "[GVG Ranking]: Rewards have been mailed to the top "+getarraysize(.GVG_Items$)+" in GvG~!",bc_blue|bc_all;
+			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 		}
 		cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
 		cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
@@ -338,7 +305,11 @@ OnHour00:
 		m_gvg_dcount = 0;
 		end;
 	}
-OnInit:
+
+//==================================
+OnInit:		//-- Config
+//==================================
+
 	// Gets NPC Name
 	// Lets you change NPC name without breaking anything
 	.NPC$ = strnpcinfo(0);
@@ -347,6 +318,7 @@ OnInit:
 	bindatcmd("PvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
 	bindatcmd("Pvpladder" ,.NPC$+"::OnPvpLadder",0,99);
 	bindatcmd("pvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("pvpladder" ,.NPC$+"::OnPvpLadder",0,99);
 
 	// Bitwise Variable
 	// 1: Record PvP
@@ -369,39 +341,49 @@ OnInit:
 	// 2: Gvg
 	.RewardType = 1|2;
 
-	// Mail Types
-	// 0: No Rewards Mailed
-	// 1: Old Mail System
-	// 2: RoDex
-	.MailType = 2;
-
 	// PVP Rewards
-	// Item,Qnt,Zeny
-	setarray .PMonth_Rewards,
-		501,10,1000000,//1st
-		501,9,500000,
-		501,8,250000,
-		501,7,125000,
-		501,6,62500,
-		501,5,31250,
-		501,4,15620,
-		501,3,7810,
-		501,2,3905,
-		501,1,1952;//10th
+	// Rewards are Mailed to winners
+	// Zeny Rewards
+	setarray .PVP_Zeny,
+		1000000,500000,250000,125000,62500,// 1st - 5th
+		  31250, 15620,  7810,  3905, 1952;// 6th - 10th
+
+	// Ro Dex Supports 5 Items
+	// Old Mail DOES NOT support multiple items
+	// "Item 1, Qnt 1, Item 2, Qnt 2, Item 3, Qnt 3, Item 4, Qnt 4, Item 5, Qnt 5"
+	setarray .PVP_Items$,
+		"501,10,0,0,0,0,0,0,0,0",// 1st
+		"501,9,0,0,0,0,0,0,0,0",
+		"501,8,0,0,0,0,0,0,0,0",
+		"501,7,0,0,0,0,0,0,0,0",
+		"501,6,0,0,0,0,0,0,0,0",
+		"501,5,0,0,0,0,0,0,0,0",
+		"501,4,0,0,0,0,0,0,0,0",
+		"501,3,0,0,0,0,0,0,0,0",
+		"501,2,0,0,0,0,0,0,0,0",
+		"501,1,0,0,0,0,0,0,0,0";// 10th
 
 	// GVG Rewards
-	// Item,Qnt,Zeny
-	setarray .GMonth_Rewards,
-		501,10,1000000,//1st
-		501,9,500000,
-		501,8,250000,
-		501,7,125000,
-		501,6,62500,
-		501,5,31250,
-		501,4,15620,
-		501,3,7810,
-		501,2,3905,
-		501,1,1952;//10th
+	// Rewards are Mailed to winners
+	// Zeny Rewards
+	setarray .GVG_Zeny,
+		1000000,500000,250000,125000,62500,// 1st - 5th
+		  31250, 15620,  7810,  3905, 1952;// 6th - 10th
+
+	// Ro Dex Supports 5 Items
+	// Old Mail DOES NOT support multiple items
+	// "Item 1, Qnt 1, Item 2, Qnt 2, Item 3, Qnt 3, Item 4, Qnt 4, Item 5, Qnt 5"
+	setarray .GVG_Items$,
+		"501,10,0,0,0,0,0,0,0,0",// 1st
+		"501,9,0,0,0,0,0,0,0,0",
+		"501,8,0,0,0,0,0,0,0,0",
+		"501,7,0,0,0,0,0,0,0,0",
+		"501,6,0,0,0,0,0,0,0,0",
+		"501,5,0,0,0,0,0,0,0,0",
+		"501,4,0,0,0,0,0,0,0,0",
+		"501,3,0,0,0,0,0,0,0,0",
+		"501,2,0,0,0,0,0,0,0,0",
+		"501,1,0,0,0,0,0,0,0,0";// 10th
 
 	// Number of kills on same person before it detects abuse
 	.RepeatCount = 5;
@@ -435,7 +417,7 @@ OnInit:
 		mf_nomemo,	mf_noteleport,		mf_nopenalty,
 		mf_noreturn,	mf_nobranch,		mf_nomobloot,
 		mf_nomvploot,	MF_NOZENYPENALTY,	MF_NOTRADE,
-		MF_NOCOMMAND;
+		MF_NOCOMMAND,	mf_nodrop;
 
 //===== Dont Touch - Mapflag & Waiting Room Generation =====
 	if(.Options&2048)
@@ -458,6 +440,24 @@ OnInit:
 		}
 	}
 	freeloop(1);
+	for(.@i = 0; .@i < getarraysize(.PVP_Items$); .@i++){
+		explode(.@convert$,.PVP_Items$[.@i],",");
+		for(.@c = 0; .@c < getarraysize(.@convert$) && .@c < 10; .@c++)
+			.@convert[.@c] = atoi(.@convert$[.@c]);
+		for(.@k = 0; .@k < getarraysize(.@convert); .@k += 2){
+			setd ".Pitem"+.@i+"["+getarraysize(getd(".Pitem"+.@i))+"]",.@convert[.@k];
+			setd ".Pqnt"+.@i+"["+getarraysize(getd(".Pqnt"+.@i))+"]",.@convert[.@k+1];
+		}
+	}
+	for(.@i = 0; .@i < getarraysize(.GVG_Items$); .@i++){
+		explode(.@convert$,.GVG_Items$[.@i],",");
+		for(.@c = 0; .@c < getarraysize(.@convert$) && .@c < 10; .@c++)
+			.@convert[.@c] = atoi(.@convert$[.@c]);
+		for(.@k = 0; .@k < getarraysize(.@convert); .@k += 2){
+			setd ".Gitem"+.@i+"["+getarraysize(getd(".Gitem"+.@i))+"]",.@convert[.@k];
+			setd ".Gqnt"+.@i+"["+getarraysize(getd(".Gqnt"+.@i))+"]",.@convert[.@k+1];
+		}
+	}
 	while(.Options&6144) {
 		for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
 			.@MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"Nightmare ":"") + 
@@ -476,3 +476,9 @@ OnInit:
 	}
 //==========================================================
 }
+
+//==================================
+		//-- Call Shop
+//==================================
+
+-	pointshop	PvP_Cash_Shop	-1,#PvpPoints,501:1,502:2
