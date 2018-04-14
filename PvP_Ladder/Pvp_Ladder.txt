@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.16
+//= 3.18
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -34,22 +34,35 @@
 //= 3.14 Moved and added more At_Commands
 //= 3.15 Dynamic Waiting Room (&4096) require Waiting Room (&2048) to work
 //= 3.16 Increased Waiting Room Rotation Time
+//= 3.17 Fixed Typos in Reset PVP Stats
+//= 3.18 Removed unnessisary next, creating hang screens
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
 //= [Stolao]
 // Email: Taingram11@gmail.com
 //============================================================
+
+//==================================
+		//-- Call Shop
+//==================================
+
+-	pointshop	PvP_Cash_Shop	-1,#PvpPoints,501:1,502:2
+
+
 prontera,161,196,2	script	Ladder	837,{
-OnPvpLadder:
-	.@i = select(((getarraysize(.MapName$))?"Enter PvP Map:":":")+
+//==================================
+OnPvpLadder:	//-- Menus
+//==================================
+
+	.@Menu = select(((getarraysize(.MapName$))?"Enter PvP Map:":":")+
 			((.Options&1)?"Pvp Ladder:":":")+
 			((.Options&2)?"GvG Ladder:":":")+
 			((.Options&8)?"Top Guild:":":")+
 			((.Options&16)?"PvP Shops:":":")+
-			((.Options&1 || .Options&2 || .Options&8)?"Personal Stats:":":")+
+			((.Options&1 || .Options&2 || .Options&8 || .Options&16)?"Personal Stats:":":")+
 			((getgmlevel() >= 99)?"Reset PVP Stats":""));
-	switch(.@i){ 
+	switch(.@Menu){ 
 		case 2:
 		case 3:
 			if(.@i == 2){
@@ -71,7 +84,7 @@ OnPvpLadder:
 			}
 			query_sql("SELECT `char_reg_num`.`value`,`char`.`name`,`char`.`char_id` FROM `char` INNER JOIN `char_reg_num` ON `char_reg_num`.`char_id`=`char`.`char_id` WHERE `char_reg_num`.`key`='" + .@key$ + "' ORDER BY `char_reg_num`.`value` DESC LIMIT 10",.@value,.@name$,.@cid);
 			if(!(.Options&256)){
-				for(.@i = 0; .@i<getarraysize(.@cid); .@i++) {
+				for(.@i = 0; .@i < getarraysize(.@cid); .@i++) {
 					if(.@i == 2){
 						if(.Options&128)
 							.@key$ = "m_dthcount";
@@ -83,7 +96,6 @@ OnPvpLadder:
 					.@Death[.@i] = .@j;
 				}
 			}
-			next;
 			mes "~ ^990000"+((.Options&128)?"Monthly ":"") + ((.@i == 2)?"PvP":"GvG") +" Ladder^000000 ~";
 			if (!getarraysize(.@cid)){
 				mes "The rankings are empty.";
@@ -115,11 +127,9 @@ OnPvpLadder:
 			}
 			close;
 		case 5:
-			close2;
-			callshop "PvP_C_Shop",1;
+			callshop "PvP_Cash_Shop",1;
 			end;
 		case 6:
-			next;
 			if(.Options&1){
 				mes "[PvP]";
 				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",pl_pkcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",pl_dthcount,"death") + ((.Options&256)?" - ^0000EE"+ kda +" Total":"") +"^000000";
@@ -139,14 +149,14 @@ OnPvpLadder:
 				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",$M_Guild_Kills[getcharid(2)],"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",$M_Guild_Deaths[getcharid(2)],"death") + ((.Options&256)?" - ^0000EE"+ $M_Guild_Kda[getcharid(2)] +" Total":"") +"^000000";
 			}
 			close;
+
 		case 7:
 			.@i = select("Monthly:Lifetime") - 1;
 			.@L$[0] = (.Options&1)?"Pvp Ladder":"";
 			.@L$[1] = (.Options&2)?"GvG Ladder":"";
 			.@L$[2] = (.Options&8)?"Top Guild":"";
-			mes implode(.@L$,":");
-			.@j = select(implode(.@L$,":") - 1);
-			mes "Are you sure you want to reset this the "+((.Options&2)?"Lifetime":"Monthly")+" "+.@L$[.@j]+"?";
+			.@j = select(implode(.@L$,":")) - 1;
+			mes "Are you sure you want to reset this the "+((.@i)?"Lifetime":"Monthly")+" "+.@L$[.@j]+"?";
 			if(select("No:Yes")!=2)
 				close;
 			close2;
@@ -183,6 +193,7 @@ OnPvpLadder:
 					break;
 			}
 			close;
+
 		case 1:	//===== Dont Touch - Menu Generation ======================
 			for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
 				.@MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"^EE3333Nightmare ":"") + 
@@ -217,7 +228,8 @@ OnPvpLadder:
 				warp .MapName$[.@m],0,0;
 			}
 	}
-close;
+	end;
+
 OnPCKillEvent:
 	if(!getgmlevel() || .Options&512){
 		if(LastPK == killedrid) RepeatKill++;
@@ -464,4 +476,3 @@ OnInit:
 	}
 //==========================================================
 }
--	pointshop	PvP_C_Shop	-1,#PvpPoints,501:1,502:2
