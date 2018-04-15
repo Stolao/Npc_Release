@@ -2,125 +2,91 @@
 //= Hourly Rewards
 //===== By: ================================================== 
 //= Stolao
-//===== Current Version: ===================================== 
-//= 1.00
-//===== Compatible With: ===================================== 
+//===== Current Version: =====================================
+//= 2.00
+//===== Compatible With: =====================================
 //= rAthena SVN
-//===== Description: ========================================= 
-//= A reward system for players who play longer
-//===== Todo: ================================================
+//===== Description: =========================================
+//= A reward system for players for every hour of play up to
+//= a limited number of hours a week, each character will have
+//= a unique 
+//===== Todo =================================================
 //= Suggestions?
+//===== Comments: ============================================
+//=   quest_db.txt
+//=	61000,180,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Hourly Rewards Cooldown"
 //===== Additional Comments: =================================
-//= 1.00 Initial release
+//= 2.00 Remake using Quest DB
 //===== Contact Info: ========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
 //============================================================
--	script	Hourly_Rewards	-1,{
-OnPCLoginEvent:
-	if(.IPCheck){
-		query_sql("SELECT last_ip FROM `login` WHERE account_id = "+getcharid(3)+"", .@LastIp$);
-		query_sql("SELECT account_id FROM `login` WHERE last_ip = '"+.@LastIp$+"'", .@AccountId);
-		if(getarraysize(.@AccountId) > .IPCheck){
-			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.IPCheck+" per IP sorry.";
-			end;
-		}
-	}
-	if(.MacCheck){
-		query_sql("SELECT last_unique_id FROM `login` WHERE account_id = "+getcharid(3)+"", .@last_unique_id$);
-		query_sql("SELECT account_id FROM `login` WHERE last_unique_id = '"+.@last_unique_id$+"'", .@AccountId2);
-		if(getarraysize(.@AccountId2) > .MacCheck){
-			message strcharinfo(0),"[Daily Rewards]: rewards are limited to "+.MacCheck+" per computer sorry.";
-			end;
-		}
-	}
-	if(.Rest) message strcharinfo(0),"[Hourly Rewards]: Rewards are now active. Enjoy!"
-	addtimer 3600000,strnpcinfo(3)+"::OnWait";
-	end;
+prontera,5,5,5	script	Hourly	111,{
 OnHourCmnd:
-	if(@vending){
-		@vending = 0;
-		addtimer 3600000,strnpcinfo(3)+"::OnWait";
-		end;
-	} else if(!@overweight)
-		end;
-	else	@overweight--;
-OnWait:
-	deltimer strnpcinfo(3)+"::OnWait"
-	if(checkvending() & 2 && .Mode & 32){
-		message strcharinfo(0),"[Hourly Rewards]: Venders cannot recive rewards. Please type @hourly to continue.";
-		@vending++;
-		end;
-	}
-	if(.Afk_Timeout && checkidle > .Afk_Timeout){
-		message strcharinfo(0),"[Hourly Rewards]: Were AFk for more then "+checkidle+" seconds, cannot recive rewards. Please type @hourly to continue.";
-		@vending++;
-		end;
-	}
-	@hourly++;
-	explode(.@XT$,.Rewards$[@hourly++],",");
-	for(.@x = 0; .@x < getarraysize(.@XT$); .@x++)
-		.@TT[.@x] = atoi(.@XT$[.@x]);
-	if(.Mode & 1 && .@TT[4] > 0){
-		for(.@x = 4; .@x <= getarraysize(.@TT) - 1 ; .@x += 2){
-			.@itms[getarraysize(.@itms)] = .@TT[.@x];
-			.@qnts[getarraysize(.@qnts)] = .@TT[.@x + 1];
-		}
-		if(checkweight2(.@itms,.@qnts)){
-			for(.@x = 0; .@x < getarraysize(.@itms) && .@x < getarraysize(.@qnts); .@x++){
-				if(.Mode & 32)
-					getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
-				else	getitem  .@itms[.@x], .@qnts[.@x];
+	switch(checkquest(61000,PLAYTIME)){
+		case 2:
+			.@NextHour = #HReward + 1;
+			explode(.@XT$,.Rewards$[.@NextHour],",");
+			for(.@x = y = 0; .@x < .@Size; .@x++)
+				.@TT[.@x] = atoi(.@XT$[.@x]);
+			if(.Mode & 1 && (.@TT[4] > 0 || .@vip[4] > 0)){
+				.@Size = getarraysize(.@TT);
+				for(.@x = 4; .@x <= .@Size - 1 ; .@x += 2){
+					.@itms[.@y] = .@TT[.@x];
+					.@qnts[.@y] = .@TT[.@x + 1];
+					.@y++;
+				}
+				if(checkweight2(.@itms,.@qnts)){
+					for(.@x = 0; .@x < .@y; .@x++){
+						if(.Mode & 32)
+							getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
+						else	getitem  .@itms[.@x], .@qnts[.@x];
+					}
+				} else {
+					message strcharinfo(0),"[Hourly Rewards]: You cannot carry the prizes, please use storage and reuse command.";
+					end;
+				}
 			}
-		} else {
-			message strcharinfo(0),"[Hourly Rewards]: You cannot carry the prizes, please use storage and type @hourly.";
-			@hourly--;
-			@overweight++;
+			if(.Mode & 2 && (.@TT[1])){
+				#Hourlypoint += .@TT[1];
+				message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[1] +" "+.Points$;
+			}
+			if(.Mode & 4 && (.@TT[0])){
+				zeny += .@TT[0];
+				message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[0] +"z";
+			}
+			if(.Mode & 8 && (.@TT[3] || .@TT[4]))
+				getexp .@TT[3], .@TT[4];
+			#HReward++;
+			erasequest 61000;
+		case -1:
+			.@Size = getarraysize(.Rewards$);
+			if(#HReward >= .@Size){
+				message strcharinfo(0),"[Hourly Rewards]: No more rewards remaining this week, .";
+				end;
+			}
+			setquest 61000;
 			end;
-		}
+		case 0:
+		case 1:
+			message strcharinfo(0),"[Hourly Rewards]: Rewards not ready again yet.";
+			end;
 	}
-	if(.Mode & 2){
-		if(.@TT[0]){
-			zeny += .@TT[0];
-			message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[0] +"z";
-		}
-		if(.@TT[1]){
-			setd getd(.Points$[0]),getd(.Points$[0]) + .@TT[1];
-			message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[1] +" "+.Points$[1];
-		}
+
+OnHour00:
+	if(gettime(DT_DAYOFWEEK) == SUNDAY){
+		query_sql("DELETE FROM `acc_reg_num` WHERE `key` = '#HReward'");
+		addrid(0);
+		#HReward = 0;
 	}
-	if(.Mode & 4 && (.@TT[3] || .@TT[4]))
-		getexp .@TT[3], .@TT[4];
-	if(.Mode & 8){
-		for(.@x = 0; .@x < getarraysize(.BuffInfo); .@x += 4){
-			if(#DRewardCon % .BuffInfo[.@x + 1] == 0)
-				sc_start .BuffInfo[.@x], .BuffInfo[.@x + 2] * 60000, .BuffInfo[.@x + 3];
-		}
-	}
-	message strcharinfo(0),"[Hourly Rewards]: You have collected your hourly reward, for "+callfunc("F_InsertPlural",#DRewardCon,"hour")+" in a row.";
-	addtimer 3600000,strnpcinfo(3)+"::OnWait";
 	end;
+
 OnInit:
 	// Basic Settings
-	//   1: Item | 2: Points | 4: Exp  
-	//   8: Gain Buffs Every X Consecutive Hours logged in
-	//   16: Bound Items
-	//   32: No Rewards ffor Autotraders
+	//   1: Item | 2: Points | 4: Zeny | 8: Exp
+	//   16: Item Rewards Bound
 	//     (a bit value, e.g. 3 = Items & Points from Multi)
-	.Mode = 1|2|4|8|16|32;
-
-	// Number of times same IP can recive rewards
-	//   0 = unlimited
-	.IPCheck = 1;
-
-	// Number of times same Computer (MacAdress) can recive rewards
-	//   0 = unlimited
-	.MacCheck = 0;
-
-	// AFK Time
-	//   How many seconds of idle till no rewards recived
-	//   0 = Unlimited
-	.Afk_Timeout = 1800;
+	.Mode = 1|2|4|16;
 
 	// Item Binding Mode
 	//	 Bound_Account : Account Bound item
@@ -129,51 +95,44 @@ OnInit:
 	//	 Bound_Char    : Character Bound item
 	.Bound_Mode = Bound_Account;
 
-	// Point Type
-	//   [0] Points earned
-	//   [1] Point name in mes
-	setarray .Points$,"#KAFRAPOINTS","K-Points";
-
-	// Consecutive Days Buff
-	// Each buff contains 4 variables (32 Total Max)
-	// <Type>,<Days>,<Duration>,<Rate>, // Buff 1
-	// <Type>,<Days>,<Duration>,<Rate>, // Buff 2
-	//   ...;
-	//
-	//  Example: 188,7,45,3
-	//    -Every 7th consecutive day logged in Player gains +3 Str for 45 mins
-	//
-	//  Type is 188, which references which SC_ to use, SC_INCSTR in this example
-	//     -For a full list of SC_ visit the db/const.txt
-	//  Days is days buff is applied, in this example 7, so every 7th day, 14,21,28....
-	//  Duration is buff duration is Minuits, in this example 45 mins
-	//  Rate is buff strength, in this example player gains 3 Str
-	setarray .BuffInfo
-				,260,2,360,1	// Life Insurance for 360 Mins Every 2nd Day
-				,198,3,120,10	// +10% Hp for 120 Mins Every 3th Day
-				,196,5,120,25	// +25 Flee for 120 Mins Every 5th Day
-				,257,7,240,50;	// +50% Exp for 240 Mins Every 7th Day
-
-	// Daily Prize items (max 128 days):
-	//   "<Zeny>|<Points>|<BaseExp>|<JobExp>|<itemID-1>|<amount-1>|<itemID-2>|<amount-2>...etc", // Day 1
-	//   "<Zeny>|<Points>|<BaseExp>|<JobExp>|<itemID-1>|<amount-1>|<itemID-2>|<amount-2>...etc"  // Day 2
-	//   ...;
-	// Total length of any days string must be 255 or shorter
-	// * If players login longer than the last set
-	//   day, they will keep getting the last prize.
-	setarray .Rewards$[1],
-		"0,0,0,0,503,5,506,5",			// Day 1: 5 White Potion + 5 Green Potion
-		"100",					// Day 2: 100 Zeny
-		"0,0,0,0,501,5",			// Day 3: 5 Red Potion
-		"0,0,0,0,503,5,506,5",			// Day 4: 5 White Potion + 5 Green Potion
-		"100",					// Day 5: 100 Zeny
-		"0,0,0,0,501,5",			// Day 6: 5 Red Potion
-		"1000",					// Day 7: 100 Zeny
-		"1000",					// Day 8: 100 Zeny
-		"0,0,0,0,503,5,506,5";			// Day 9: 5 White Potion + 5 Green Potion
-
 	// To disable the command '@loginreward' comment the next lines
 	// * Needs extra commands for typos
 	bindatcmd("hourly",strnpcinfo(3)+"::OnHourCmnd",0,99);
-	end;
+	bindatcmd("hourlyreward",strnpcinfo(3)+"::OnHourCmnd",0,99);
+
+	// Point Name
+	.Points$ = "Hourly Points";
+
+	// Hourly Prize items:
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc", // Hour 1
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc"  // Hour 2
+	//   ...;
+	// Total length of any days string must be 255 or shorter
+	// This is total hours collected per week, max possible is 167
+	setarray .Rewards$[1],
+		"1000,1",			// Hour 1: 1000 Zeny + 1 #Hourlypoint
+		"0,1,0,0,501,5",		// Hour 2: 5 Red Potion
+		"0,1,0,0,506,5",		// Hour 3: 5 Green Potion
+		"2000,1",			// Hour 4: 2000 Zeny
+		"2000,1",			// Hour 5: 2000 Zeny
+		"0,1,0,0,502,5",		// Hour 6: 5 Orange Potion
+		"0,1,0,0,12208,1",		// Hour 7: 1 Battle Manual
+		"2500,1",			// Hour 8: 2500 Zeny
+		"2500,1",			// Hour 8: 2500 Zeny
+		"2500,1",			// Hour 9: 2500 Zeny
+		"0,1,0,0,503,5",		// Hour 10: 5 White Potion
+		"2500,1",			// Hour 11: 2500 Zeny
+		"2500,1",			// Hour 12: 2500 Zeny
+		"2500",				// Hour 13: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 14: 5 White Potion + 3 Green Potion
+		"2500,1",			// Hour 15: 2500 Zeny
+		"2500,1",			// Hour 16: 2500 Zeny
+		"2500,1",			// Hour 17: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 18: 5 White Potion + 3 Green Potion
+		"2500,1",			// Hour 19: 2500 Zeny
+		"2500,1",			// Hour 20: 2500 Zeny
+		"0,1,0,0,604,3",		// Hour 21: 1 Dead Branch
+		"2500,1",			// Hour 22: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 23: 5 White Potion + 3 Green Potion
+		"2500,1";			// Hour 24: 2500 Zeny
 }
