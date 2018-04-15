@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.2F
+//= 2.32
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -22,6 +22,7 @@
 //= Add Devil Square, Disguise, Invasion, X-O Event, MVP Arena, Dead Branch, Wiki, Jumper, Fast Type Event
 //= Add Other Requested Events
 //= Upgrade Randomize Event to allow choices in events
+//= Fix Manually Removing Events Overflow Error (not game breaking)
 //===== Additional Comments: =================================
 //= 2.12 Fixed Display Day of week
 //= 2.13 Fixed Emp Breaker Instance Enter
@@ -53,6 +54,9 @@
 //= 2.2D Added Mutiple item support for RoDex
 //= 2.2E Fixed 'Event Event' typo
 //= 2.2F Added more GM menus if dont want commands enabled
+//= 2.30 Fixed a fallthrough error
+//= 2.31 Added Remove Event Type comamnd
+//= 2.32 Added Add Event Type comamnd
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -115,14 +119,18 @@ OnMenu:		//-- Click Menus
 			close;
 		case 3:
 		while(1){
-			switch(select(" ~ Add a event...: ~ Delete a event...: ~ End Event: ~ Randomize Event: ~ Reset Queue:~ ^777777Go back^000000")) {
+			switch(select(" ~ Add an event...: ~ Delete an event...: ~ End current event: ~ Randomize event list: ~ Add event type: ~ Remove event type: ~ Reset queue:~ ^777777Go back^000000")) {
 				case 3:	next;
 					goto OnEndEvent;
 				case 4:	next;
 					goto OnRandomize;
 				case 5:	next;
-					goto OnClear;
+					goto OnAddType;
 				case 6:	next;
+					goto OnRemoveType;
+				case 7:	next;
+					goto OnClear;
+				case 8:	next;
 					goto OnMenu;
 				case 1:
 					next;
@@ -197,6 +205,44 @@ OnMenu:		//-- Click Menus
 			next;
 			break;
 	}
+
+//==================================
+OnJoinEvent:	//-- Join Event
+//==================================
+
+	if($@CurrentEvent < 1)
+		mes "[ Event Management ]","Sorry no event is running.";
+	else {
+		mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Want to join the "+ .ColorName$[$@CurrentEvent] +"?";
+		if($@CurrentEvent == 2)
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Must be a Novice Level 10/10 or lower.";
+		if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7)
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Will have any Carts or Pets Removed.";
+		if(select("Yes:No") == 2)
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Ok come back later.",bc_self|bc_blue;
+		else if((Baselevel > 10 || JobLevel > 10 || Class != Job_Novice ) && $@CurrentEvent == 2)
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Sorry you must be a Novice Level 10/10 or lower.";
+		else if($@CurrentEvent < 1)
+			mes "[ Event Management ]","Sorry event closed before you hit yes.";
+		else {
+			if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7){
+				setmadogear 0;
+				setdragon 0;
+				if (checkwug())
+					setoption Option_Wugrider,0;
+				if(ismounting())
+					setmounting;
+				setriding 0;
+				setfalcon 0;
+				setcart 0;
+				callfunc("dispell");
+			} else if($@CurrentEvent == 2)
+				callfunc("dispell");
+			warp .EnterMap$[$@CurrentEvent],.EnterX[$@CurrentEvent],.EnterY[$@CurrentEvent];
+		}
+	}
+	close;
+
 //==================================
 OnRandomize:	//-- Randomize Event
 //==================================
@@ -239,6 +285,63 @@ OnClear:	//-- Clear Event
 	close;
 
 //==================================
+OnRemoveType:	//-- Remove Event Type
+//==================================
+
+	mes "[ Remove Event Type ]";
+	Mes "Which Event Would you Like to remove?";
+	.@select = select(implode(.ColorName$,": ~ ")) - 1;
+	next;
+	mes "[ Remove Event Type ]";
+	mes "Are you sure you want to remove all "+.ColorName$[.@select]+"?";
+	if(select("No:Yes")== 1)
+		close;
+	freeloop(1);
+	for(.@i = 0; .@i < 168; .@i++){
+		if($EVENT_CONTROL[.@i] == .@select){
+			$EVENT_CONTROL[.@i] = 0;
+			continue;
+		}
+	}
+	freeloop(0);
+	next;
+	mes "[ Remove Event Type ]";
+	mes "All "+.ColorName$[.@select]+" Events Removed.";
+	close;
+
+//==================================
+OnAddType:	//-- Add Event Type
+//==================================
+
+	mes "[ Add Event Type ]";
+	Mes "Which Event Would you Like to add?";
+	.@select = select(implode(.ColorName$,": ~ ")) - 1;
+	next;
+	mes "[ Add Event Type ]";
+	mes "What chance would you like "+.ColorName$[.@select]+" to appear?";
+	input(.@j,0,100);
+	next;
+	mes "[ Add Event Type ]";
+	mes "Would you like "+.ColorName$[.@select]+" to overwrite other events?";
+	.@Over = select("No:Yes") - 1;
+	next;
+	mes "[ Add Event Type ]";
+	mes "Are you sure you want to add "+.ColorName$[.@select]+" at a "+.@j+"% chance"+((.@Over)?" overwriting other events":"")+"?";
+	if(select("No:Yes")== 1)
+		close;
+	freeloop(1);
+	for(.@i = 0; .@i < 168; .@i++){
+		if(rand(100) > .@j || (!.@Over && $EVENT_CONTROL[.@i]))
+			continue;
+		else $EVENT_CONTROL[.@i] = .@select;
+	}
+	freeloop(0);
+	next;
+	mes "[ Add Event Type ]";
+	mes .ColorName$[.@select]+" Added.";
+	close;
+
+//==================================
 OnEndEvent:	//-- End Event
 //==================================
 
@@ -261,43 +364,6 @@ OnEndEvent:	//-- End Event
 	Announce "Sorry a GM has stopped the "+ .EventName$[$@CurrentEvent] +".",bc_all|bc_blue;
 	$@CurrentEvent = 0;
 	end;
-
-//==================================
-OnJoinEvent:	//-- Join Event
-//==================================
-
-	if($@CurrentEvent < 1)
-		mes "[ Event Management ]","Sorry no event is running.";
-	else {
-		mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Want to join the "+ .ColorName$[$@CurrentEvent] +"?";
-		if($@CurrentEvent == 2)
-			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Must be a Novice Level 10/10 or lower.";
-		if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7)
-			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Will have any Carts or Pets Removed.";
-		if(select("Yes:No") == 2)
-			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Ok come back later.",bc_self|bc_blue;
-		else if((Baselevel > 10 || JobLevel > 10 || Class != Job_Novice ) && $@CurrentEvent == 2)
-			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Sorry you must be a Novice Level 10/10 or lower.";
-		else if($@CurrentEvent < 1)
-			mes "[ Event Management ]","Sorry event closed before you hit yes.";
-		else {
-			if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7){
-				setmadogear 0;
-				setdragon 0;
-				if (checkwug())
-					setoption Option_Wugrider,0;
-				if(ismounting())
-					setmounting;
-				setriding 0;
-				setfalcon 0;
-				setcart 0;
-				callfunc("dispell");
-			} else if($@CurrentEvent == 2)
-				callfunc("dispell");
-			warp .EnterMap$[$@CurrentEvent],.EnterX[$@CurrentEvent],.EnterY[$@CurrentEvent];
-		}
-	}
-	close;
 
 //==================================
 OnRunEvent:	//-- GM Run
@@ -340,7 +406,7 @@ function Func_Countdown {
 	for(.@i = 5; .@i > 0; .@i--){
 		announce .EventName$[$@CurrentEvent]+" will begin in "+ callfunc("F_InsertPlural",.@i,"minute") +"!",bc_all|bc_blue;
 		Announce "Please type @joinevent to join",bc_all|bc_blue;
-		sleep 60000;
+		sleep 6000;
 	}
 	Announce .EventName$[$@CurrentEvent] +" Has Begun!",bc_all|bc_blue;
 	return;
@@ -886,6 +952,12 @@ OnInit:		//-- Config
 
 	// Clear Event Command to wipe event scedule
 	bindatcmd("wipeevent",strnpcinfo(1)+"::OnClear",60,99);
+
+	// Remove Event Command to wipe event scedule
+	bindatcmd("removeevent",strnpcinfo(1)+"::OnRemoveType",60,99);
+
+	// Add Event Command to wipe event scedule
+	bindatcmd("addevent",strnpcinfo(1)+"::OnRemoveType",60,99);
 
 	// Join Event Command
 	bindatcmd("joinevent",strnpcinfo(1)+"::OnJoinEvent",0,99);
