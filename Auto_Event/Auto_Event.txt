@@ -25,30 +25,6 @@
 //= Upgrade Randomize Event to allow choices in events
 //= Fix Manually Removing Events Overflow Error (not game breaking)
 //===== Additional Comments: =================================
-//= 2.12 Fixed Display Day of week
-//= 2.13 Fixed Emp Breaker Instance Enter
-//= 2.14 Converted Instance var to NPC var in Emp Breaker Instance
-//= 2.15 Fixed Emp Breaker Instance using sleep2 instead of sleep
-//= 2.16 Added a few more names to Poring Event
-//= 2.17 Lower Zombie Event Round time by 1 Second (even 60 now)
-//= 2.18 Lower Slow Duration after killing Zombie in Zombie Event to 30 Seconds
-//= 2.19 Corrected Typo in Final Wave of Zombie Event
-//= 2.1A Lower Dice Event Initialize time to 60 seconds
-//= 2.1B Fixed typo 'Event Event' when reciving rewards
-//= 2.1C Made the PvP Event Check Players every 5 seconds instead of 60
-//= 2.1D Dice Event Now Sends Players back to Prontera on event End
-//= 2.1E Zombie Event Now Sends Players back to Prontera on event End
-//= 2.1F Fixed at_endevent not ending events already in progress.
-//= 2.20 Bombring Event Now Sends Players back to Prontera on event End
-//= 2.21 Bombring Event now gets harder per wave.
-//= 2.22 Bombring Event waves come slower
-//= 2.23 Added Clear Event Command
-//= 2.24 Fixed Manhunt picking players from wrong map
-//= 2.25 Fixed Issue #33 Man Hunt Event (Thanks Sader)
-//= 2.26 Poring now correctly removes mapflags
-//= 2.27 Added 'mf_nodrop' to Bombring and Poring
-//= 2.28 Fixed? Lucky Event
-//= 2.29 Replaced "mapnames" with .EnterMap$[#] in most cases
 //= 2.2A Fixed minor tabulation
 //= 2.2B Fixed an extra {
 //= 2.2C Converted to use new mail script commands
@@ -61,7 +37,7 @@
 //= 2.33 Updated Poring Event to auto end on last poring killed
 //= 2.34 Added conf for number of correct poring in find the poring event
 //= 2.35 Fixed typo in Mail
-//= 2.36 Added a conf for Number of waves in Bombring
+//= 2.36 Added a conf for NUmber of waves in Bombring
 //= 2.37 Added a TestMode option
 //===== Contact Ifo: =========================================
 //= [Stolao] 
