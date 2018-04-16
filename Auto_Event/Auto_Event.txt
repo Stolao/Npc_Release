@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.35
+//= 2.37
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -59,8 +59,10 @@
 //= 2.31 Added Remove Event Type comamnd
 //= 2.32 Added Add Event Type comamnd
 //= 2.33 Updated Poring Event to auto end on last poring killed
-//= 2.34 Added conf setting for number of correct poring in find the poring event
+//= 2.34 Added conf for number of correct poring in find the poring event
 //= 2.35 Fixed typo in Mail
+//= 2.36 Added a conf for Number of waves in Bombring
+//= 2.37 Added a TestMode option
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -410,7 +412,9 @@ function Func_Countdown {
 	for(.@i = 5; .@i > 0; .@i--){
 		announce .EventName$[$@CurrentEvent]+" will begin in "+ callfunc("F_InsertPlural",.@i,"minute") +"!",bc_all|bc_blue;
 		Announce "Please type @joinevent to join",bc_all|bc_blue;
-		sleep 6000;
+		if(.TestMode)
+			sleep 6000;
+		else	sleep 60000;
 	}
 	Announce .EventName$[$@CurrentEvent] +" Has Begun!",bc_all|bc_blue;
 	return;
@@ -800,8 +804,8 @@ OnBombStart:	//-- Bombring Event
 		sleep 2000;
 		mapannounce .EnterMap$[9],"Sooooooooooo, ready or not here they come!!!",bc_blue;
 		sleep 10000;
-		for(.@wave = 1; .@wave <= 5; .@wave++){
-			if(.@wave < 5){
+		for(.@wave = 1; .@wave <= .Bombwaves; .@wave++){
+			if(.@wave < .Bombwaves){
 				mapannounce .EnterMap$[9],"Wave "+.@wave+"!",bc_blue;
 			} else	mapannounce .EnterMap$[9],"FIANL WAVE!",bc_blue;
 			if (.@wave * .@totalplayers < 60)
@@ -809,7 +813,7 @@ OnBombStart:	//-- Bombring Event
 			else	areamonster .EnterMap$[9],48,334,71,357,"Run for you life!",1904,60;
 			if(!getmapusers(.EnterMap$[9]))
 				.@wave += 5;
-			else	sleep 2000 * 5 / .@wave;
+			else	sleep 1500 * .Bombwaves / .@wave;
 		}
 		sleep 10000;
 		if(getmapusers(.EnterMap$[9])){
@@ -1048,6 +1052,14 @@ OnInit:		//-- Config
 
 	// Number of poring to Spawn in Find the poring Event
 	.PoringSpawn = 2;
+
+	// Number of waves in Bombporing Event
+	.Bombwaves = 5;
+
+	// Test mode, Shortens Coutdown timer to 30 seconds for faster testing
+	// [0] = Off
+	// [1] = On
+	.TestMode = 1;
 
 // -------------------
 //  Don't Touch Ever
