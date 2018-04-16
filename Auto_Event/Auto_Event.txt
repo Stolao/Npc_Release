@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.32
+//= 2.35
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -19,7 +19,8 @@
 //===== To Do: ===============================================
 //= Make Rewards Editable in game
 //= Add A Vote4Event(ingame) Feature
-//= Add Devil Square, Disguise, Invasion, X-O Event, MVP Arena, Dead Branch, Wiki, Jumper, Fast Type Event
+//= Add Events; Devil Square, Disguise, Invasion, X-O Event, MVP Arena,
+//=	Dead Branch, Wiki, Jumper, Fast Type, Safetywall
 //= Add Other Requested Events
 //= Upgrade Randomize Event to allow choices in events
 //= Fix Manually Removing Events Overflow Error (not game breaking)
@@ -57,6 +58,9 @@
 //= 2.30 Fixed a fallthrough error
 //= 2.31 Added Remove Event Type comamnd
 //= 2.32 Added Add Event Type comamnd
+//= 2.33 Updated Poring Event to auto end on last poring killed
+//= 2.34 Added conf setting for number of correct poring in find the poring event
+//= 2.35 Fixed typo in Mail
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -416,7 +420,7 @@ function Func_Prizes {
 	announce "Congrats "+strcharinfo(0,getarg(0))+", a winner in the "+getarg(1)+" Event.",bc_all|bc_blue;
 	WonEvents++;
 	MWonEvents++;
-	if($@Mail == 2){
+	if($@Mail){
 		mail getarg(0), "no-reply", getarg(1), "Congratulations!% You have won in the "+getarg(1)+" % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
 		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
 	} else {
@@ -710,20 +714,23 @@ OnPoringStart:	//-- Poring Event
 		mapannounce .EnterMap$[6],"Event will now Begin~",bc_blue;
 		for(.@i = 0; .@i < getarraysize(.Poring$); .@i++)
 			monster .EnterMap$[6],0,0,.Poring$[.@i],1725,5,strnpcinfo(1)+"::OnKillWrong";
-		monster .EnterMap$[6],0,0,"--ja--",1725,2,strnpcinfo(1)+"::OnKillRight";
+		monster .EnterMap$[6],0,0,"--ja--",1725,.PoringSpawn,strnpcinfo(1)+"::OnKillRight";
+		.PoringSpawn = 2;
  		for(.@poring = 30; .@poring > 0; .@poring--){
 			if(getmapusers(.EnterMap$[6]) < 1) .@poring = 0;
 			mapannounce .EnterMap$[6],callfunc("F_InsertPlural",.@poring,"Minute")+" Remaining.",bc_blue;
 			sleep 60000;
 		}
 	}
-	mapannounce .EnterMap$[6],"Time Is up",bc_blue;
-	killmonsterall .EnterMap$[6];
-	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
-		removemapflag "quiz_02", .bombflag[.@i];
-	$@CurrentEvent = 0;
-	sleep 5000;
-	mapwarp .EnterMap$[6],"prontera",155,181;
+	if(!.PoringLeft){
+		mapannounce .EnterMap$[6],"Time Is up",bc_blue;
+		killmonsterall .EnterMap$[6];
+		for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+			removemapflag "quiz_02", .bombflag[.@i];
+		$@CurrentEvent = 0;
+		sleep 5000;
+		mapwarp .EnterMap$[6],"prontera",155,181;
+	}
 	end;
 
 OnKillWrong:
@@ -734,6 +741,16 @@ OnKillWrong:
 OnKillRight:
 	Func_Prizes(getcharid(0),.EventName$[6]);
 	warp "prontera",155,181;
+	.PoringLeft--;
+	if(!.PoringLeft){
+		mapannounce .EnterMap$[6],"Time Is up",bc_blue;
+		killmonsterall .EnterMap$[6];
+		for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+			removemapflag "quiz_02", .bombflag[.@i];
+		$@CurrentEvent = 0;
+		sleep 5000;
+		mapwarp .EnterMap$[6],"prontera",155,181;
+	}
 	end;
 
 //==================================
@@ -1028,6 +1045,9 @@ OnInit:		//-- Config
 
 	// Mushroom Event Possible Maps
 	setarray .ShroomMaps$[0],"izlude","geffen","morocc","prontera";
+
+	// Number of poring to Spawn in Find the poring Event
+	.PoringSpawn = 2;
 
 // -------------------
 //  Don't Touch Ever
