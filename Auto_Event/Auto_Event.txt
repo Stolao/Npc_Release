@@ -3,7 +3,7 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.37
+//= 2.38
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -37,8 +37,9 @@
 //= 2.33 Updated Poring Event to auto end on last poring killed
 //= 2.34 Added conf for number of correct poring in find the poring event
 //= 2.35 Fixed typo in Mail
-//= 2.36 Added a conf for NUmber of waves in Bombring
+//= 2.36 Added a conf for Number of waves in Bombring
 //= 2.37 Added a TestMode option
+//= 2.38 Added No_Trade flag to bomring and poring events
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -1021,7 +1022,7 @@ OnInit:		//-- Config
 				"Pickle","Puring","Ponirg","Poning","P o r i n g";
 
 	// Poring and Bombring Mapflags
-	setarray .bombflag,mf_nodrop,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption;
+	setarray .bombflag,mf_nodrop,mf_nowarp,mf_nowarpto,mf_nosave,mf_nomemo,mf_noteleport,mf_nopenalty,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption,mf_notrade;
 
 	// Mushroom Event Possible Maps
 	setarray .ShroomMaps$[0],"izlude","geffen","morocc","prontera";
