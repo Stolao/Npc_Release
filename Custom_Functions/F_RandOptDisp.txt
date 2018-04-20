@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.00
+//= 1.01
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -12,13 +12,15 @@
 //= Optmize more?
 //===== Additional Comments: =================================
 //= 1.00 Original Make
+//= 1.01 Added 'Blank' for 'missing' rndoptions client side
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
 //============================================================
 function	script	F_RandOptDisp	{
 // callfunc("F_RandOptDisp",id,value,paramater);
-	setarray .@RNDOptions$[1],"Max Hp +"+getarg(1,0)+"","Max Sp +"+getarg(1,0)+"","Str +"+getarg(1,0)+"","Agi +"+getarg(1,0)+"","Vit +"+getarg(1,0)+"","Int +"+getarg(1,0)+"","Dex +"+getarg(1,0)+"","Luk +"+getarg(1,0)+"","Max Hp +"+getarg(1,0)+"%","Max Sp +"+getarg(1,0)+"%",
+	setarray .@RNDOptions$[1],"Max Hp +"+getarg(1,0)+"","Max Sp +"+getarg(1,0)+"","Str +"+getarg(1,0)+"","Agi +"+getarg(1,0)+"","Vit +"+getarg(1,0)+"",
+				"Int +"+getarg(1,0)+"","Dex +"+getarg(1,0)+"","Luk +"+getarg(1,0)+"","Max Hp +"+getarg(1,0)+"%","Max Sp +"+getarg(1,0)+"%",
 				"Increases natural HP regeneration by "+getarg(1,0)+"%","Increases natural SP regeneration by "+getarg(1,0)+"%","ATK +"+getarg(1,0)+"%","MATK +"+getarg(1,0)+"%","ASPD +"+getarg(1,0)+"",
 				"Increases attack speed (reduce delay after attack by "+getarg(1,0)+"%)","ATK +"+getarg(1,0)+"","HIT +"+getarg(1,0)+"","MATK +"+getarg(1,0)+"","DEF +"+getarg(1,0)+"",
 				"MDEF +"+getarg(1,0)+"","FLEE +"+getarg(1,0)+"","Perfect dodge +"+getarg(1,0)+"","CRIT +"+getarg(1,0)+"","Resistance to Neutral "+getarg(1,0)+"%",
@@ -34,6 +36,7 @@ function	script	F_RandOptDisp	{
 				"Magical damage to Shadow monsters "+getarg(1,0)+"%","Magical recistance to Ghost monsters "+getarg(1,0)+"%","Magical damage to Ghost monsters "+getarg(1,0)+"%","Magical recistance to Undead monsters "+getarg(1,0)+"%","Magical damage to Undead monsters "+getarg(1,0)+"%",
 				"Enchants armor with Neutral property","Enchants armor with Water property","Enchants armor with Earth property","Enchants armor with Fire property","Enchants armor with Wind property",
 				"Enchants armor with Poison property","Enchants armor with Holy property","Enchants armor with Shadow property","Enchants armor with Ghost property","Enchants armor with Undead property",
+				"Blank",
 				"Resistance to Formless monsters "+getarg(1,0)+"%","Resistance to Undead monsters "+getarg(1,0)+"%","Resistance to Brute monsters "+getarg(1,0)+"%","Resistance to Plant monsters "+getarg(1,0)+"%","Resistance to Insect monsters "+getarg(1,0)+"%",
 				"Resistance to Fish monsters "+getarg(1,0)+"%","Resistance to Demon monsters "+getarg(1,0)+"%","Resistance to Demihuman monsters "+getarg(1,0)+"%","Resistance to Angel monsters "+getarg(1,0)+"%","Resistance to Dragon monsters "+getarg(1,0)+"%",
 				"Physical damage to Formless monsters "+getarg(1,0)+"%","Physical damage to Undead monsters "+getarg(1,0)+"%","Physical damage to Brute monsters "+getarg(1,0)+"%","Physical damage to Plant monsters "+getarg(1,0)+"%","Physical damage to Insect monsters "+getarg(1,0)+"%",
@@ -51,7 +54,9 @@ function	script	F_RandOptDisp	{
 				"Damage to Small size monsters "+getarg(1,0)+"%","Damage to Medium size monsters "+getarg(1,0)+"%","Damage to Large size monsters "+getarg(1,0)+"%","Resistance to Small size monsters "+getarg(1,0)+"%","Resistance to Medium size monsters "+getarg(1,0)+"%",
 				"Resistance to Large size monsters "+getarg(1,0)+"%","Nullify weapon's damage size penalty","Increases critical damage by "+getarg(1,0)+"%","Decreases critical damage by "+getarg(1,0)+"%","Increases ranged physical damage "+getarg(1,0)+"%",
 				"Decreases ranged physical damage "+getarg(1,0)+"%","Increases Healing skills by "+getarg(1,0)+"%","Increases Healing skills by "+getarg(1,0)+"%","Reduces cast time by "+getarg(1,0)+"%","Reduces cast delay by "+getarg(1,0)+"%",
-				"Decreases SP consumption by "+getarg(1,0)+"%","Enchants weapon with Neutral property","Enchants weapon with Water property","Enchants weapon with Earth property","Enchants weapon with Fire property",
+				"Decreases SP consumption by "+getarg(1,0)+"%",
+				"Blank","Blank",
+				"Enchants weapon with Neutral property","Enchants weapon with Water property","Enchants weapon with Earth property","Enchants weapon with Fire property",
 				"Enchants weapon with Wind property","Enchants weapon with Poison property","Enchants weapon with Holy property","Enchants weapon with Shadow property","Enchants weapon with Ghost property",
 				"Enchants weapon with Undead property","Indestructible","Indestructible";
 	return .@RNDOptions$[getarg(0,0)];
