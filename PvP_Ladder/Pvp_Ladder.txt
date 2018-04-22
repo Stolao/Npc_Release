@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.1A
+//= 3.1B
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -38,6 +38,7 @@
 //= 3.18 Removed unnessisary next, creating hang screens
 //= 3.19 Made compatable with new mail command
 //= 3.1A Reformatted Rewards in conf to support 5 items
+//= 3.1B Fixeda Hang when entering Nightmare PVP (thanks klesler)
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
@@ -204,7 +205,8 @@ OnPvpLadder:	//-- Menus
 			.@m = select(implode(.@MapList$,":")) - 1;
 			if(.MapMode[.@m]&2){
 				mes "You are about to enter NIGHTMARE PvP, on death you will lose gear randomly.";
-				if(select("Nevermind:Continue") == 1) close;
+				if(select("Nevermind:Continue") == 1)
+					close;
 			} else	if(.MapMode[.@m]&8 && (countitem(607) || countitem(608))){
 				mes "No "+getitemname(607)+" or "+getitemname(608)+" Allowed.";
 				close;
@@ -217,10 +219,9 @@ OnPvpLadder:	//-- Menus
 			} else if(.MaxPlayers[.@m] && getmapusers(.MapName$[.@m]) >= .MaxPlayers[.@m]){
 				mes "Room is Full.";
 				close;
-			} else {
-				announce "[ PvP Warper ] "+strcharinfo(0)+" has entered in "+((.MapMode[.@m]&1)?"GvG":"PvP")+" Room",0,((.MapMode[.@m]&1)?0x00CC99:0xEE0000);
-				warp .MapName$[.@m],0,0;
 			}
+			announce "[ PvP Warper ] "+strcharinfo(0)+" has entered in "+((.MapMode[.@m]&1)?"GvG":"PvP")+" Room",0,((.MapMode[.@m]&1)?0x00CC99:0xEE0000);
+			warp .MapName$[.@m],0,0;
 	}
 	end;
 
