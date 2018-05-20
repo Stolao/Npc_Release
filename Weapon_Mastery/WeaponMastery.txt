@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 1.36
+//= 1.37
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -33,6 +33,7 @@
 //= 1.34 Made Any Shield Combo Safeguard
 //= 1.35 Made Exp Table a Constant (Dynamic from settings)
 //= 1.36 Fixed typo bug in Leveing up
+//= 1.37 Added F_WM_type to condence script a little
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
@@ -114,6 +115,18 @@ function	script	Mystical_M	{
 	return;
 }
 
+function	script	F_WM_type	{
+	switch(getarg(0,0)){
+		case 3:  	case 6: 	case 7: 	case 8:	
+		case 9:		case 12:	case 2:				return "Onslaught";	Break;
+		case 1: 	case 16:	case 22:			return "Swiftness";	Break;
+		case 4: 	case 5:		default:			return "Safegaurd";	Break;
+		case 11:	case 13:	case 14:	case 17:
+		case 18:	case 19:	case 20:	case 21:	return "Ranged";	Break;
+		case 10:	case 15:	case 23:	case 24:	return "Mystical";	Break;
+	}
+}
+
 prontera,5,5,5	script	PCSTATCALC	111,{
 	end;
 
@@ -124,15 +137,7 @@ OnWeaponInfo:
 			getiteminfo(getequipid(EQI_HAND_L),2) == 4)
 			.@i = 0;
 		else	.@i = getiteminfo(getequipid(EQI_HAND_R),11);
-		switch(.@i){
-			case 3:  	case 6: 	case 7: 	case 8:	
-			case 9:		case 12:	case 2:				.@M$ = "Onslaught";	Break;
-			case 1: 	case 16:	case 22:			.@M$ = "Swiftness";	Break;
-			case 4: 	case 5:		default:			.@M$ = "Safegaurd";	Break;
-			case 11:	case 13:	case 14:	case 17:
-			case 18:	case 19:	case 20:	case 21:	.@M$ = "Ranged";	Break;
-			case 10:	case 15:	case 23:	case 24:	.@M$ = "Mystical";	Break;
-		}
+		.@M$ = callfunc("F_WM_type",.@i);
 	}
 	if(.@M$ == "Onslaught" || .@M$ == "onslaught" || .@M$ == "OnSlaught") .@i = 1;
 	if(.@M$ == "Swiftness" || .@M$ == "swiftness") .@i = 2;
@@ -243,8 +248,7 @@ OnWeaponLevel:
 OnPCStatCalcEvent:
 	if(.Weapon){
 		if(getequipid(EQI_HAND_R) > 500 || (getequipid(EQI_HAND_R) < 500 && .RightFist)){
-			if(getiteminfo(getequipid(EQI_HAND_R),11) == 2 &&
-				getiteminfo(getequipid(EQI_HAND_L),2) == 4)
+			if(getiteminfo(getequipid(EQI_HAND_R),11) == 2 && getiteminfo(getequipid(EQI_HAND_L),2) == 4)
 				.@i = 0;
 			else	.@i = getiteminfo(getequipid(EQI_HAND_R),11);
 			switch(.@i){
@@ -282,15 +286,7 @@ OnNPCKillEvent:
 				getiteminfo(getequipid(EQI_HAND_L),2) == 4)
 				.@i = 0;
 			else	.@i = getiteminfo(getequipid(EQI_HAND_R),11);
-			switch(.@i){
-				case 3:  	case 6: 	case 7: 	case 8:	
-				case 9:		case 12:	case 2:				.@M$ = "Onslaught";	Break;
-				case 1: 	case 16:	case 22:			.@M$ = "Swiftness";	Break;
-				case 4: 	case 5:		default:			.@M$ = "Safegaurd";	Break;
-				case 11:	case 13:	case 14:	case 17:
-				case 18:	case 19:	case 20:	case 21:	.@M$ = "Ranged";	Break;
-				case 10:	case 15:	case 23:	case 24:	.@M$ = "Mystical";	Break;
-			}
+			.@M$ = callfunc("F_WM_type",.@i);
 			.@exp = strmobinfo(3,killedrid);
 			.@wLv = getiteminfo(getequipid(EQI_HAND_R),13);
 			.@master = getd(""+ .@M$ + "Master");
@@ -308,15 +304,7 @@ OnNPCKillEvent:
 			if(getiteminfo(getequipid(EQI_HAND_L),2) == 4)
 				.@i = 0;
 			else	.@i = getiteminfo(getequipid(EQI_HAND_L),11);
-			switch(.@i){
-				case 3:  	case 6: 	case 7: 	case 8:	
-				case 9:		case 12:	case 2: 			.@M$ = "Onslaught";	Break;
-				case 1:		case 16:	case 22:			.@M$ = "Swiftness";	Break;
-				case 4: 	case 5:		default:			.@M$ = "Safegaurd";	Break;
-				case 11:	case 13:	case 14:	case 17:
-				case 18:	case 19:	case 20:	case 21:	.@M$ = "Ranged";	Break;
-				case 10:	case 15:	case 23:	case 24:	.@M$ = "Mystical";	Break;
-			}
+			.@M$ = callfunc("F_WM_type",.@i);
 			.@wLv = getiteminfo(getequipid(EQI_HAND_L),13);
 			.@master = getd(""+ .@M$ + "Master");
 			if(.MaxMastery > .@master){
