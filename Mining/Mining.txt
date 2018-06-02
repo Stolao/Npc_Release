@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 4.4A
+//= 4.4B
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -35,6 +35,7 @@
 //= 4.48 Removed extra {
 //= 4.49 Removed use of 'set'
 //= 4.4A Fixed not collecting later rewards
+//= 4.4B Changed Iron Break Chance from 1200 -> 120
 //===== Extras: ==============================================
 //= db/import/mob_avail.txt
 //= Mining Crystals
@@ -227,7 +228,7 @@ OnMineCoal:
 	end;
 OnMineIron:
 	MiningSpawn(1,2);
-	MiningFunc(10,10,.Pick[0],7,1200,rand(25,70),7049,1000,1002,1000,7049,1000,1002,1000,7049,1000,1002,2000,984,1500,1002,4500,1002,2500,998,5000);
+	MiningFunc(10,10,.Pick[0],7,120,rand(25,70),7049,1000,1002,1000,7049,1000,1002,1000,7049,1000,1002,2000,984,1500,1002,4500,1002,2500,998,5000);
 	end;
 OnMineFire:
 	MiningSpawn(1,3);
