@@ -3,7 +3,7 @@
 //===== By: ================================================== 
 //= Stolao
 //===== Current Version: ===================================== 
-//= 4.48
+//= 4.4A
 //===== Compatible With: ===================================== 
 //= rAthena SVN
 //===== Description: ========================================= 
@@ -33,6 +33,8 @@
 //= 4.46 Tabulation
 //= 4.47 More Tabulation fixes
 //= 4.48 Removed extra {
+//= 4.49 Removed use of 'set'
+//= 4.4A Fixed not collecting later rewards
 //===== Extras: ==============================================
 //= db/import/mob_avail.txt
 //= Mining Crystals
@@ -432,9 +434,9 @@ OnInit:
 	function MiningSpawn {
 	// MiningSpawn(<Amount>,<Tier>{,<Location>})
 		freeloop(1);
-		for(set .@i,getarg(0,1); .@i > 0; set .@i,.@i-1){
-			set .@lv,getarg(1,rand(0,6));
-			set .@s,getarg(2,rand(getarraysize(getd(".Tier"+ .@lv +"_M$"))));
+		for(.@i = getarg(0,1); .@i > 0; .@i--){
+			.@lv = getarg(1,rand(0,6));
+			.@s = getarg(2,rand(getarraysize(getd(".Tier"+ .@lv +"_M$"))));
 			if(getd(".Tier"+.@lv+"_X1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_X2["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y1["+.@s+"]") < 0 || getd(".Tier"+.@lv+"_Y2["+.@s+"]") < 0)
 				monster getd(".Tier"+.@lv+"_M$["+.@s+"]"),0,0,getd(".Tier"+.@lv+"_N$["+.@s+"]")+" Deposit",rand(.MobIds[0],.MobIds[1]) + 2*.@lv,1,"Mining::"+(getd(".Tier"+.@lv+"_T$["+.@s+"]"))+"";
 			else	areamonster getd(".Tier"+.@lv+"_M$["+.@s+"]"),getd(".Tier"+.@lv+"_X1["+.@s+"]"),getd(".Tier"+.@lv+"_Y1["+.@s+"]"),getd(".Tier"+.@lv+"_X2["+.@s+"]"),getd(".Tier"+.@lv+"_Y2["+.@s+"]"),getd(".Tier"+.@lv+"_N$["+.@s+"]")+" Deposit",rand(.MobIds[0],.MobIds[1]) + 2*.@lv,1,"Mining::"+(getd(".Tier"+.@lv+"_T$["+.@s+"]"))+"";
@@ -445,7 +447,7 @@ OnInit:
 
 	function MiningFunc {
 	//calfunc "MiningFunc",<MinBaseLevel>,<MinMineLvl>,<Min Pick>,<Break Chance>,<Damage Chance>,<Exp>,<ItemID1>,<Get Chance1>{,<ItemID2>,<Get Chance2>.....,<ItemID10>,<Get Chance10>};
-		set .@T, getequipid(EQI_HAND_R);
+		.@T = getequipid(EQI_HAND_R);
 		if(.@T < 1){
 			message strcharinfo(0),"[Mining]: "+strcharinfo(0)+" your hand looks as though it could break...";
 			percentheal -15,-15;	heal -5,0;	end;
@@ -485,20 +487,21 @@ OnInit:
 			failedrefitem EQI_HAND_R;
 			end;
 		} else {
-			
-			for(set .@i,6; .@i < getargcount() - 6 && !.@C; set .@i, .@i + 2 ){
-				if(getarg(.@i + 1,0) + MineMaster * (.@i - 5) / 7 > rand(10000))
-					getitem getarg(.@i,7049),1;	set .@C,1;
+			for(.@i = 6; .@i < getargcount() && !.@C; .@i += 2 ){
+				if(getarg(.@i + 1,0) + MineMaster * (.@i - 5) / 7 > rand(10000)){
+					getitem getarg(.@i,7049),1;
+					.@C = 1;
+				}
 			}
 			if(!.@C){
 				message strcharinfo(0),"[Mining]: "+strcharinfo(0)+" you failed to harvest anything.";
 				end;
 			} else if(MineMaster != .MinelvlMax){
-				set .@expneed,MineMaster*(MineMaster*.expcurve)+10+MineMaster;
-				set MineExp,MineExp+getarg(5,1);
+				.@expneed = MineMaster*(MineMaster*.expcurve)+10+MineMaster;
+				MineExp += getarg(5,1);
 				if(MineExp > .@expneed && MineMaster < .MinelvlMax){
-					set MineMaster,MineMaster+1;
-					set MineExp,0;
+					MineMaster++;
+					MineExp = 0;
 					announce "[Mining]: Level has advanced to Lv "+MineMaster+"!",bc_blue|bc_self;
 					specialeffect2 371;
 				} else	message strcharinfo(0),"[Mining]: "+getarg(5,1)+" Exp Gained "+MineExp+"/"+(.@expneed+1)+" untill Lv "+(MineMaster+1)+"";
@@ -508,11 +511,3 @@ OnInit:
 	end;
 	}
 }
-
-
-
-
-
-
-
-
