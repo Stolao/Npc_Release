@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.1B
+//= 3.1C
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -39,6 +39,7 @@
 //= 3.19 Made compatable with new mail command
 //= 3.1A Reformatted Rewards in conf to support 5 items
 //= 3.1B Fixeda Hang when entering Nightmare PVP (thanks klesler)
+//= 3.1C Cied incorrrect use of close
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
@@ -187,7 +188,7 @@ OnPvpLadder:	//-- Menus
 					cleararray $Guild_Deaths[0],0,getarraysize($Guild_Deaths);
 					break;
 			}
-			close;
+			end;
 
 		case 1:	//===== Dont Touch - Menu Generation ======================
 			for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
