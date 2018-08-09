@@ -3,7 +3,7 @@
 //===== Author ===============================================
 //= Stolao
 //===== Current Version: =====================================
-//= 3.1F
+//= 3.21
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
@@ -43,6 +43,8 @@
 //= 3.1D Fixed Missing Party Check (thanks Haikenz)
 //= 3.1E Fixed Not opening PVP ladder, only GVG ladder (thanks Haikenz)
 //= 3.1F Fixed a warning when generating waitingroom
+//= 3.20 Fixed Missing Guild Check (thanks Haikenz)
+//= 3.21 Changed Default maps to pvp maps
 //===== Todo: ================================================
 //= Condence repeat queries
 //===== Contact Ifo: =========================================
@@ -226,6 +228,9 @@ OnPvpLadder:	//-- Menus
 			} else	if(.MapMode[.@m]&4 && getcharid(1) <= 0 ){
 				mes "You must be in a Party to join.";
 				close;
+			} else	if(.MapMode[.@m]&1 && getcharid(2) <= 0 ){
+				mes "You must be in a Guild to join.";
+				close;
 			}
 			announce "[ PvP Warper ] "+strcharinfo(0)+" has entered in "+((.MapMode[.@m]&1)?"GvG":"PvP")+" Room",0,((.MapMode[.@m]&1)?0x00CC99:0xEE0000);
 			warp .MapName$[.@m],0,0;
@@ -400,7 +405,7 @@ OnInit:		//-- Config
 	.MaxRank = 10;
 
 	// Map Names
-	setarray .MapName$,"guild_vs1","guild_vs2","guild_vs3","guild_vs4","guild_vs5";
+	setarray .MapName$,"pvp_n_1-2","pvp_n_1-1","pvp_n_1-4","pvp_n_1-3","pvp_n_1-5";
 
 	// Pvp Mode
 	// Modes are Addative
