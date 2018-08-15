@@ -143,4 +143,3 @@
 		slotCount = 0,
 		ClassNum = 0
 	},
-*/
