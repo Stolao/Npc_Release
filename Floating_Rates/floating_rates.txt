@@ -51,7 +51,7 @@ OnMinute30:
 	end;
 
 OnInit:
-	bindatcmd("setrates","floating_rate::OnSetRate",0,99);
+	bindatcmd("setrates","floating_rate::OnSetRate",99,99);
 
 	// Multiplier Per Player and .Random
 	// Each point is .01x Increase in exp rates
