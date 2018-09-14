@@ -190,27 +190,49 @@ OnMenu:		//-- Click Menus
 					}
 					break;
 				case 2:
+					deletearray .@menu$, getarraysize(.@menu$);
+					.@itemperpage = 24;
+					.@itemsize = getarraysize($EVENT_CONTROL);
+					.@maxpage = .@itemsize / .@itemperpage + (.@itemsize % .@itemperpage > 0);
+					.@i = 0;
+					while ( .@i < .@maxpage ) {
+						.@menu$[.@i] = (.@i) ? "Previous Page:" : ":";
+						.@j = 1;
+						while (.@j < .@itemperpage +1) {
+							.@itemname$[.@k] = .Days$[.@k/24]+" - "+Func_Add_Time(.@k%24)+" ~ "+.ColorName$[$EVENT_CONTROL[.@k]];
+							.@menu$[.@i] = .@menu$[.@i] + .@itemname$[.@k]+":";
+							.@j++;
+							.@k++;
+						}
+						.@menu$[.@i] = .@menu$[.@i] +((.@i < .@maxpage -1)? "Next Page" : "");
+						.@i++;
+					}
 					next;
 					mes "[ Remove Event ]";
-					mes "Which Event?";
-					.@menu$ = "";
-					for(.@i = .@e = 0; .@i < 168; .@i++){
-						if($EVENT_CONTROL[.@i]){
-							.@menu$ = .@menu$ + .Days$[ .@i / 24 ] +" - "+ Func_Add_Time( .@i % 24 ) +" ~ "+ .ColorName$[ $EVENT_CONTROL[ .@i ] ]+":";
-							.@e += 1;
-						} else	.@menu$ = .@menu$ + ":";
-					}
-					if(!.@e){
+					if (!.@itemsize) {
 						mes "No Events Setup.";
 						close;
 					}
-					.@D = select(.@menu$) - 1;
+					mes "Which Event?";
+					next;
+					while (1) {
+						.@pick = select( .@menu$[ .@currentpage ] ) -1;
+						if ( !.@pick )
+							.@currentpage--;
+						else if ( .@pick == .@itemperpage +1 )
+							.@currentpage++;
+						else
+							break;
+					}
+					.@D =  .@currentpage * .@itemperpage + .@pick -1;
 					next;
 					mes "[ Remove Event ]";
-					mes "Are you sure you want to add the "+ .ColorName$[.@D] +",";
-					mes "for ^0055FF"+ .Days$[.@D % 168 / 24] +" ~ "+ Func_Add_Time(.@D % 168 / 24) +"^000000?";
+					mes "Are you sure you want to remove "+
+						"^0055FF"+ .Days$[.@D % 168 / 24] +" - "+ Func_Add_Time(.@D % 168 / 24) +"^000000 ~ "+.ColorName$[ $EVENT_CONTROL[.@D%168]]+" ?";
 					.@A = (select(" ~ ^FF0000Remove event...^000000: ~ ^777777Cancel^000000"));
-					if(.@A == 2){
+					clear;
+					mes "[ Remove Event ]";
+					if(.@A == 2) {
 						mes "Cancelled.";
 					} else {
 						$EVENT_CONTROL[.@D] = 0;
