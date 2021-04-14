@@ -3,51 +3,42 @@
 //===== By: ==================================================
 //= Stolao
 //===== Current Version: =====================================
-//= 2.5A
+//= 2.63
 //===== Compatible With: =====================================
 //= rAthena SVN
 //===== Description: =========================================
 //= Auto Event
 //===== Comments: ============================================
 //= [Stolao]
-//	db/import/instance_db.txt
-//	30,Emp Breaker,900,300,sword_1-1,215,206
+// Instance.yml
+//  - Id: 44
+//    Name: Emp Breaker
+//    TimeLimit: 900
+//    Enter:
+//      Map: sword_1-1
+//      X: 215
+//      Y: 206
 //
 //	src/map/chat.h
 //	#define MAX_CHAT_USERS 20
 //		Increase as needed for your server size
 //
 //===== To Do: ===============================================
+//= No Range MF
+//= No Arealoot
+//= No Cost MF
 //= Make Rewards Editable in game
 //= Add A Vote4Event(ingame) Feature
 //= Add Events; Invasion, X-O Event, MVP Arena,
-//=	Dead Branch, Wiki, Jumper, Fast Type, Safetywall
+//=	Dead Branch, Safetywall
 //= Add Other Requested Events
 //= Fix Manually Removing Events Overflow Error (not game breaking)
+//= Guess monster based of what it says event
+//= Emp Defender
+//= Find Stolao
+//= DDR
+//= Tower Defence
 //===== Additional Comments: =================================
-//= 2.38 Added No_Trade flag to bomring and poring events
-//= 2.39 Added Find th Baphomet
-//= 2.3A Added Grab the Candy!
-//= 2.3B Added Monsters Counting (requires the server to be compiled with regular expressions library enabled)
-//= 2.3C Combined OnPCLogout Events
-//= 2.3D Added Disgusie Event
-//= 2.3E Replaced 'strnpcinfo()' type 0 and 1 with type 3
-//= 2.3F Removed dependencey on regular expressions library for Disguise and Coutning
-//= 2.40 Fixed Poring Event setting mapflags non-dynamic map
-//= 2.41 Added Fabre Event
-//= 2.42 Fixed Emp Event Failing to annouce not enough players
-//= 2.43 Fixed Zombie Failing to start due to negative index
-//= 2.44 Added Devil Square
-//= 2.45 Certain mapflags no loger removed on events end
-//= 2.46 Warp Players to Save instead of Prontera
-//= 2.47 Made default time for emp event ~23 Days
-//= 2.48 Added a player death check to zombie event
-//= 2.49 Fixed a loop issue in PVP
-//= 2.4A Players warp to prontera instead of save, apperenetly map warp doesnt support "Save"
-//= 2.4B Fixed Lucky Pick
-//= 2.4C Fixed a missing "" in maze event
-//= 2.4D Added a check so Mushroom Event will always have at least 1 mushroom
-//= 2.4E Fixed incorrect map index for Mushroom and Bapho events
 //= 2.4F Fixed incorrect event index for Mushroom and Bapho events
 //= 2.50 Added a Gm diplay count for mob counting event if Testmode is enabled
 //= 2.51 Removed map warp from counting event
@@ -60,16 +51,48 @@
 //= 2.58 Fixed incorrect mapindex for disguise event
 //= 2.59 Devil Square now rewards all players once last chest is killed
 //= 2.5A Fabre event now propery kills monsters at end
+//= 2.5B Replace all Announce with announce, for consistancy
+//= 2.5C Added testmode command
+//= 2.5D Added Player Count to Event Announcement
+//= 2.5E Fixed a few events not giving prizes
+//= 2.5F Fixed a bunch of stuff on Stream, Vod: https://youtu.be/EM2t_HqHlkc
+//= 2.60 Fixed a missing song
+//= 2.61 Added more songs
+//= 2.62 Removed Custom Mapflags for release
+//= 2.63 Removed Discord intigration for release
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
 //============================================================
 
-prontera,164,171,4	script	Event Information	835,{
+//==================================
+//-- Reward Function
+//==================================
 
+function	script	Func_Prizes	{
+	announce "Congrats "+strcharinfo(0,getarg(0))+", a winner in the "+getarg(1)+" Event, check your mail for your reward.",bc_all|bc_blue;
+	if(!getattachedrid())
+		attachrid(getcharid(3,strcharinfo(0,getarg(0))),1);
+	
+	WonEvents++;
+	MWonEvents++;
+	if($@Mail){
+		mail getarg(0), "no-reply", getarg(1), "Congratulations!% You have won in the "+getarg(1)+" % % % [ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
+		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
+	} else {
+		getitem $@RewardID,$@RewardQNT;
+		zeny += $@RewardZeny;
+	}
+	return;
+}
+
+//==================================
+//-- Core Script
+//==================================
+
+prontera,164,171,4	script	Event Information	835,{
 	function Func_Countdown;
 	function Func_Add_Time;
-	function Func_Prizes;
 	freeloop(1);
 
 //==================================
@@ -78,13 +101,21 @@ prontera,164,171,4	script	Event Information	835,{
 
 	if($@CurrentEvent == -14){
 		if(getgmlevel() >= .GMAccess && .TestMode)
-			dispbottom .MobCount[.@Target]+"";
-		input .@i;
-		if(.@i == .MobCount[.@Target])
-			doevent strnpcinfo(3)+"::OnRight";
+			dispbottom .MobCount[.Target]+"";
+		input .@answer;
+		if(.@answer == .MobCount[.Target])
+			doevent strnpcinfo(3)+"::OnRightCount";
 		else	doevent strnpcinfo(3)+"::OnSpam";
 		end;
-	}
+	} else if($@CurrentEvent == -18){
+		if(getgmlevel() >= .GMAccess && .SongID)
+			dispbottom .SongName$[.SongID];
+		input .@answer$;
+		if(.@answer$ == .SongName$[.SongID])
+			doevent strnpcinfo(3)+"::OnRightSong";
+		else	doevent strnpcinfo(3)+"::OnSpam";
+		end;
+	} 
 
 //==================================
 OnMenu:		//-- Click Menus
@@ -229,9 +260,11 @@ OnMenu:		//-- Click Menus
 OnJoinEvent:	//-- Join Event
 //==================================
 
-	if($@CurrentEvent < 1)
+	if($@CurrentEvent < 1){
 		mes "[ Event Management ]","Sorry no event is running.";
-	else {
+		close;
+	} else {
+		.@c = checkhomcall();
 		mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Want to join the "+ .ColorName$[$@CurrentEvent] +"?";
 		if($@CurrentEvent == 2)
 			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Must be a Novice Level 10/10 or lower.";
@@ -243,24 +276,90 @@ OnJoinEvent:	//-- Join Event
 			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","Sorry you must be a Novice Level 10/10 or lower.";
 		else if($@CurrentEvent < 1)
 			mes "[ Event Management ]","Sorry event closed before you hit yes.";
+		else if(.@c != 1 && .@c != -1 && ($@CurrentEvent == 2 || $@CurrentEvent == 6 || $@CurrentEvent == 9 || $@CurrentEvent == 16))
+			mes "[ "+ .EventName$[$@CurrentEvent] +" ]","No homunculus allowed, put it away before joining.";
 		else {
-			if($@CurrentEvent == 5 || $@CurrentEvent == 6 || $@CurrentEvent == 7 || $@CurrentEvent == 13){
-				setmadogear 0;
-				setdragon 0;
-				if (checkwug())
-					setoption Option_Wugrider,0;
-				if(ismounting())
-					setmounting;
-				setriding 0;
-				setfalcon 0;
-				setcart 0;
+			if($@CurrentEvent >= 5 && $@CurrentEvent <= 9){
+				if(checkmadogear()){
+					if(checkweight(33017,1)){
+						getitem 33017,1;
+						setmadogear 0;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you're in a Mado Gear and cant seem to carry a voucher, either remove the Mado Gear or come back when you can hold the voucher.";
+						close;
+					}
+				}
+				if(checkdragon()){
+					if(checkweight(33018,1)){
+						getitem 33018,1;
+						setdragon 0;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you're on a Dragon and can't seem to carry a voucher, either remove you're Dragon or come back when you can hold the voucher.";
+						close;
+					}
+				}			
+				if(checkwug()){
+					if(checkweight(33019,1)){
+						getitem 33019,1;
+						setoption Option_Wugrider,0;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you're on a Wug and can't seem to carry a voucher, either remove you're Wug or come back when you can hold the voucher.";
+						close;
+					}
+				}
+				if(ismounting()){
+					if(checkweight(33020,1)){
+						getitem 33020,1;
+						setmounting;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you're mounted and can't seem to carry a voucher, either remove you're mount or come back when you can hold the voucher.";
+						close;
+					}
+				}
+				if(checkriding()){
+					if(checkweight(33021,1)){
+						getitem 33021,1;
+						setriding 0;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you're mounted and can't seem to carry a voucher, either remove you're mount or come back when you can hold the voucher.";
+						close;
+					}
+				}
+				if(checkfalcon()){
+					if(checkweight(33022,1)){
+						getitem 33022,1;
+						setfalcon 0;
+					} else {
+						next;
+						mes "[ Event Management ]","Seems you have  a falcon and can't seem to carry a voucher, either remove you're falcon or come back when you can hold the voucher.";
+						close;
+					}
+				}
+				if(geteleminfo(1) > 0)
+					unitkill geteleminfo(1);
 				callfunc("dispell");
 			} else if($@CurrentEvent == 2)
 				callfunc("dispell");
+			.register_aid[ .register_count ] = getcharid(3);
+			.register_count++;
 			if($@CurrentEvent == 13){
-				.register_aid[ .register_count ] = getcharid(3);
-				.register_count++;
 				delitem .candy_id, countitem( .candy_id );
+				delitem .apple_id, countitem( .apple_id );
+			}
+			if($@CurrentEvent == 13 && checkcart()){
+				if(checkweight(33023,1)){
+					getitem 33023,1;
+					setcart 0;
+				} else {
+					next;
+					mes "[ Event Management ]","Seems you have cart and can't seem to carry a voucher, either remove you're cart or come back when you can hold the voucher.";
+					close;
+				}	
 			}
 			fabre = 0;
 			warp .EnterMap$[$@CurrentEvent],.EnterX[$@CurrentEvent],.EnterY[$@CurrentEvent];
@@ -381,14 +480,25 @@ OnEndEvent:	//-- End Event
 			mapwarp .EnterMap$[$@CurrentEvent],"prontera",155,172;
 		case 1:	case 8:	case 7:
 			break;
+		case 2:	case 6:	case 9:
+		case 16:	case 17:
+			killmonsterall .EnterMap$[$@CurrentEvent];
+			mapwarp .EnterMap$[$@CurrentEvent],"prontera",155,172;
+			break;
 		case 11:
 			killmonster .Map$[11],strnpcinfo(3)+"::OnShroomKilled";
+			mapwarp .EnterMap$[$@CurrentEvent],"prontera",155,172;
+			break;
+		case 12:
+			killmonster .Map$[11],strnpcinfo(3)+"::OnBaphoKilled";
+			mapwarp .EnterMap$[$@CurrentEvent],"prontera",155,172;
 			break;
 		case 14:
 			killmonster .Map$[14],strnpcinfo(3)+"::OnKilled";
+			mapwarp .EnterMap$[$@CurrentEvent],"prontera",155,172;
 			break;
 	}
-	Announce "Sorry a GM has stopped the "+ .EventName$[$@CurrentEvent] +".",bc_all|bc_blue;
+	announce "Sorry a GM has stopped the "+ .EventName$[$@CurrentEvent] +".",bc_all|bc_blue;
 	$@CurrentEvent = 0;
 	delwaitingroom;
 	end;
@@ -404,7 +514,9 @@ OnRunEvent:	//-- GM Run
 	else {
 		mes "[ Event Management ]","Pick an Event.";
 		.@i = select(implode(.ColorName$,": ~ ") +":Bug Test") - 1;
-	} 
+	}
+	deletearray .register_aid;
+	.register_count = 0;
 	switch(.@i){
 		case 0:							break;
 		case 1: donpcevent strnpcinfo(3)+"::OnEmpStart";	break;
@@ -424,11 +536,37 @@ OnRunEvent:	//-- GM Run
 		case 15: donpcevent strnpcinfo(3)+"::OnDisguiseStart";	break;
 		case 16: donpcevent strnpcinfo(3)+"::OnFabreStart";	break;
 		case 17: donpcevent strnpcinfo(3)+"::OnDevilStart";	break;
-
-
+		case 18: donpcevent strnpcinfo(3)+"::OnSongStart";	break;
 		default: Func_Prizes(getcharid(0),"Bug Test");		break;
 	}
 	close;
+
+//==================================
+OnTestMode:	// Enable / Disable Testmode
+//==================================
+
+	if(.@atcmd_numparameters){
+		if(.@atcmd_parameters$ == "1" || .@atcmd_parameters$ == "On" || .@atcmd_parameters$ == "Enable" || .@atcmd_parameters$ == "on" || .@atcmd_parameters$ == "enable"){
+			if(.TestMode)
+				announce "[Auto Events]: Debug Mode Already Enabled.",bc_self|bc_blue;
+			else	announce "[Auto Events]: Debug Mode Enabled.",bc_self|bc_blue;
+			.TestMode = 1;
+		} else if(.@atcmd_parameters$ == "0" || .@atcmd_parameters$ == "Off" || .@atcmd_parameters$ == "Disable" || .@atcmd_parameters$ == "off" || .@atcmd_parameters$ == "disable"){
+			if(.TestMode)
+				announce "[Auto Events]: Debug Mode Disabled.",bc_self|bc_blue;
+			else	announce "[Auto Events]: Debug Mode Already Disabled.",bc_self|bc_blue;
+			.TestMode = 0;
+		} else	announce "[Auto Events]: Test Mode may be enabled with, 1 | On | Enable or disabled with 0 | Off | Disable.",bc_self|bc_blue;
+	} else {
+		if(.TestMode){
+			announce "[Auto Events]: Debug Mode Disabled.",bc_self|bc_blue;
+			.TestMode = 0;
+		} else {
+			announce "[Auto Events]: Debug Mode Enabled.",bc_self|bc_blue;
+			.TestMode = 1;
+		}
+	}
+	end;
 
 //==================================
 		//-- Functions
@@ -441,26 +579,17 @@ function Func_Add_Time {
 function Func_Countdown {
 	for(.@i = 5; .@i > 0; .@i--){
 		announce .EventName$[$@CurrentEvent]+" will begin in "+ callfunc("F_InsertPlural",.@i,"minute") +"!",bc_all|bc_blue;
-		Announce "Please type @joinevent to join",bc_all|bc_blue;
+		if(.MinPlayers[$@CurrentEvent] > 1){
+			if($@CurrentEvent == 1 || $@CurrentEvent == 8){
+				getwaitingroomusers strnpcinfo(3);
+				announce "Please type @joinevent to join, "+.@waitingroom_usercount+"/"+.MinPlayers[$@CurrentEvent]+" players have joined.",bc_all|bc_blue;
+			} else	announce "Please type @joinevent to join, "+getmapusers(.EnterMap$[$@CurrentEvent])+"/"+.MinPlayers[$@CurrentEvent]+" players have joined.",bc_all|bc_blue;
+		} else	announce "Please type @joinevent to join.",bc_all|bc_blue;
 		if(.TestMode)
 			sleep 6000;
 		else	sleep 60000;
 	}
-	Announce .EventName$[$@CurrentEvent] +" Has Begun!",bc_all|bc_blue;
-	return;
-}
-
-function Func_Prizes {
-	announce "Congrats "+strcharinfo(0,getarg(0))+", a winner in the "+getarg(1)+" Event.",bc_all|bc_blue;
-	WonEvents++;
-	MWonEvents++;
-	if($@Mail){
-		mail getarg(0), "no-reply", getarg(1), "Congratulations!% You have won in the "+getarg(1)+" % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
-		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-	} else {
-		getitem $@RewardID,$@RewardQNT;
-		zeny += $@RewardZeny;
-	}
+	announce .EventName$[$@CurrentEvent] +" Has Begun!",bc_all|bc_blue;
 	return;
 }
 
@@ -473,6 +602,8 @@ OnMinute00:	//- Start Events
 	if(agitcheck() || agitcheck2() || $@CurrentEvent) end;
 	sleep .StartTime * 60000 + 1000;
 	.@Time = gettime(4) * 24 + gettime(3);
+	deletearray .register_aid;
+	.register_count = 0;
 	switch($EVENT_CONTROL[.@Time]){
 		default:						break;
 		case 1: donpcevent strnpcinfo(3)+"::OnEmpStart";	break;
@@ -492,6 +623,7 @@ OnMinute00:	//- Start Events
 		case 15: donpcevent strnpcinfo(3)+"::OnDisguiseStart";	break;
 		case 16: donpcevent strnpcinfo(3)+"::OnFabreStart";	break;
 		case 17: donpcevent strnpcinfo(3)+"::OnDevilStart";	break;
+		case 18: donpcevent strnpcinfo(3)+"::OnSongStart";	break;
 	}
 	end;
 
@@ -511,19 +643,22 @@ OnEmpStart:	//-- Emperium Event
 		for(.@i = 0; .@i < .@waitingroom_usercount; .@i++){
 			attachrid(.@waitingroom_users[.@i]);
 			callfunc("dispell");
-			if(instance_id())
-				instance_destroy;
+			if(instance_id(IM_CHAR))
+				instance_destroy(IM_CHAR);
 			instance_create("Emp Breaker",IM_CHAR);
-			instance_enter("Emp Breaker");
+			instance_enter("Emp Breaker",215,206,getcharid(0),instance_id(IM_CHAR));
 		}
 		freeloop(0);
 		delwaitingroom;
-		sleep 905000;	// 15 mins should be enough?
+		if(.TestMode)
+			sleep 60000;
+		else
+			sleep 10000;
 	} else {
 		delwaitingroom;
 		announce .EventName$[1]+" Stopped! Not Enough Players Joined the "+.EventName$[1]+"!",bc_blue|bc_area|bc_npc;
 	}
-	if($@BestCid && $@CurrentEvent == -1)
+	if($@BestCid)
 		Func_Prizes($@BestCid,.EventName$[1]);
 	$@CurrentEvent = 0;
 	end;
@@ -585,13 +720,14 @@ OnDiceStart:	//-- Dice Event
 
 	mapwarp .EnterMap$[3],"prontera",155,172;
 	$@CurrentEvent = 3;
+	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+		setmapflag .EnterMap$[5], .bombflag[.@i];
 	Func_Countdown;
 	$@CurrentEvent = -3;
 	if(getmapusers(.EnterMap$[3]) < .MinPlayers[3]){
 		mapannounce .EnterMap$[3],"Event Stopped! Not Enough Players Joined the "+.EventName$[3]+"!",bc_blue;
 		mapwarp .EnterMap$[3],"prontera",155,172;
 		$@CurrentEvent = 0;
-		end;
 	} else {
 		mapannounce .EnterMap$[3],"Ok the rules of "+.EventName$[3]+" are as follows",bc_blue;
 		sleep 5000;
@@ -619,18 +755,25 @@ OnDiceStart:	//-- Dice Event
 				sleep 1000;
 			}
 			.@i = rand(1,4);
+			$DiceCount[.@i]++;
 			mapannounce .EnterMap$[3],"0... Good Bye Box "+.@i,bc_blue;
 			switch(.@i){
-				case 1:	areawarp .EnterMap$[3],183,81,191,59,"prontera",155,172;	break;
-				case 2:	areawarp .EnterMap$[3],195,81,203,59,"prontera",155,172;	break;
-				case 3:	areawarp .EnterMap$[3],207,81,215,59,"prontera",155,172;	break;
-				case 4:	areawarp .EnterMap$[3],219,81,227,59,"prontera",155,172;	break;
+				case 1:	areawarp .EnterMap$[3],183,81,191,58,"prontera",155,172;	break;
+				case 2:	areawarp .EnterMap$[3],192,81,203,58,"prontera",155,172;	break;
+				case 3:	areawarp .EnterMap$[3],204,81,215,58,"prontera",155,172;	break;
+				case 4:	areawarp .EnterMap$[3],216,81,227,58,"prontera",155,172;	break;
 			}
+			areawarp .EnterMap$[3],0,0,183,400,"prontera",155,172;
+			areawarp .EnterMap$[3],0,82,400,400,"prontera",155,172;
+			areawarp .EnterMap$[3],0,58,400,0,"prontera",155,172;
+			areawarp .EnterMap$[3],227,0,400,400,"prontera",155,172;
+/*
 			areawarp .EnterMap$[3],182,94,228,88,"prontera",155,172;	//Upper Area
 			areawarp .EnterMap$[3],185,87,188,82,"prontera",155,172;	//Stairs 1
 			areawarp .EnterMap$[3],197,87,200,82,"prontera",155,172;	//Stairs 2
 			areawarp .EnterMap$[3],209,87,212,82,"prontera",155,172;	//Stairs 3
 			areawarp .EnterMap$[3],221,87,224,82,"prontera",155,172;	//Stairs 4
+*/
 			if(getmapusers(.EnterMap$[3]) <= 1){
 				.@1234 += 100;
 			} else {
@@ -646,13 +789,16 @@ OnDiceStart:	//-- Dice Event
 		}
 		$@CurrentEvent = 0;
 		mapwarp .EnterMap$[3],"prontera",155,172;
-		end;
 	}
+	for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag .EnterMap$[5], .bombflag[.@i];
+	end;
 
 //==================================
 OnPvPStart:	//-- PvP Event
 //==================================
 
+	killmonster .EnterMap$[4],"All";
 	mapwarp .EnterMap$[4],"prontera",155,172;
 	pvpoff .EnterMap$[4];
 	$@CurrentEvent = 4;
@@ -739,6 +885,7 @@ OnMazeStart:	//-- Maze Event
 OnPoringStart:	//-- Poring Event
 //==================================
 
+	killmonsterall .EnterMap$[6];
 	mapwarp .EnterMap$[6],"prontera",155,172;
 	$@CurrentEvent = 6;
 	pvpoff .EnterMap$[6];
@@ -749,6 +896,7 @@ OnPoringStart:	//-- Poring Event
 	if(getmapusers(.EnterMap$[6]) < .MinPlayers[6]){
 		mapannounce .EnterMap$[6],"Event Stopped! Not Enough Players Joined the "+.EventName$[6]+"!",bc_blue;
 	} else {
+		killmonsterall .EnterMap$[6];
 		mapannounce .EnterMap$[6],"Rules are simple",bc_blue;
 		sleep 3000;
 		mapannounce .EnterMap$[6],"Kill the 'Poring' with the correct name, and get a warped to town with a prize.",bc_blue;
@@ -763,20 +911,19 @@ OnPoringStart:	//-- Poring Event
 		monster .EnterMap$[6],0,0,"--ja--",1725,.PoringSpawn,strnpcinfo(3)+"::OnKillRight";
 		.PoringSpawn = 2;
  		for(.@poring = 30; .@poring > 0; .@poring--){
-			if(getmapusers(.EnterMap$[6]) < 1) .@poring = 0;
+			if(getmapusers(.EnterMap$[6]) < 1)
+				.@poring = 0;
 			mapannounce .EnterMap$[6],callfunc("F_InsertPlural",.@poring,"Minute")+" Remaining.",bc_blue;
 			sleep 60000;
 		}
 	}
-	if(!.PoringLeft){
-		mapannounce .EnterMap$[6],"Time Is up",bc_blue;
-		killmonsterall .EnterMap$[6];
-		for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
-			removemapflag .EnterMap$[6], .bombflag[.@i];
-		$@CurrentEvent = 0;
-		sleep 5000;
-		mapwarp .EnterMap$[6],"prontera",155,172;
-	}
+	mapannounce .EnterMap$[6],"Time Is up",bc_blue;
+	killmonsterall .EnterMap$[6];
+	for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag .EnterMap$[6], .bombflag[.@i];
+	$@CurrentEvent = 0;
+	sleep 5000;
+	mapwarp .EnterMap$[6],"prontera",155,172;
 	end;
 
 OnKillWrong:
@@ -786,9 +933,8 @@ OnKillWrong:
 
 OnKillRight:
 	Func_Prizes(getcharid(0),.EventName$[6]);
-	warp "prontera",155,172;
-	.PoringLeft--;
-	if(!.PoringLeft){
+	.PoringSpawn -= 1;
+	if(.PoringSpawn < 1){
 		mapannounce .EnterMap$[6],"Time Is up",bc_blue;
 		killmonsterall .EnterMap$[6];
 		for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
@@ -796,7 +942,9 @@ OnKillRight:
 		$@CurrentEvent = 0;
 		sleep 5000;
 		mapwarp .EnterMap$[6],"prontera",155,172;
+		end;
 	}
+	warp "prontera",155,172;
 	end;
 
 //==================================
@@ -825,6 +973,8 @@ OnBombStart:	//-- Bombring Event
 
 	mapwarp .EnterMap$[9],"prontera",155,172;
 	$@CurrentEvent = 9;
+	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+		setmapflag .EnterMap$[9], .bombflag[.@i];
 	Func_Countdown;
 	$@CurrentEvent = -9;
 	.@totalplayers = getmapusers(.EnterMap$[9]);
@@ -832,8 +982,6 @@ OnBombStart:	//-- Bombring Event
 		mapannounce .EnterMap$[9],"Event Stopped! Not Enough Players Joined the "+.EventName$[9]+"!",bc_blue;
 		mapwarp .EnterMap$[9],"prontera",155,172;
 	} else {
-		for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
-			setmapflag .EnterMap$[9], .bombflag[.@i];
 		mapannounce .EnterMap$[9],"Okay listen up, this is how it works.",bc_blue;
 		sleep 2000;
 		mapannounce .EnterMap$[9],"Bombrings will run rampant in this area.",bc_blue;
@@ -858,14 +1006,15 @@ OnBombStart:	//-- Bombring Event
 			else	sleep 1500 * .Bombwaves / .@wave;
 		}
 		sleep 10000;
-		if(getmapusers(.EnterMap$[9])){
+		if(getmapusers(.EnterMap$[9]) > 0){
 			addrid(5,0,.EnterMap$[9]);
 			if(HP > 0 && strcharinfo(3) == .EnterMap$[9])
 				Func_Prizes(getcharid(0),.EventName$[9]);
 		}
-		for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
-			removemapflag .EnterMap$[9], .bombflag[.@i];
+		sleep 100;
 	}
+	for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag .EnterMap$[9], .bombflag[.@i];
 	$@CurrentEvent = 0;
 	mapwarp .EnterMap$[9],"prontera",155,172;
 	end;
@@ -888,28 +1037,35 @@ OnHuntStart:	//-- Man Hunt Event
 		mapannounce .EnterMap$[10],"But if the target surivived, the target will gain the prize",bc_blue;
 		sleep 5000;
 		mapannounce .EnterMap$[10],"Man-Hunt Event start!",bc_blue;
-		for(.@round = 1; .@round <= 10; .@round++){
+		for(.@round = 1; .@round <= 5; .@round++){
 			if(getmapusers(.EnterMap$[10]) < 3){
 				mapannounce .EnterMap$[10],"Sorry there are no longer enough players for another round",bc_blue;
 			} else {
-				if(.@round < 10)
-				mapannounce .EnterMap$[10],"Next Round will begin in 10 seconds!",bc_blue;
-				deletearray .@AID[0],getarraysize(.@AID);
-				addrid(5,0,.EnterMap$[10]);
-				.@AID[getarraysize(.@AID)] = getcharid(3);
-				$@Target = rand(getarraysize(.@AID));
+				if(.@round < 5)
+					mapannounce .EnterMap$[10],"Next Round will begin in 10 seconds!",bc_blue;
+				for(.@i = 0; .@i < 10; .@i++){
+					if($@LastTarget == $@Target)
+						$@Target = .register_aid[rand(.register_count)];
+					else break;
+				}
+				$@Targetname$ = rid2name($@Target);
 				sleep 10000;
-				mapannounce .EnterMap$[10],"[Round "+.@round+"] Our target is "+rid2name($@Target)+"!",bc_blue;
-				charcommand "killable "+rid2name($@Target);
-				charcommand "size "+rid2name($@Target)+" 2";
+				mapannounce .EnterMap$[10],"[Round "+.@round+"] Our target is "+$@Targetname$+"!",bc_blue;
+				attachrid($@Target);
+				atcommand "#killable \""+$@Targetname$+"\"";
+				atcommand "#size \""+$@Targetname$+"\" 2";
+				detachrid;
 				sleep 60000;
 				if($@Target != -1){
 					if(attachrid($@Target) && strcharinfo(3) == .EnterMap$[10])
 						Func_Prizes(getcharid(0),.EventName$[10]);
 				}
-				charcommand "alive "+rid2name($@Target);
-				charcommand "killable "+rid2name($@Target);
-				charcommand "size "+rid2name($@Target)+" 0";
+				attachrid($@Target);
+				atcommand "#alive \""+$@Targetname$+"\"";
+				atcommand "#killable \""+$@Targetname$+"\"";
+				atcommand "#size \""+$@Targetname$+"\" 0";
+				detachrid;
+				$@LastTarget = $@Target;
 			}
 		}
 	}
@@ -929,18 +1085,20 @@ OnShroomStart:	//-- Mushroom Event
 	Func_Countdown;
 	$@CurrentEvent = -11;
 	.@Spawn = .Spawn = max(1,rand(getusers(1) / 10));
-	if(1 > .Spawn) .@Spawn = .Spawn = 1;
+	if(1 > .Spawn)
+		.@Spawn = .Spawn = 1;
 	monster .Map$,0,0,"Please don't kill me!",1084,.Spawn,strnpcinfo(3)+"::OnShroomKilled";
 	announce "Find the Mushroom : Total of "+.Spawn+" Mushrooms have been spawned in "+.Map$+"!",bc_blue;
-	sleep 60000 * 45;
-	if(.Spawn == .@Spawn) Announce .EventName$[11]+" Has Ended with No Winner!",bc_blue;
+	sleep 60000 * 30;
+	if(.Spawn == .@Spawn)
+		announce .EventName$[11]+" Has Ended with No Winner!",bc_blue;
 	killmonster .Map$,strnpcinfo(3)+"::OnShroomKilled";
 	$@CurrentEvent = 0;
 	end;
 
 OnShroomKilled:
 	if($@CurrentEvent == -11){
-		.Spawn--;
+		.Spawn -= 1;
 		Func_Prizes(getcharid(0),.EventName$[11]);
 		if (.Spawn)
 			announce "[ "+strcharinfo(0)+" ] has killed a Mushroom. There are now "+.Spawn+" Mushroom(s) left.",bc_map|bc_blue;
@@ -961,18 +1119,19 @@ OnBaphoStart:	//-- Find the Baphomet
 	.EnterMap$[$@CurrentEvent] = .Map$;
 	Func_Countdown;
 	$@CurrentEvent = -12;
-	.@Spawn = .Spawn = max(1,rand(getusers(1) / 10));
+	.@Spawn = .Spawn = 1;
 	monster .Map$,0,0,"Please don't kill me!",1039,.Spawn,strnpcinfo(3)+"::OnBaphoKilled";
 	announce "Find the Baphomet: Total of "+.Spawn+" Baphomets have been spawned in "+.Map$+"!",bc_blue;
-	sleep 60000 * 45;
-	if(.Spawn == .@Spawn) Announce .EventName$[12]+" Has Ended with No Winner!",bc_blue;
+	sleep 60000 * 30;
+	if(.Spawn == .@Spawn)
+		announce .EventName$[12]+" Has Ended with No Winner!",bc_blue;
 	killmonster .Map$,strnpcinfo(3)+"::OnBaphoKilled";
 	$@CurrentEvent = 0;
 	end;
 
 OnBaphoKilled:
 	if($@CurrentEvent == -12){
-		.Spawn--;
+		.Spawn -= 1;
 		Func_Prizes(getcharid(0),.EventName$[12]);
 		if (.Spawn)
 			announce "[ "+strcharinfo(0)+" ] has killed a Baphomet. There are now "+.Spawn+" Baphomet(s) left.",bc_map|bc_blue;
@@ -989,35 +1148,49 @@ OnCandyStart:	//-- Grab the Candy
 
 	mapwarp .EnterMap$[13],"prontera",155,172;
 	$@CurrentEvent = 13;
+	for ( .@i = 0; .@i < getarraysize( .bombflag ); .@i++ )
+		setmapflag .EnterMap$[16], .bombflag[.@i];
 	Func_Countdown;
 	$@CurrentEvent = -13;
 	if(getmapusers(.EnterMap$[13]) < .MinPlayers[13]){
 		mapannounce .EnterMap$[13],"Event Stopped! Not Enough Players Joined the "+.EventName$[13]+"!",bc_blue;
 	} else {
 		sleep 3000;
-		mapannounce .EnterMap$[13],"The goal is this event is to pick up as many "+getitemname(.candy_id)+".",bc_blue;
+		mapannounce .EnterMap$[13],"The goal is this event is to pick up as many "+getitemname(.candy_id)+" and as little "+getitemname(.apple_id)+" as possible.",bc_blue;
 		sleep 1000;
 		for ( .@i = 5; .@i >= 0; .@i-- ) {
-			mapannounce .EnterMap$[13], "["+ .@i +"]", 0;
+			mapannounce .EnterMap$[13], "["+ .@i +"]",bc_blue;
 			sleep 1000;
 		}
-		.@drop_candy_amount = .register_count * 12; // drop the amount of candies equal to no. of participants x 12
+		.@drop_candy_amount = .register_count * 25; // drop the amount of candies equal to no. of participants x 12
 		freeloop 1;
-		while ( .@i < .@drop_candy_amount ) {
+		while ( .@i < .@drop_candy_amount / 2 ) {
 			while ( checkcell( .EnterMap$[13], .@x = rand(450), .@y = rand(450), cell_chknopass ) );
-			makeitem .candy_id, 1, .EnterMap$[13], .@x, .@y;
+				makeitem .candy_id, 1, .EnterMap$[13], .@x, .@y;
 			.@i++;
 		}
+		.@i = 0;
+		while ( .@i < 800 ) {
+			while ( checkcell( .EnterMap$[13], .@x = rand(450), .@y = rand(450), cell_chknopass ) );
+			if(rand(2))
+				makeitem .candy_id, 1+rand(3)*rand(3), .EnterMap$[13], .@x, .@y;
+			else
+				makeitem .apple_id, 1+rand(2)*rand(2), .EnterMap$[13], .@x, .@y;
+			.@i++;
+			sleep 75;
+		}
 		freeloop 0;
-		sleep 60000;
 		for ( .@i = 0; .@i < .register_count; .@i++ ) {
 			if ( attachrid( .register_aid[.@i] ) ) {
 				.@amount = countitem( .candy_id );
+				.@amount -= countitem( .apple_id );
 				if ( .@amount >= .@highest ) {
 					setd ".@count"+ .@amount +"["+ getarraysize( getd( ".@count"+ .@amount ) ) +"]", getcharid(3);
 					.@highest = .@amount;
 				}
+				dispbottom "Candy: "+countitem( .candy_id)+" Apples: "+ countitem( .apple_id );
 				delitem .candy_id, countitem( .candy_id );
+				delitem .apple_id, countitem( .apple_id );
 			}
 		}
 		cleanmap .EnterMap$[13];
@@ -1026,10 +1199,12 @@ OnCandyStart:	//-- Grab the Candy
 				attachrid getd( ".@count"+ .@highest +"["+ .@i +"]" );
 				Func_Prizes(getcharid(0),.EventName$[13]);
 			}
-			mapannounce .EnterMap$[13], "Event end, there are "+ .@size +" player having most "+ getitemname( .candy_id ) +" ! "+ .@name$, 0;
+			mapannounce .EnterMap$[13], "Event end, there are "+ .@size +" player having most "+ getitemname( .candy_id ) +" with "+.@highest+"! "+ .@name$,bc_blue;
 		} else	mapannounce .EnterMap$[13], "Event end, nobody is a winner ... too bad", 0;
 	}
 	sleep 5000;
+	for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag .EnterMap$[16], .bombflag[.@i];
 	mapwarp .EnterMap$[13],"prontera",155,172;
 	deletearray .register_aid;
 	.register_count = 0;
@@ -1045,27 +1220,29 @@ OnCountStart:	//-- Monsters Counting
 	Func_Countdown;
 	.Round = .CountRound;
 
-OnStartGame:
-	deletearray .MobCount[0],getarraysize( .MobCount );
+OnStartCountRound:
+	for(.@i = 0; .@i < getarraysize( .CountMonster ); .@i++)
+		.MobCount[.@i] = 0;
 	for( .@x = .CountXY[0]; .@x <= .CountXY[2]; .@x++ ){
 		for( .@y = .CountXY[1]; .@y <= .CountXY[3]; .@y++ ){
 			.@Summon = rand( getarraysize( .CountMonster ) );
 			monster .EnterMap$[14],.@x,.@y,"Count Me",.CountMonster[.@Summon],1,strnpcinfo(3)+"::OnKilled";
 			.GID = $@mobid;
 			setunitdata .GID,UMOB_DMGIMMUNE,1;
-			.MobCount[.@Summon] = .MobCount[.@Summon] + 1;
+			.MobCount[.@Summon]++;
 			sleep 1;
 		}
 	}
-	.@Target = rand( getarraysize( .CountMonster ) );
+	.Target = rand( getarraysize( .CountMonster ) );
 	deletepset 1;
-	defpattern 1, "([^:]+): (\\|\\d{2})?"+.MobCount[.@Target]+ ".$", "OnRight";
+	defpattern 1, "([^:]+): (\\|\\d{2})?"+.MobCount[.Target]+ ".$", "OnRightCount";
 	defpattern 1,"([^:]+):.*.*", "OnSpam";
 	activatepset 1;
 	delwaitingroom;
-	waitingroom getmonsterinfo( .CountMonster[.@Target],0 ),0;
+	waitingroom getmonsterinfo( .CountMonster[.Target],0 ),0;
 	npctalk "Count for the Targeted Monster's Amount to Win the Game.";
 	$@CurrentEvent = -14;
+	initnpctimer;
 	end;
 
 OnSpammed:
@@ -1083,10 +1260,10 @@ OnSpam:
 	addtimer ( .Spam * 1000 ),strnpcinfo(3)+"::OnSpammed";
 	end;
 
-OnRight:
+OnRightCount:
 	@Spam = 0;
 	deltimer strnpcinfo(3)+"::OnSpammed";
-	if( $@CurrentEvent != -14 ){
+	if( $@CurrentEvent != -14 && $@CurrentEvent != -18 ){
 		message strcharinfo(0),"Sorry, there is no Event right now.";
 	} else if( @SpamDelay > gettimetick(2) ){
 		message strcharinfo(0),"SPAM Protection : Remain "+( @SpamDelay - gettimetick(2) )+" seconds.";
@@ -1102,7 +1279,7 @@ OnRight:
 		Func_Prizes(getcharid(0),.EventName$[14]);
 		killmonster .EnterMap$[14],strnpcinfo(3)+"::OnKilled";
 		if( .Round )
-			donpcevent strnpcinfo(3)+"::OnStartGame";
+			donpcevent strnpcinfo(3)+"::OnStartCountRound";
 		else	$@CurrentEvent = 0;
 
 	}
@@ -1124,7 +1301,7 @@ OnDisguiseStart: //-- Disguise
 	if(getmapusers(.EnterMap$[15]) < .MinPlayers[15])
 		mapannounce .EnterMap$[15],"Event Stopped! Not Enough Players Joined the "+.EventName$[15]+"!",bc_blue;
 	else {
-		enablenpc "Disguise Event";
+		enablenpc $@DisguiseNpc$;
 		sleep 100;
 		donpcevent "Disguise Event::OnStart";
 		for(.@dis = 30; .@dis > 0; .@dis--){
@@ -1135,7 +1312,7 @@ OnDisguiseStart: //-- Disguise
 		}
 		mapannounce .EnterMap$[15],"Time Is up",bc_blue;
 	}
-	disablenpc "Disguise Event";
+	disablenpc $@DisguiseNpc$;
 	sleep 5000;
 	mapwarp .EnterMap$[15],"prontera",155,172;
 	$@CurrentEvent = 0;
@@ -1146,7 +1323,8 @@ OnFabreStart:	//-- Fabre Event
 //==================================
 
 	killmonsterall .EnterMap$[16];
-	query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'fabre'");
+	deletearray .register_aid;
+	.register_count = 0;
 	mapwarp .EnterMap$[16],"prontera",155,172;
 	$@CurrentEvent = 16;
 	pvpoff .EnterMap$[16];
@@ -1156,10 +1334,10 @@ OnFabreStart:	//-- Fabre Event
 	$@CurrentEvent = -16;
 	if(getmapusers(.EnterMap$[16]) < .MinPlayers[16]){
 		mapannounce .EnterMap$[16],"Event Stopped! Not Enough Players Joined the "+.EventName$[16]+"!",bc_blue;
-		for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
-			removemapflag .EnterMap$[16], .bombflag[.@i];
+
 		$@CurrentEvent = 0;
 	} else {
+		killmonsterall .EnterMap$[16];
 		mapannounce .EnterMap$[16],"Rules are simple",bc_blue;
 		sleep 5000;
 		mapannounce .EnterMap$[16],"Kill the monsters to recive points.",bc_blue;
@@ -1167,29 +1345,44 @@ OnFabreStart:	//-- Fabre Event
 		mapannounce .EnterMap$[16],"Player with the most points at the end wins.",bc_blue;
 		sleep 5000;
 		mapannounce .EnterMap$[16],"Event will now Begin~",bc_blue;
-		monster .EnterMap$[16],0,0,"1 Point",1007,60,strnpcinfo(3)+"::OnKill_1";
-		monster .EnterMap$[16],0,0,"10 Point",1008,30,strnpcinfo(3)+"::OnKill_2";
-		monster .EnterMap$[16],0,0,"-20 Point",1002,50,strnpcinfo(3)+"::OnKill_3";
- 		for(.@fabre = 5; .@fabre > 0; .@fabre--){
-			if(getmapusers(.EnterMap$[16]) < 1) .@poring = 0;
-			mapannounce .EnterMap$[16],callfunc("F_InsertPlural",.@fabre,"Minute")+" Remaining.",bc_blue;
-			sleep 60000;
+		monster .EnterMap$[16],0,0,"1 Point",1007,90,strnpcinfo(3)+"::OnKill_1";
+		monster .EnterMap$[16],0,0,"3 Point",1008,30,strnpcinfo(3)+"::OnKill_2";
+		monster .EnterMap$[16],0,0,"-2 Point",1002,70,strnpcinfo(3)+"::OnKill_3";
+ 		for(.@fabre = 6; .@fabre > 0; .@fabre--){
+			if(getmapusers(.EnterMap$[16]) < 1) .@fabre = 0;
+				mapannounce .EnterMap$[16],callfunc("F_InsertPlural",(.@fabre*10),"Second")+" Remaining.",bc_blue;
+			if(.TestMode)
+				sleep 5000;
+			else
+				sleep 10000;
 		}
 		killmonsterall .EnterMap$[16];
-		for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
-			removemapflag .EnterMap$[16], .bombflag[.@i];
-		$@CurrentEvent = 0;
-		query_sql("SELECT `char_reg_num`.`value`,`char`.`name`,`char`.`char_id` FROM `char` INNER JOIN `char_reg_num` ON `char_reg_num`.`char_id`=`char`.`char_id` WHERE `char_reg_num`.`key`='fabre' ORDER BY `char_reg_num`.`value` DESC LIMIT 50",.@value,.@name$,.@cid);
-		.@size = getarraysize( .@cid );
-		for ( .@i = 0; .@i < .@size; .@i++ ){
-			if(.@value == .@value[.@i])
-				Func_Prizes(.@cid[.@i],.EventName$[16]);
-			else	break;
+		for ( .@i = 0; .@i < .register_count; .@i++ ) {
+			if ( attachrid( .register_aid[.@i] ) ) {
+				.@amount = fabre;
+				if ( .@amount >= .@highest ) {
+					setd ".@count"+ .@amount +"["+ getarraysize( getd( ".@count"+ .@amount ) ) +"]", getcharid(3);
+					.@highest = .@amount;
+				}
+				dispbottom "Score: "+fabre;
+				fabre = 0;
+			}
 		}
-		mapannounce .EnterMap$[16],.EventName$[16]+" ended with a total  of "+(.@i+1)+" winners.",bc_all;
+		if ( .@size = getarraysize( getd( ".@count"+ .@highest ) ) ) {
+			for ( .@i = 0; .@i < .@size; .@i++ ) {
+				attachrid getd( ".@count"+ .@highest +"["+ .@i +"]" );
+				Func_Prizes(getcharid(0),.EventName$[16]);
+			}
+			mapannounce .EnterMap$[16], "Event end, there are "+ .@size +" player having "+.@highest+" Points ! "+ .@name$,bc_blue;
+		} else	mapannounce .EnterMap$[16], "Event end, nobody is a winner ... too bad", 0;
+		
 	}
-	sleep 5000;
-	mapwarp .EnterMap$[16],"prontera",155,172;
+	for ( .@i = 6; .@i < getarraysize( .bombflag ); .@i++ )
+		removemapflag .EnterMap$[16], .bombflag[.@i];
+	mapwarp .EnterMap$[13],"prontera",155,172;
+	deletearray .register_aid;
+	.register_count = 0;
+	$@CurrentEvent = 0;
 	end;
 		
 OnKill_1:
@@ -1198,20 +1391,22 @@ OnKill_1:
 	end;
 		
 OnKill_2:
-	monster .EnterMap$[16],0,0,"10 Points",1008,1,strnpcinfo(3)+"::OnKill_2";
-	fabre += 10;
+	monster .EnterMap$[16],0,0,"3 Points",1008,1,strnpcinfo(3)+"::OnKill_2";
+	fabre += 3;
 	end;
 		
 OnKill_3:
-	monster .EnterMap$[16],0,0,"-20 Points",1002,1,strnpcinfo(3)+"::OnKill_3";
-	fabre -= 20;
+	monster .EnterMap$[16],0,0,"-2 Points",1002,1,strnpcinfo(3)+"::OnKill_3";
+	fabre -= 2;
 	end;
 
 //==================================
 OnDevilStart:	//-- Devil Square
 //==================================
 
+	killmonsterall .EnterMap$[17];
 	mapwarp .EnterMap$[17],"prontera",155,172;
+	pvpoff .EnterMap$[4];
 	for ( .@i = 0; .@i < getarraysize( .devilflag ); .@i++ )
 		setmapflag .EnterMap$[17], .devilflag[.@i];
 	$@CurrentEvent = 17;
@@ -1226,26 +1421,27 @@ OnDevilStart:	//-- Devil Square
 		mapannounce .EnterMap$[17],"[Devil Square]: You will encounter 3 waves of monsters. The monsters will grow stronger with each wave.",bc_blue;
 		mapannounce .EnterMap$[17],"[Devil Square]: If you defeat all the enemies, you will be given the opportunity to open 10 Treasure Chests with items, equipment, and rare cards inside!",bc_blue;
 		mapannounce .EnterMap$[17],"[Devil Square]: Event has started!",bc_blue;
-		.round = 1;
-		.mob =  0;
+		.round = 0;
+		.mob = 0;
 		set .monsterset, query_sql("SELECT id, iname, hp FROM `mob_db` where LV <= 70 and LV >= 60 and hp < 99999999 and MEXP = 0 and not iName='Treasure Chest' ORDER BY RAND() LIMIT 100", .monsterid, .monstername$, .monsterhp);
-		for (.@x = 0; .@x < getmapusers(.EnterMap$[17]); .@x++){
+		for (.@x = 0; .@x < min(10,getmapusers(.EnterMap$[17])); .@x++){
 			.monstercount = 3;
-			for (.@y = 0; .@y < .monstercount; .@y++) {
+			for (.@y = 0; .@y < 3; .@y++) {
 				.monster = rand(0,.monsterset-1);
 				monster .EnterMap$[17],0,0,"[Devil Square]: "+.monstername$[.monster],.monsterid[.monster],.monstercount,strnpcinfo(3)+"::OnDevilDead";	 
 				.mob += .monstercount;
 			}
 		}
 		for(.devil = 50; .devil > 0; .devil--){
-			if(getmapusers(.EnterMap$[17]) < 1)
-				.devil = 0;
+			if(getmapusers(.EnterMap$[17]) < 1){
+				.devil = .round = .mob = $@CurrentEvent = 0;
+			}
 			mapannounce .EnterMap$[17],"There are "+(.devil)+" Minuets Remaining",bc_blue;
 			sleep 60000;
 		}
 		mapannounce .EnterMap$[17],"Time Is up",bc_blue;
 	}
-	.round = .mob = $@CurrentEvent = 0;
+	$@CurrentEvent = 0;
 	killmonsterall .EnterMap$[17];
 	for ( .@i = 6; .@i < getarraysize( .devilflag ); .@i++ )
 		removemapflag .EnterMap$[17], .devilflag[.@i];
@@ -1256,12 +1452,13 @@ OnDevilStart:	//-- Devil Square
 OnDevilDead:
 	if(.round > 3){
 		$MVPDefeat += 5;
-		if (rand(1,.2 + $MVPDefeat) == 1) { 
+		if (rand(1,2 + $MVPDefeat) == 1) { 
 			mapannounce .EnterMap$[17],"[Devil Square]: It's not over yet! Another MVP Has entered the realm!!", bc_map;
-			set.mob, 0;
+			set .mob, 0;
 			if (getmapusers(.EnterMap$[17]) <= 5)
 				set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 1 and MEXP>1", .monsterid, .monstername$);
-			else	set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 85 and MEXP>1", .monsterid, .monstername$);
+			else
+				set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 85 and MEXP>1", .monsterid, .monstername$);
 			.monstercount = 1;
 			.monster = rand(0,.monsterset-1);
 			monster .EnterMap$[17],0,0,"[Devil Square]: "+.monstername$[.monster],.monsterid[.monster],1,strnpcinfo(3)+"::OnDevilDead";
@@ -1277,16 +1474,17 @@ OnDevilDead:
 		}
 		end; 
 	} else {
-		.mob--;
-		if ( .mob <= 10 && .mob >= 1)
+		.mob -= 1;
+		if (.mob >= 1){
 			announce "Devil Square : "+ .mob +" monsters remaining in round "+.round+".", bc_map;
-		else if ( .mob <= 0 ) {
+		} else {
 			if(.round == 3){
 				mapannounce .EnterMap$[17],"[Devil Square]: Watchout!! An MVP Has entered the realm!!", bc_map;	
-				set.mob, 0;
+				.mob =  0;
 				if (getmapusers(.EnterMap$[17]) <= 5)
 					set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 1 and MEXP>1", .monsterid, .monstername$);
-				else	set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 85 and MEXP>1", .monsterid, .monstername$);
+				else
+					set .monsterset, query_sql("SELECT id, iname FROM `mob_db` where LV <= 99 and LV >= 85 and MEXP>1", .monsterid, .monstername$);
 				.monstercount = 1;
 				.monster = rand(0,.monsterset-1);
 				monster .EnterMap$[17],0,0,"[Devil Square]: "+.monstername$[.monster],.monsterid[.monster],1,strnpcinfo(3)+"::OnDevilDead";
@@ -1317,13 +1515,67 @@ OnDevilDead:
 	end;
  
 OnTreasureDead:
-	.mob--;
+	.mob -= 1;
 	if (.mob < 1){
 		.round = .mob = .devil = 0;
 		addrid(5,0,.EnterMap$[17]);
 		Func_Prizes(getcharid(0),.EventName$[17]);
 		sleep2 10000;
 		warp "prontera",155,172;
+	}
+	$@CurrentEvent = 0;
+	end;
+
+//==================================
+OnSongStart:	//-- Name that BGM
+//==================================
+
+	$@CurrentEvent = 18;
+	Func_Countdown;
+	.Round = .SongRound;
+
+OnStartSongRound:
+	.SongID = 0;
+	while(!.SongID || .SongID == 32)
+		.SongID = rand(1,getarraysize(.SongName$));
+	deletepset 1;
+	defpattern 1, "([^:]+): (\\|\\d{2})?"+ .SongName$[.SongID] + ".$", "OnRightSong";
+	defpattern 1,"([^:]+):.*.*", "OnSpam";
+	activatepset 1;
+	delwaitingroom;
+	waitingroom .EventName$[18],0;
+	npctalk "Name the BGM to win~.";
+	$@CurrentEvent = -18;
+	initnpctimer;
+	.@round = .Round;
+	while(.Round && .@round == .Round && $@CurrentEvent == -18){
+		.@song$ = "";
+		if(.SongID < 10) .@song$ = "0";
+		.@song$ += .SongID;
+		playBGMall .@song$,.EnterMap$[18];
+		sleep .SongTime[.SongID];
+	}
+	end;
+
+OnRightSong:
+	@Spam = 0;
+	deltimer strnpcinfo(3)+"::OnSpammed";
+	if( $@CurrentEvent != -18 ){
+		message strcharinfo(0),"Sorry, there is no Event right now.";
+	} else if( @SpamDelay > gettimetick(2) ){
+		message strcharinfo(0),"SPAM Protection : Remain "+( @SpamDelay - gettimetick(2) )+" seconds.";
+	} else if( getcharid(0) == .Winner[0] && gettimetick(2) < .Winner[1] ){
+		message strcharinfo(0),"Sorry, Winner Time Penalty : Remain "+( .Winner[1] - gettimetick(2) )+" seconds.";
+	} else {
+		delwaitingroom;
+		.Round--;
+		.Winner[0] = getcharid(0);
+		.Winner[1] = gettimetick(2) + .Delay;
+		deletepset 1;
+		Func_Prizes(getcharid(0),.EventName$[18]);
+		if( .Round )
+			donpcevent strnpcinfo(3)+"::OnStartSongRound";
+		else	$@CurrentEvent = 0;
 	}
 	end;
 
@@ -1344,13 +1596,31 @@ OnPCLogOutEvent:	//-- On Logout
 //==================================
 OnPCDieEvent:	//-- On player death
 //==================================
-
+	if(isequipped(51055))
+		DracoFail++;
 	if(($@CurrentEvent == -4 && strcharinfo(3) == .EnterMap$[4]) || ($@CurrentEvent == -2 && strcharinfo(3) == .EnterMap$[2]))
 		warp "prontera",155,172;
 	if($@CurrentEvent == -10 && getcharid(3) == $@Target ){
-		Func_Prizes(killerrid,.EventName$[10]);
+		Func_Prizes(getcharid(0,rid2name(killerrid)),.EventName$[10]);
 		$@Target = -1;
 	}
+	end;
+
+//==================================
+OnTimer1800000:	// Timer for Monster Count and Song
+//==================================
+
+	if($@CurrentEvent == -14 || $@CurrentEvent = -18 || $@CurrentEvent == 14 || $@CurrentEvent = 18){
+		if($@CurrentEvent < 0)
+			.@ce = -1 * $@CurrentEvent;
+		mapannounce .EnterMap$[.@ce],"["+.EventName$[.@ce]+"]: Event has come to and end.", bc_map;	
+		.Round = .SongID = .Target = $@CurrentEvent = 0;
+		killmonster .EnterMap$[14],strnpcinfo(3)+"::OnKilled";
+		$@CurrentEvent = 0;
+		delwaitingroom;
+		deletepset 1;
+	}
+	stopnpctimer;
 	end;
 
 //==================================
@@ -1409,8 +1679,13 @@ OnInit:		//-- Config
 	// Add Event Command to wipe event scedule
 	bindatcmd("addevent",strnpcinfo(3)+"::OnRemoveType",60,99);
 
+	// Debugmode Toggle Command
+	bindatcmd("testevent",strnpcinfo(3)+"::OnTestMode",60,99);
+
 	// Join Event Command
 	bindatcmd("joinevent",strnpcinfo(3)+"::OnJoinEvent",0,99);
+	bindatcmd("join",strnpcinfo(3)+"::OnJoinEvent",0,99);
+	bindatcmd("je",strnpcinfo(3)+"::OnJoinEvent",0,99);
 
 // -------------------
 //  Event Data
@@ -1428,41 +1703,41 @@ OnInit:		//-- Config
 		"Emperium Event","Zombie Survival","Dice Event","PvP Event","Maze Event",
 		"Find The Poring","Cluckers","Lucky Pick","Bombring Event","Manhunt",
 		"Find The Mushroom","Find The Baphomet","Grab the Candy!","Monsters Counting","Disguise Event",
-		"Fabre Event","Devil Square";
+		"Fabre Event","Devil Square","What's the BGM";
 
 	// Colored Event Names
 	setarray .ColorName$[1],
 		"^00CCCC"+.EventName$[1]+"^000000",	"^CC00CC"+.EventName$[2]+"^000000",	"^00CC00"+.EventName$[3]+"^000000",	"^CC0000"+.EventName$[4]+"^000000",	"^00CC00"+.EventName$[5]+"^000000",
 		"^00CCCC"+.EventName$[6]+"^000000",	"^00CC00"+.EventName$[7]+"^000000",	"^00CC00"+.EventName$[8]+"^000000",	"^CC00CC"+.EventName$[9]+"^000000",	"^CC0000"+.EventName$[10]+"^000000",
 		"^00CCCC"+.EventName$[11]+"^000000",	"^00CCCC"+.EventName$[12]+"^000000",	"^00CC00"+.EventName$[13]+"^000000",	"^00CC00"+.EventName$[14]+"^000000",	"^00CC00"+.EventName$[15]+"^000000",
-		"^00CCCC"+.EventName$[16]+"^000000",	"^CC00CC"+.EventName$[17]+"^000000";
+		"^00CCCC"+.EventName$[16]+"^000000",	"^CC00CC"+.EventName$[17]+"^000000",	"^00CCCC"+.EventName$[18]+"^000000";
 
 	// Min Players
 	//	Cluckers, Mushroom & Monter Counting don't check
 	setarray .MinPlayers[1],
 		2,1,2,3,2,
-		1,0,3,1,99,
+		1,0,3,1,4,
 		0,0,2,0,3,
-		3,3;
+		3,3,0;
 
 	// @JoinEvent warp points
 	setarray .EnterMap$[1],
-		"prontera","1@zombie","quiz_01","guild_vs2","maze",
-		"guild_vs2","prontera","prontera","quiz_02","guild_vs2",//"pvp_n_1-5" needs a fix
-		"prontera","prontera","guild_vs2","prontera","guild_vs2",
-		"guild_vs2","guild_vs2";
+		"prontera","1@zombie","quiz_01","pvp_n_1-5","maze",
+		"pvp_n_1-5","prontera","prontera","quiz_02","pvp_n_1-5",
+		"prontera","prontera","pvp_n_1-5","prontera","pvp_n_1-5",
+		"pvp_n_1-5","pvp_n_1-5","prontera";
 
 	setarray .EnterX[1],
 		161,  0,205,  0,371,
 		  0,155,161, 59,  0,
-		  0,  0,  0,156,  0,
-		  0, 50;
+		  0,  0,  0,157,  0,
+		  0, 100,156;
 
 	setarray .EnterY[1],
 		168,  0, 92,  0,143,
 		  0,227,168,345,  0,
-		  0,  0,  0,164,  0,
-		  0, 50;
+		  0,  0,  0,171,  0,
+		  0, 100,164;
 
 	// Zombies Spawned per Wave
 	// MobID1,Quantity1{,MobID2,Quantity2{,{....}}
@@ -1470,10 +1745,10 @@ OnInit:		//-- Config
 	//	so 10 will become 100 in last wave
 	//	and mobs are not killed between
 	//	so 10 will have 550 spawned in last wave
-	setarray .Zombies,1394,10,1423,5,1298,1;
+	setarray .Zombies,25155,10,1423,5,1298,1;
 
 	// Fake Poring Names
-	setarray .Poring$,"Porjng","P0ring","Porlng","Porimg","Porinq",
+	setarray .Poring$,	"Porjng","P0ring","Porlng","Porimg","Porinq",
 				"Poporing","This One","Right","Kill Me","Poning",
 				"qoring","Pooring","Pouring","Polling","~Poring~",
 				"Winner","Prize","Porirg","Paring","Notice Me Senpai",
@@ -1483,11 +1758,10 @@ OnInit:		//-- Config
 	.PoringSpawn = 2;
 
 	// Poring and Bombring and Grab the Candy Mapflags
-	setarray .bombflag,mf_nosave,mf_nowarp,mf_nowarpto,mf_nomemo,mf_noteleport,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption,mf_nodrop,mf_notrade,mf_nopenalty;
-
+	setarray .bombflag,mf_nosave,mf_nowarp,mf_nowarpto,mf_nomemo,mf_noteleport,MF_NOITEMCONSUMPTION,MF_NOTRADE,mf_noreturn,mf_nobranch,mf_nomobloot,mf_nomvploot,mf_noskill,mf_noitemconsumption,mf_nodrop,mf_notrade,mf_nopenalty;
 
 	// Devil Square Mapflags
-	setarray .devilflag,mf_nosave,mf_nowarp,mf_nowarpto,mf_nomemo,mf_noteleport,mf_noreturn,mf_notrade,mf_nopenalty;
+	setarray .devilflag,mf_nosave,mf_nowarp,mf_nowarpto,mf_nomemo,mf_noteleport,mf_noreturn,mf_notrade,mf_nopenalty,mf_nobranch,mf_nodrop,mf_nomobloot,mf_nomvploot;
 
 	// Mushroom Event Possible Maps
 	setarray .ShroomMaps$,"izlude","geffen","morocc","prontera";
@@ -1496,43 +1770,91 @@ OnInit:		//-- Config
 	setarray .BaphoMaps$,"splendide","hugel","yuno","comodo","xmas","aldebaran","izlude","payon","geffen","morocc","prontera";
 
 	// Number of waves in Bombporing Event
-	.Bombwaves = 5;
+	.Bombwaves = 6;
 
 	// Item ID used in the Grab the Candy! event
 	// Best to use a custom ID
 	.candy_id = 529;
 
+	// Item ID used in the Grab the Candy! event
+	// Best to use a custom ID
+	.apple_id = 7821;
+	
 	// Monster Counting
 	setarray .CountMonster,1084,1085;
 
 	// Number of rounds for Monster Counting
-	.CountRound = 1;
-	
+	.CountRound = 3;
+
+	// Number of rounds for Whats the BGM
+	.SongRound = 3;
+
 	// Monster Coutning Mob Spawn area
 	setarray .CountXY,152,160,159,167;
 
 	// Winners Answer Delay for Monster Counting
-	set .Delay,10;
+	set .Delay,1800;
 
 	// Spam Prevention for Monster Counting
 	set .Spam,3;
+
+	setarray .SongName$[1],	"Title", "Gambler of highway", "Peaceful Forest", "I miss you", "Tread on the ground", "Risk your life", "Wind of Tragedy", "Theme of Prontera", "Great honor", "Divine Grace", 
+			"Theme of Morroc", "Streamside", "Theme of Geffen", "Theme of Payon", "Theme of Alberta", "Labyrinth", "Tresure hunter", "Time up!!", "Under the ground", "Ancient groover", 
+			"Through the tower", "Backattack!!", "Travel", "Desert", 
+			"Plateau", "Everlasting Wanderers", "Dreamer's Dream", "You're in ruins", "Be Nice 'n Easy", "One Step Closer", 
+			"Brassy Road", "", "Yuna Song", "Pampas Upas", "TeMPoison", "Nano East", "TeMPorsche", "Hamatan", "Theme of Al de Baran", "Fear...", 
+			"Rag All Night Long", "Curse'n Pain", "Morning Gloomy", "TeMP it Up", "Don't Piss me Off", "An Ant-lion's Pit", "Welcome Mr.Hwang", "Help Yourself", "Watery Grave", "Out of Curiosity", 
+			"Believe in myself", "Ready~", "White Christmas", "Come on my deer!!", "Welcome, my lord", "Silver Bell", "Don't cry, baby", "Jingle Bell on Ragnarok", "Theme of Lutie", "Aeon", 
+			"Zingaro", "High Roller Coaster", "Mucho Gusto", "One Fine Day", "Into the Abyss", "Wanna Be Free!!", "TeMPotato", "Jazzy Funky Sweety", "Retro Metro", "Theme of Juno", 
+			"Antique Cowboy", "Big Guys Love This", "Higher than the sun", "Not so far away", "Come, and Get It!", "Purity of your smile", "Can't go home again, baby", "adios", "The Great", "Jumping Dragon", 
+			"Thai Orchid", "Muay Thai King", "Sleepless", "Christmas in the 13th Month", "Dancing Christmas in the 13th Month", "Steel Me", "Ethnica", "Come in Peace", "We have Lee but you don't have", "Noblesse Oblige", 
+			"CheongChoon", "Naive Rave", "Latinnova", "Theme of Rael", "Underneath The Temple", "Yetit Petit", "Lastman Dancing", "Top Hoppy", "Uncanny Lake", "Abyss",
+			"AbSolitude", "Erebos' Prelude", "Invisible Invasion", "On Your Way Back", "Rose of Sharon", "Sleeping Volcano", "Seven Days Seven Nights", "Angelica", "Alpen Rose", "Kingdom Memories", 
+			"Good Morning", "Good Night", "Monastery In Disguise", "Theme of Moscovia", "Tale of the East", "Away from Home", "Dream of a Whale", "Taiko's Fury", "Stained Memories", "Fissure Eruption", 
+			"Outer Breath", "Ethical Aspiration", "Into The Arena!", "Stranger Aeons", "Forbidden Anguish", "New World Orde", "Mystic Haze", "Splendide Dreams", "Fireflies Heaven", "Dread and Bold", 
+			"Daytime in Manuk", "March with Irish Whistle", "Sunny Side of Life", "Borborema", "At Dusk", "Emotion Creep", "Dazzling Snow", "TeMPlatonic", "Sugar Cane Carnival", "Twilight Heaven", 
+			"Tricky Cheeky", "Arrival", "Mother Earth", "Silent Voyage", "Marshmallow Waltz", "Diamond Dust", "Octopus Scamble", "Melt Down!", "Theme of Port Malaya", "Uncanny Dreams", 
+			"Maximum", "Voices", "Horizon", "Eclage", "Eclage", "Beyond The Grave", "Disillusion", "Indelible Scars", "Judgement", "Jittering Nightmare",
+			"Forest of Despiar", "Dark Light", "Lost souls", "From the Grave", "Apex Fortress", "Brutal Ritual", "Shade of a Shadow", "How to rescue our dragon", "Little kitty's adventure", "Welcome to Doram town",
+			"Django vs Yojimbo", "Macaroni Express", "", "Ethnically Diverse", "Cat on Bullet", "Tears of Deviant", "mysterious mansion", "behind the silence", "Echoes of Nature", "Finding pillow book",
+			"limits of darkness", "Cake Is Lie", "I Need You", "Magdaros", "Once upon a December", "Theme of Wolf";
+
+	setarray .SongTime[1],	1 * 60000 + 14 * 1000,3 * 60000 + 03 * 1000,2 * 60000 + 30 * 1000,2 * 60000 + 46 * 1000,1 * 60000 + 54 * 1000,2 * 60000 + 49 * 1000,1 * 60000 + 44 * 1000,4 * 60000 + 33 * 1000,1 * 60000 + 19 * 1000,1 * 60000 + 36 * 1000,
+				2 * 60000 + 08 * 1000,2 * 60000 + 27 * 1000,3 * 60000 + 00 * 1000,2 * 60000 + 22 * 1000,3 * 60000 + 20 * 1000,2 * 60000 + 18 * 1000,2 * 60000 + 36 * 1000,3 * 60000 + 44 * 1000,3 * 60000 + 22 * 1000,2 * 60000 + 04 * 1000,
+				1 * 60000 + 41 * 1000,2 * 60000 + 06 * 1000,3 * 60000 + 23 * 1000,3 * 60000 + 40 * 1000,2 * 60000 + 36 * 1000,2 * 60000 + 09 * 1000,3 * 60000 + 20 * 1000,2 * 60000 + 26 * 1000,2 * 60000 + 26 * 1000,2 * 60000 + 59 * 1000,
+				2 * 60000 + 48 * 1000,0 * 60000 + 00 * 1000,2 * 60000 + 23 * 1000,2 * 60000 + 35 * 1000,3 * 60000 + 08 * 1000,1 * 60000 + 55 * 1000,2 * 60000 + 23 * 1000,2 * 60000 + 25 * 1000,3 * 60000 + 45 * 1000,2 * 60000 + 30 * 1000,
+				2 * 60000 + 35 * 1000,3 * 60000 + 03 * 1000,2 * 60000 + 20 * 1000,2 * 60000 + 10 * 1000,2 * 60000 + 22 * 1000,2 * 60000 + 11 * 1000,2 * 60000 + 20 * 1000,2 * 60000 + 38 * 1000,2 * 60000 + 30 * 1000,2 * 60000 + 18 * 1000,
+				2 * 60000 + 12 * 1000,1 * 60000 + 43 * 1000,2 * 60000 + 09 * 1000,2 * 60000 + 09 * 1000,2 * 60000 + 00 * 1000,2 * 60000 + 01 * 1000,2 * 60000 + 04 * 1000,2 * 60000 + 06 * 1000,3 * 60000 + 48 * 1000,1 * 60000 + 57 * 1000,
+				2 * 60000 + 18 * 1000,2 * 60000 + 25 * 1000,2 * 60000 + 52 * 1000,2 * 60000 + 27 * 1000,2 * 60000 + 59 * 1000,2 * 60000 + 45 * 1000,2 * 60000 + 18 * 1000,1 * 60000 + 53 * 1000,2 * 60000 + 44 * 1000,2 * 60000 + 16 * 1000,
+				2 * 60000 + 04 * 1000,2 * 60000 + 19 * 1000,2 * 60000 + 03 * 1000,2 * 60000 + 13 * 1000,2 * 60000 + 37 * 1000,2 * 60000 + 37 * 1000,2 * 60000 + 26 * 1000,2 * 60000 + 07 * 1000,2 * 60000 + 28 * 1000,2 * 60000 + 00 * 1000,
+				2 * 60000 + 41 * 1000,2 * 60000 + 16 * 1000,2 * 60000 + 07 * 1000,2 * 60000 + 16 * 1000,3 * 60000 + 04 * 1000,3 * 60000 + 22 * 1000,3 * 60000 + 02 * 1000,3 * 60000 + 19 * 1000,2 * 60000 + 32 * 1000,3 * 60000 + 23 * 1000,
+				2 * 60000 + 49 * 1000,2 * 60000 + 30 * 1000,2 * 60000 + 13 * 1000,2 * 60000 + 20 * 1000,1 * 60000 + 48 * 1000,2 * 60000 + 34 * 1000,2 * 60000 + 16 * 1000,1 * 60000 + 45 * 1000,2 * 60000 + 01 * 1000,2 * 60000 + 32 * 1000,
+				2 * 60000 + 07 * 1000,3 * 60000 + 07 * 1000,2 * 60000 + 44 * 1000,2 * 60000 + 34 * 1000,2 * 60000 + 12 * 1000,2 * 60000 + 28 * 1000,2 * 60000 + 32 * 1000,2 * 60000 + 53 * 1000,2 * 60000 + 38 * 1000,2 * 60000 + 38 * 1000,
+				4 * 60000 + 10 * 1000,3 * 60000 + 09 * 1000,4 * 60000 + 13 * 1000,2 * 60000 + 01 * 1000,2 * 60000 + 20 * 1000,2 * 60000 + 02 * 1000,2 * 60000 + 11 * 1000,2 * 60000 + 31 * 1000,2 * 60000 + 32 * 1000,2 * 60000 + 36 * 1000,
+				5 * 60000 + 46 * 1000,3 * 60000 + 12 * 1000,2 * 60000 + 49 * 1000,2 * 60000 + 56 * 1000,3 * 60000 + 14 * 1000,2 * 60000 + 27 * 1000,2 * 60000 + 09 * 1000,2 * 60000 + 34 * 1000,2 * 60000 + 11 * 1000,2 * 60000 + 31 * 1000,
+				2 * 60000 + 39 * 1000,2 * 60000 + 34 * 1000,3 * 60000 + 07 * 1000,3 * 60000 + 12 * 1000,4 * 60000 + 16 * 1000,4 * 60000 + 04 * 1000,2 * 60000 + 16 * 1000,2 * 60000 + 32 * 1000,3 * 60000 + 05 * 1000,3 * 60000 + 01 * 1000,
+				2 * 60000 + 39 * 1000,2 * 60000 + 35 * 1000,2 * 60000 + 43 * 1000,2 * 60000 + 44 * 1000,2 * 60000 + 02 * 1000,2 * 60000 + 08 * 1000,2 * 60000 + 03 * 1000,2 * 60000 + 07 * 1000,2 * 60000 + 04 * 1000,2 * 60000 + 24 * 1000,
+				2 * 60000 + 24 * 1000,1 * 60000 + 41 * 1000,2 * 60000 + 21 * 1000,2 * 60000 + 47 * 1000,2 * 60000 + 23 * 1000,2 * 60000 + 24 * 1000,2 * 60000 + 01 * 1000,2 * 60000 + 11 * 1000,2 * 60000 + 02 * 1000,2 * 60000 + 24 * 1000,
+				3 * 60000 + 32 * 1000,3 * 60000 + 14 * 1000,2 * 60000 + 38 * 1000,2 * 60000 + 17 * 1000,3 * 60000 + 49 * 1000,2 * 60000 + 50 * 1000,2 * 60000 + 34 * 1000,2 * 60000 + 59 * 1000,1 * 60000 + 31 * 1000,1 * 60000 + 38 * 1000,
+				2 * 60000 + 15 * 1000,2 * 60000 + 17 * 1000,0 * 60000 + 00 * 1000,2 * 60000 + 00 * 1000,1 * 60000 + 54 * 1000,2 * 60000 + 07 * 1000,1 * 60000 + 35 * 1000,2 * 60000 + 20 * 1000,2 * 60000 + 05 * 1000,1 * 60000 + 32 * 1000,
+				1 * 60000 + 26 * 1000,4 * 60000 + 32 * 1000,3 * 60000 + 44 * 1000,3 * 60000 + 16 * 1000,3 * 60000 + 06 * 1000,3 * 60000 + 04 * 1000;
 
 	// Test mode, Shortens Coutdown timer to 30 seconds for faster testing
 	// [0] = Off
 	// [1] = On
 	.TestMode = 0;
-	
+
 // -------------------
 //  Don't Touch Ever
 // -------------------
 	
-	disablenpc "Disguise Event";
 	$@CurrentEvent = 0;
 	if( .StartTime > 59 ) .StartTime = 59;
 	if( .StartTime < 0 ) .StartTime = 0;
 	setarray .Days$[0],"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday";
 	end;
 }
+
 
 //==================================
 //-- Emperium Event Extras
@@ -1552,7 +1874,7 @@ OnBreak:
 		$@BestCid = getcharid(0);
 		announce "[Emperium Event]: "+strcharinfo(0)+" now holds the top time of "+((.@m)?callfunc("F_InsertPlural",.@i,"minute")+" ":"")+""+((.@s)?.@s+""+((.@ms)?"."+.@ms:"")+" seconds":"")+".",bc_all|bc_blue;
 	}
-	mapannounce .Map$,"You have a "+((.@Time == BestTime)?"new personal best ":"")+"time of "+((.@m)?callfunc("F_InsertPlural",.@i,"minute")+" ":"")+""+((.@s)?.@s+""+((.@ms)?"."+.@ms:"")+" seconds":"")+".",bc_area|bc_blue;
+	mapannounce 'Map$,"You have a "+((.@Time == BestTime)?"new personal best ":"")+"time of "+((.@m)?callfunc("F_InsertPlural",.@i,"minute")+" ":"")+""+((.@s)?.@s+""+((.@ms)?"."+.@ms:"")+" seconds":"")+".",bc_area|bc_blue;
 	sleep2 2500;
 	instance_destroy;
 	end;
@@ -1561,28 +1883,28 @@ OnInstanceInit:
 	initnpctimer;
 	stopnpctimer;
 	setnpctimer 0,strnpcinfo(3);
-	.Map$ = strnpcinfo(4);
-	monster .Map$,223,206,"Emperium",1288,1,strnpcinfo(3)+"::OnBreak";
-	.GID = $@mobid;
-	setunitdata .GID,UMOB_DMGIMMUNE,1;
+	'Map$ = strnpcinfo(4);
+	monster 'Map$,223,206,"Emperium",1288,1,strnpcinfo(3)+"::OnBreak";
+	'GID = $@mobid;
+	setunitdata 'GID,UMOB_DMGIMMUNE,1;
 	sleep 2000;
-	mapannounce .Map$,"[Emperium Event]: Goal is simple, kill the Emperium as fast as you can~",bc_map|bc_blue;
+	mapannounce 'Map$,"[Emperium Event]: Goal is simple, kill the Emperium as fast as you can~",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"[Emperium Event]: Once Countdown is done have at it.",bc_map|bc_blue;
+	mapannounce 'Map$,"[Emperium Event]: Once Countdown is done have at it.",bc_map|bc_blue;
 	sleep 2000;
-	mapannounce .Map$,"5",bc_map|bc_blue;
+	mapannounce 'Map$,"5",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"4",bc_map|bc_blue;
+	mapannounce 'Map$,"4",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"3",bc_map|bc_blue;
+	mapannounce 'Map$,"3",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"2",bc_map|bc_blue;
+	mapannounce 'Map$,"2",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"1",bc_map|bc_blue;
+	mapannounce 'Map$,"1",bc_map|bc_blue;
 	sleep 1000;
-	mapannounce .Map$,"Go~",bc_map|bc_blue;
+	mapannounce 'Map$,"Go~",bc_map|bc_blue;
 	startnpctimer strnpcinfo(3);
-	setunitdata .GID,UMOB_DMGIMMUNE,0;
+	setunitdata 'GID,UMOB_DMGIMMUNE,0;
 	end;
 }
 
@@ -1600,16 +1922,7 @@ maze,369,162,4	script	Event_Agent#Maze	405,4,4,{
 OnTouch_:
 	if($@CurrentEvent == -5){
 		$@CurrentEvent = 0;
-		announce "Congrats "+strcharinfo(0)+", a winner in the Maze Event.",bc_all|bc_blue;
-		WonEvents++;
-		MWonEvents++;
-		if($@Mail){
-			mail getcharid(0), "no-reply", "Maze Event", "Congratulations!% You have won in the Maze Event % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
-			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-		} else {
-			getitem $@RewardID,$@RewardQNT;
-			zeny += $@RewardZeny;
-		}
+		Func_Prizes(getcharid(0),"Maze Event");
 		mapwarp "maze","prontera",155,172;
 	}
 	warp "prontera",155,172;
@@ -1624,17 +1937,17 @@ prontera,155,227,4	script	Cluckers	800,{
 	if ($@CurrentEvent == -7) {
 		specialeffect2 EF_HIT3;
 		switch(rand(16)) {
-			case 0: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 0: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
 			case 1: npctalk "Cluuuuuck!~"; break;
 			case 2: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
 			case 3: sc_start SC_Freeze,10000,0; break;
-			case 4: npctalk "CLUUUUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 4: npctalk "CLUUUUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
 			case 5: sc_start SC_Sleep,10000,0; break;
-			case 6: sc_start SC_Stone,10000,0; emotion e_gg; break;
-			case 7: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
-			case 8: npctalk "Cluck! CLUUUCK!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion e_omg; break;
+			case 6: sc_start SC_Stone,10000,0; emotion ET_KIK; break;
+			case 7: npctalk "CLUUUUUUCK!!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
+			case 8: npctalk "Cluck! CLUUUCK!!"; unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; emotion ET_HUK; break;
 			case 9: sc_start SC_Stun,10000,0; break;
-			case 10: sc_start SC_Sleep,10000,0; emotion e_gg; break;
+			case 10: sc_start SC_Sleep,10000,0; emotion ET_KIK; break;
 			case 11: npctalk "Cluck! Cluck!"; break;
 			case 12: sc_start SC_Stun,10000,0; break;
 			case 13: unitkill getcharid(3); skilleffect "NPC_SELFDESTRUCTION",1; break;
@@ -1642,16 +1955,7 @@ prontera,155,227,4	script	Cluckers	800,{
 				if (!rand(7)) {
 					npctalk "WOOF!...........";
 					specialeffect2 EF_SPHERE;
-					announce "Congrats "+strcharinfo(0)+", a winner in the Cluckers Event.",bc_all|bc_blue;
-					WonEvents++;
-					MWonEvents++;
-					if($@Mail){
-						mail getcharid(0), "no-reply", "Cluckers Event", "Congratulations!% You have won in the Cluckers Event % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
-						query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-					} else {
-						getitem $@RewardID,$@RewardQNT;
-						zeny += $@RewardZeny;
-					}
+					Func_Prizes(getcharid(0),"Cluckers Event");
 					$@CurrentEvent = 0;
 				} else {
 					npctalk "Cluck! CLUUUCK!!";
@@ -1680,21 +1984,21 @@ OnInit:
 OnEventStart:
 	$@CurrentEvent = 7;
 	for(.@i = 5; .@i > 0; .@i--){
-		Announce "Cluckers Event Will begin in "+callfunc("F_InsertPlural",.@i,"minute")+"!",bc_blue;
-		Announce "Please type @joinevent to join",bc_blue;
+		announce "Cluckers Event Will begin in "+callfunc("F_InsertPlural",.@i,"minute")+"!",bc_blue;
+		announce "Please type @joinevent to join",bc_blue;
 		sleep 60000;
 	}
-	Announce "Cluckers Event Has Begun!",bc_blue;
+	announce "Cluckers Event Has Begun!",bc_blue;
 	$@CurrentEvent = -7;
 	sleep 60000 * 45;
 	if($@CurrentEvent == -7){
 		$@CurrentEvent = 0;
-		Announce "Cluckers Event Has Ended with No Winner!",bc_blue|bc_area|bc_npc;
+		announce "Cluckers Event Has Ended with No Winner!",bc_blue|bc_area|bc_npc;
 	}
 	end;
 }
 
-guild_vs2,50,50,4	script	Disguise Event	795,{
+pvp_n_1-5,100,100,4	script	Disguise Event	795,{
 	if($@CurrentEvent == -15){
 		if(getgmlevel() == 99)
 			dispbottom $MonsterName$+"";
@@ -1759,23 +2063,15 @@ OnCorrect:
 	deletepset 1;
 	activatepset 1;
 	specialeffect2 EF_SPHERE;
-	announce "Congrats "+strcharinfo(0)+", a winner in the Disguise Event.",bc_all|bc_blue;
-	WonEvents++;
-	MWonEvents++;
-	if($@Mail){
-		mail getcharid(0), "no-reply", "Disguise Event", "Congratulations!% You have won in the Disguise Event % % %[ Your reward is attached. ]", $@RewardZeny, $@RewardID, $@RewardQNT;
-		query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
-	} else {
-		getitem $@RewardID,$@RewardQNT;
-		zeny += $@RewardZeny;
-	}
-	if (.RoundCount >= .Rounds) {
+	Func_Prizes(getcharid(0),"Disguise Event");
+	if (.RoundCount >= .DisguiseRound) {
 		setnpcdisplay "Disguise Event",795;
 		.RoundCount = .Change = .EventON = 0;
+		$@CurrentEvent = 0;
 		setnpctimer 0;
 		stopnpctimer;
 		npctalk "Disguise Event : Thank you all for playing. That was the last round of the Disguise Event. Come play again later.";
-		mapwarp "guild_vs2","prontera",155,172;
+		mapwarp "pvp_n_1-5","prontera",155,172;
 		end;
 	}
 	setnpcdisplay "Disguise Event",795;
@@ -1795,10 +2091,10 @@ OnInit:
 
 	// Number of rounds for Disguise Event
 	.DisguiseRound = 5;
-
+	$@DisguiseNpc$ = strnpcinfo(3);
 	// MVP List
 	setarray .MVP[0],1038,1039,1046,1059,1086,1087,1112,1115,1147,1150,1157,1159,1190,1251,1252,1272,1312,1373,
-			1389,1399,1418,1492,1502,1511,1583,1623,1630,1646,1647,1648,1649,1650,1651,1658,1685,1688,
+			1389,25156,1418,1492,1502,1511,1583,1623,1630,1646,1647,1648,1649,1650,1651,1658,1685,1688,
 			1708,1719,1734,1751,1768,1779,1785,1802,1832,1871,1874,1885,1917,1980,2022,2068,2087,2131,
 			2156,2165;
 
@@ -1813,36 +2109,12 @@ OnInit:
 		"2086,2087,2088,2089,2090,2091,2092,2093,2094,2095,2096,2097,2098,2099," + 
 		"2100,2101,2012,2103,2104,2105,2106,2107,2108,2109,2110,2111,2112,2113," + 
 		"2114,2115,2116,2117,2118,2119,2120,2121,2123,2124,2125,1496,";
+		
+	disablenpc $@DisguiseNpc$;
 }
 
 //==================================
 //-- Event Shops
 //==================================
 
-prontera,164,175,3	itemshop	Event Headgear Shop	877,33001,5381:50,5391:50,5462:50,5463:75,5596:75,5214:100,5380:100,5210:100,5226:100,5227:100,5228:100,5229:100,5230:100,5231:100,5232:100,5233:100,5234:100,5235:100,5236:100,5237:100,5283:100,5288:100,5293:100,5313:100,5314:100,5315:100,5324:100,5372:100,5376:100,5377:100,5378:100,5503:100,5505:100,5529:100,5286:125,5263:125,5098:125,5382:125,5238:175,5239:175,5240:175,5241:175,5242:175,5374:500
-prontera,164,173,3	itemshop	Event Rental Shop	877,33001,36502:7,35504:10,35505:10,35503:20
-prontera,164,169,3	itemshop	Event Shop	877,33001,12209:1,12211:2,604:3,7621:3,12299:5,12212:5,12311:5,12221:7,608:10,607:15,12208:15,14592:15,12210:15,12214:20,7776:20,35501:25,35502:25
-prontera,164,167,3	itemshop	Event Food Shop	877,33001,12041:10,12042:20,12043:30,12044:40,12045:50,12046:10,12047:20,12048:30,12049:40,12050:50,12051:10,12052:20,12053:30,12054:40,12055:50,12056:10,12057:20,12058:30,12059:40,12060:50,12061:10,12062:20,12063:30,12064:40,12065:50,12066:10,12067:20,12068:30,12069:40,12070:50
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+prt_in,136,31,3	itemshop	Event Costume Shop	877,33001,20350:10,20351:10,20352:10,20353:10,20354:10,20355:10,20356:10,20357:10,20358:10,20359:10,20360:10,20361:10,20362:10,20363:10,20364:10,20365:10,20366:10,20367:10,20368:10,20369:10,20370:10,31063:10,31064:10,31065:10,31066:10,31067:10,31068:10,31069:10,31070:10,31071:10,31072:10,31073:10,31074:10,31075:10,31076:10,31077:10,31078:10,31079:10,31080:10,31081:10,31082:10,31083:10,31084:10,31085:10,31086:10,31329:30,31407:30,31062:50,31405:50,31149:50,31406:50,19291:100
