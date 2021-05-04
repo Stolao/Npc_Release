@@ -1,0 +1,138 @@
+//===== EinherjarRO Scripts ================================== 
+//= Hourly Rewards
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: =====================================
+//= 2.00
+//===== Compatible With: =====================================
+//= rAthena SVN
+//===== Description: =========================================
+//= A reward system for players for every hour of play up to
+//= a limited number of hours a week, each character will have
+//= a unique 
+//===== Todo =================================================
+//= Suggestions?
+//===== Comments: ============================================
+//=   quest_db.txt
+//=	61000,180,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"Hourly Rewards Cooldown"
+//===== Additional Comments: =================================
+//= 2.00 Remake using Quest DB
+//===== Contact Info: ========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+prontera,5,5,5	script	Hourly	111,{
+OnHourCmnd:
+	switch(checkquest(61000,PLAYTIME)){
+		case 2:
+			.@NextHour = #HReward + 1;
+			explode(.@XT$,.Rewards$[.@NextHour],",");
+			for(.@x = y = 0; .@x < .@Size; .@x++)
+				.@TT[.@x] = atoi(.@XT$[.@x]);
+			if(.Mode & 1 && (.@TT[4] > 0 || .@vip[4] > 0)){
+				.@Size = getarraysize(.@TT);
+				for(.@x = 4; .@x <= .@Size - 1 ; .@x += 2){
+					.@itms[.@y] = .@TT[.@x];
+					.@qnts[.@y] = .@TT[.@x + 1];
+					.@y++;
+				}
+				if(checkweight2(.@itms,.@qnts)){
+					for(.@x = 0; .@x < .@y; .@x++){
+						if(.Mode & 32)
+							getitembound  .@itms[.@x], .@qnts[.@x], .Bound_Mode;
+						else	getitem  .@itms[.@x], .@qnts[.@x];
+					}
+				} else {
+					message strcharinfo(0),"[Hourly Rewards]: You cannot carry the prizes, please use storage and reuse command.";
+					end;
+				}
+			}
+			if(.Mode & 2 && (.@TT[1])){
+				#Hourlypoint += .@TT[1];
+				message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[1] +" "+.Points$;
+			}
+			if(.Mode & 4 && (.@TT[0])){
+				zeny += .@TT[0];
+				message strcharinfo(0),"[Hourly Rewards]: Recieved "+ .@TT[0] +"z";
+			}
+			if(.Mode & 8 && (.@TT[3] || .@TT[4]))
+				getexp .@TT[3], .@TT[4];
+			#HReward++;
+			erasequest 61000;
+		case -1:
+			.@Size = getarraysize(.Rewards$);
+			if(#HReward >= .@Size){
+				message strcharinfo(0),"[Hourly Rewards]: No more rewards remaining this week, .";
+				end;
+			}
+			setquest 61000;
+			end;
+		case 0:
+		case 1:
+			message strcharinfo(0),"[Hourly Rewards]: Rewards not ready again yet.";
+			end;
+	}
+
+OnHour00:
+	if(gettime(DT_DAYOFWEEK) == SUNDAY){
+		query_sql("DELETE FROM `acc_reg_num` WHERE `key` = '#HReward'");
+		addrid(0);
+		#HReward = 0;
+	}
+	end;
+
+OnInit:
+	// Basic Settings
+	//   1: Item | 2: Points | 4: Zeny | 8: Exp
+	//   16: Item Rewards Bound
+	//     (a bit value, e.g. 3 = Items & Points from Multi)
+	.Mode = 1|2|4|16;
+
+	// Item Binding Mode
+	//	 Bound_Account : Account Bound item
+	//	 Bound_Guild   : Guild Bound item
+	//	 Bound_Party   : Party Bound item
+	//	 Bound_Char    : Character Bound item
+	.Bound_Mode = Bound_Account;
+
+	// To disable the command '@loginreward' comment the next lines
+	// * Needs extra commands for typos
+	bindatcmd("hourly",strnpcinfo(3)+"::OnHourCmnd",0,99);
+	bindatcmd("hourlyreward",strnpcinfo(3)+"::OnHourCmnd",0,99);
+
+	// Point Name
+	.Points$ = "Hourly Points";
+
+	// Hourly Prize items:
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc", // Hour 1
+	//   "<Zeny>,<Points>,<BaseExp>,<JobExp>,<itemID-1>,<amount-1>,<itemID-2>,<amount-2>...etc"  // Hour 2
+	//   ...;
+	// Total length of any days string must be 255 or shorter
+	// This is total hours collected per week, max possible is 167
+	setarray .Rewards$[1],
+		"1000,1",			// Hour 1: 1000 Zeny + 1 #Hourlypoint
+		"0,1,0,0,501,5",		// Hour 2: 5 Red Potion
+		"0,1,0,0,506,5",		// Hour 3: 5 Green Potion
+		"2000,1",			// Hour 4: 2000 Zeny
+		"2000,1",			// Hour 5: 2000 Zeny
+		"0,1,0,0,502,5",		// Hour 6: 5 Orange Potion
+		"0,1,0,0,12208,1",		// Hour 7: 1 Battle Manual
+		"2500,1",			// Hour 8: 2500 Zeny
+		"2500,1",			// Hour 8: 2500 Zeny
+		"2500,1",			// Hour 9: 2500 Zeny
+		"0,1,0,0,503,5",		// Hour 10: 5 White Potion
+		"2500,1",			// Hour 11: 2500 Zeny
+		"2500,1",			// Hour 12: 2500 Zeny
+		"2500",				// Hour 13: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 14: 5 White Potion + 3 Green Potion
+		"2500,1",			// Hour 15: 2500 Zeny
+		"2500,1",			// Hour 16: 2500 Zeny
+		"2500,1",			// Hour 17: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 18: 5 White Potion + 3 Green Potion
+		"2500,1",			// Hour 19: 2500 Zeny
+		"2500,1",			// Hour 20: 2500 Zeny
+		"0,1,0,0,604,3",		// Hour 21: 1 Dead Branch
+		"2500,1",			// Hour 22: 2500 Zeny
+		"0,1,0,0,503,5,506,3",		// Hour 23: 5 White Potion + 3 Green Potion
+		"2500,1";			// Hour 24: 2500 Zeny
+}

@@ -1,0 +1,76 @@
+//===== EinherjarRO Scripts ================================== 
+//= F_ApplyOption
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A function that will apply random options to gear defined 
+//= within paramaters defined
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+// callfunc("F_ApplyOptions",Slot{,Number,Option1,Value1,Option2,...});
+// [0] Equipment Slot
+//	EQI_ACC_L (0)	- Accessory 1
+//	EQI_ACC_R (1)	- Accessory 2
+//	EQI_SHOES (2)	- Footgear (shoes, boots)
+//	EQI_GARMENT (3)	- Garment (mufflers, hoods, manteaux)
+//	EQI_HEAD_LOW (4)- Lower Headgear (beards, some masks)
+//	EQI_HEAD_MID (5)- Middle Headgear (masks, glasses)
+//	EQI_HEAD_TOP (6)- Upper Headgear
+//	EQI_ARMOR (7)	- Armor (jackets, robes)
+//	EQI_HAND_L (8)	- Left hand (weapons, shields)
+//	EQI_HAND_R (9)	- Right hand (weapons)
+// [1] Number of Enchants
+//	1 - 5, can use rand(1,5) for variable amounts
+// [2] Possible Options
+//	Check const.tx for referances
+// [3] Option Value
+//	Can value for the defined Possible Option
+//	use rand() to make random
+//
+// [Examples]
+// Simple
+// -- Will Apply Random Element on first Equip
+// 1201,Knife,Knife,5,50,,400,17,,1,3,0xFE9F7EEF,7,2,2,1,1,1,1,{},{ callfunc("F_ApplyOptions",EQI_HAND_R); },{}
+// 2301,Cotton_Shirt,Cotton Shirt,4,10,,100,,1,,0,0xFFFFFFFFFFFFFFFF,7,2,16,,0,1,0,{},{ callfunc("F_ApplyOptions",EQI_ARMOR); },{}
+//
+// Advanced
+// -- Will add between 1 and 5 total of any of the stats
+// 1201,Knife,Knife,5,50,,400,17,,1,3,0xFE9F7EEF,7,2,2,1,1,1,1,{},{ callfunc("F_ApplyOptions",EQI_HAND_R,rand(1,5),RDMOPT_VAR_STRAMOUNT,1,RDMOPT_VAR_AGIAMOUNT,1,RDMOPT_VAR_VITAMOUNT,1,RDMOPT_VAR_INTAMOUNT,1,RDMOPT_VAR_DEXAMOUNT,1,RDMOPT_VAR_LUKAMOUNT,1); },{}
+// 2301,Cotton_Shirt,Cotton Shirt,4,10,,100,,1,,0,0xFFFFFFFFFFFFFFFF,7,2,16,,0,1,0,{},{ callfunc("F_ApplyOptions",EQI_ARMOR,rand(1,5),RDMOPT_VAR_STRAMOUNT,1,RDMOPT_VAR_AGIAMOUNT,1,RDMOPT_VAR_VITAMOUNT,1,RDMOPT_VAR_INTAMOUNT,1,RDMOPT_VAR_DEXAMOUNT,1,RDMOPT_VAR_LUKAMOUNT,1); },{}
+
+function	script	F_ApplyOption	{
+	if(getequipid(getarg(0,9)) > 0 && getequiprandomoption(getarg(0,9),0,ROA_ID) == 0){
+		if(getargcount() < 2){
+			switch(getarg(0,9)){
+				case 7:
+					setrandomoption(getarg(0,9),0,rand(RDMOPT_BODY_ATTR_NOTHING,RDMOPT_BODY_ATTR_UNDEAD),1,1;
+					break;
+				case 9:
+					setrandomoption(getarg(0,9),0,rand(RDMOPT_WEAPON_ATTR_NOTHING,RDMOPT_WEAPON_ATTR_UNDEAD),1,1;
+				default:
+					break;
+			}
+		} else {
+			for(.@i = 0; .@i < getarg(1,0); .@i++){
+				.@x = rand(2,getargcount());
+				if(.@x % 2)
+					.@x++;
+				if(.@x > getargcount())
+					.@x -= 2;
+				setrandomoption(getarg(0,9),.@i,getarg(.@x,0),.@x + 1,1;
+			}
+		}
+	}
+	return;
+}
+

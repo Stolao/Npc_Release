@@ -1,0 +1,47 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.03
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Checks both invetory count and weight for an array of items
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//= 1.01 Fixed syntex error
+//= 1.02 Added a count item check for items already in invetory
+//= 1.03 Added a check for strings for dynamic use
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//callfunc "F_InvCheck",<ItemID1>,<ItemCount1>{,<ItemID2>,<ItemCount2>{,<ItemID3>,<ItemCount3>......}};
+//callfunc "F_InvCheck","<ItemArray>","<QntArray>";
+//callfunc "F_InvCheck",Implode(<ItemArray>,","),Implode(<QntArray>,",");
+Function	Script	F_InvCheck	{
+	if(getargcount() == 2 && compare(getarg(0),",")){			//check for compressed array
+		explode(.@id,getarg(0),",");					//decompress
+		explode(.@qnt,getarg(1),",");
+	} else {
+		for(.@i = 0; .@i < getargcount(); .@i = .@i + 2){		// convert uncompressed into 2 arrays
+			.@id[.@i / 2] = getarg(.@i);
+			.@qnt[.@i / 2] = getarg(.@i + 1);
+		}
+	}
+	for(.@i = 0; .@i < getarraysize(.@id); .@i++){
+		if( countitem(.@id[.@i]) &&					//count items that are stackable
+			getiteminfo(.@id[.@i],2) != IT_ARMOR &&
+			getiteminfo(.@id[.@i],2) != IT_WEAPON &&
+			getiteminfo(.@id[.@i],2) != IT_PETEGG && 
+			getiteminfo(.@id[.@i],2) != IT_PETARMOR &&
+			getiteminfo(.@id[.@i],2) != IT_SHADOWGEAR ) .@c += .@qnt(.@i);
+	}
+	getinventorylist;
+	if(!checkweight2(.@id,.@qnt) || @inventorylist_count + getarraysize(.@id) - .@c > MAX_INVENTORY){
+		return 0;
+	} return 1;
+}

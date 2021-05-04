@@ -1,0 +1,121 @@
+//===== EinherjarRO Scripts ================================== 
+//= Group Buffs
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.04
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Party/Guild Buffs
+//===== Uses: ================================================
+//= Apply party / Guild buffs via npc or item (autobonus)
+//===== Comments: ============================================
+//= [Stolao]
+//= Optimize
+//= Sugestions?
+//= Map Check?
+//===== Additional Comments: =================================
+//= 1.00 Origional Make
+//= 1.01 Changed Group to bitwise
+//= 1.02 Made buffs editable via callfunc
+//= 1.03 Typo Fixed thanks to ??
+//= 1.04 Tabulation
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+// Guilde/Party buffs from gear
+// callfunc("Aegis",<Group>{,<Buff>{,<Duration>{,<Amount>{,<Amount2>}}}});
+//- Group
+//	[1] Party
+//	[2] Guild
+// - Buff
+//	[-] Random Buff
+//	[0] Remove Buffs
+//	[1] Mdef +A% for D Seconds
+//	[2] Def +A% for D seconds
+//	[3] Aspd Potion[0] for D seconds
+//	[4] Aspd Potion[1] for D seconds
+//	[5] Aspd Potion[2] for D seconds
+//	[6] Aspd Potion[3] for D seconds
+//	[7] Atk +A for D seconds
+//	[8] Matk +A for D seconds
+//	[9] Heal A% HP
+//	[10] Heal A% SP
+//	[11] Sp Cost A% for D Seconds
+//	[12] Regenerate A2% of Max HP Every A Seconds for D Seconds
+
+Function	Script	Aegis	{
+	if(getcharid(1) && getarg(0,0)&1){
+		addrid(2,0,getcharid(1));
+	}
+	if(getcharid(2) && getarg(0,0)&2){
+		addrid(3,0,getcharid(2));
+	}
+	switch(getarg(1,rand(1,12))){
+		case 0:
+			sc_end SC_MDEF_RATE;
+			sc_end SC_DEF_RATE;
+			sc_end SC_ASPDPOTION0;
+			sc_end SC_ASPDPOTION1;
+			sc_end SC_ASPDPOTION2;
+			sc_end SC_ASPDPOTION3;
+			sc_end SC_ATKPOTION;
+			sc_end SC_MATKPOTION;
+			sc_end SC_SPCOST_RATE;
+			sc_end SC_S_LIFEPOTION;
+			percentheal -3,-3;
+			break;
+		case 1:
+			specialeffect2 EF_SPELLBREAKER; 
+			sc_start SC_MDEF_RATE,getarg(2,5)*1000,getarg(3,5);
+			break;
+		case 2:
+			specialeffect2 EF_GUARD;
+			sc_start SC_DEF_RATE,getarg(2,5)*1000,getarg(3,5);
+			break;
+		case 3:
+			specialeffect2 EF_BLOODDRAIN;
+			sc_start SC_ASPDPOTION0,getarg(2,9)*1000,0;
+			break;
+		case 4:
+			specialeffect2 EF_POTION_BERSERK;
+			sc_start SC_ASPDPOTION1,getarg(2,9)*1000,0;
+			break;
+		case 5:
+			specialeffect2 EF_HASTEUP;
+			sc_start SC_ASPDPOTION2,getarg(2,9)*1000,0;
+			break;
+		case 6:
+			specialeffect2 EF_HASTEUP;
+			sc_start SC_ASPDPOTION3,getarg(2,9)*1000,0;
+			break;
+		case 7:
+			specialeffect2 EF_FIRESPLASHHIT; 
+			sc_start SC_ATKPOTION,getarg(2,5)*1000,getarg(3,30);
+			break;
+		case 8:
+			specialeffect2 EF_ENHANCE;
+			sc_start SC_MATKPOTION,getarg(2,5)*1000,getarg(3,30);
+			break;
+		case 9:
+			specialeffect2 EF_MAGICALATTHIT;
+			percentheal getarg(3,3),0;
+			break;
+		case 10:
+			specialeffect2 EF_MAGICALATTHIT;
+			percentheal 0,getarg(3,3);
+			break;
+		case 11:
+			specialeffect2 EF_FREEZED;
+			sc_start SC_SPCOST_RATE,getarg(2,9)*1000,getarg(3,-15);
+			break;
+		case 12:
+			specialeffect2 EF_HEAL3;
+			sc_start4 SC_S_LIFEPOTION,getarg(2,15)*1000,getarg(4,-1),getarg(3,7),0,0;
+			break;
+	}
+end;
+}

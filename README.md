@@ -3,6 +3,7 @@ Stolao's Script Collection
 
 Usage Policy
 =======
+* These scripts are designed with rAthenas codebase, if your using any other emulator these most likely will not work
 * You may use, modify, and host all of my released scripts.
 * You may not sell them, re-release them in any way (modified or otherwise), or remove the credits.
 * My scripts are not to be used for donation purposes, but soly for the betterment of a server.
@@ -26,6 +27,8 @@ A Few Useful @Commands
   * @Home
   * @BGM
   * @BGMALL
+  * @boom
+  * @getskill
 
 Auto Event
 ---------
@@ -43,6 +46,8 @@ Custom Functions
         * Function use to replace sc_end all; when relevent
     * 2Test_Functions
         * Functions that may or may not work, will get back to later
+    * F_InvCheck_v1.00
+        * Checks both invetory count and weight for an array of items
 
 Daily Login Rewards
 ---------
@@ -50,10 +55,10 @@ On Login Players recive Items and Buffs Based on number of consecutive days logg
    * Full Customizable
    * Can Set Number of Hours Between Login Prizes and Losing Consecutive Prizes make Days Weeks or even Months
    * Can Item, Point, Xp or even Buff Rewards
-   * Consecutive Prizes for up to 128 Rewards
+   * Consecutive Prizes for up to 2,147,483,647 Rewards 
    * Includes Configurable Whisper Commands for checking status of and collecting next rewards
    * Includes @Command for checking status of and collecting next rewards
-   * Includes Dynamic Buff Rewards, supporting up to 32 different buffs
+   * Includes Dynamic Buff Rewards, supporting up to 536,870,911 different buffs
 
 EX Job Master
 ---------
@@ -62,19 +67,39 @@ Allows Players to swap in and out of all jobs freely saving there stats (non sql
    * Option to disable class Unlocking, so players have to earn classes from quest still
    * [Bug] Platinum Skills earned through quest are lost sometimes on job change if platinum is disabled
 
+Farming (Instance)
+---------
+Coming Soon
+
 Floating Rates
 ---------
 Exp and Item Drop Rates Increase and Decrease Dynamically base off Online Player Count and Config
    * Easy Configuration
 
+Fly-Wings
+--------
+Reusable Flywings and Butterfly Wings
+   * Contains item_db, lua files and @commands
+
 Group Buffs
 ---------
 Apply party / Guild buffs via npc or item (autobonus)
    * Easy Configuration
- 
+
+Lucky
+---------
+Every Hour on a random Minute will give a random non-idle character and item 
+
 Mining
 ---------
 A mob + script based mining system
+
+MVP_Speed_Run
+---------
+MVP Team Speed Run
+   * Party based MVP Ladder
+   * has buit in ranking for each MVP
+   * Configurable
 
 Non-Abuse Healer
 ---------

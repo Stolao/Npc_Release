@@ -1,0 +1,499 @@
+//===== EinherjarRo Scripts ==================================
+//= PvP Ladder
+//===== Author ===============================================
+//= Stolao
+//===== Current Version: =====================================
+//= 3.21
+//===== Compatible With: =====================================
+//= rAthena SVN
+//===== Description: =========================================
+// Configurable Pvp Ladder
+//===== Comments: ============================================
+//= [Stolao]
+//===== Additional Comments: =================================
+//= 3.00 Overhaul
+//= 3.01 Fixed missing "No" for "No Ygg"
+//= 3.02 Added Show Map Name Option
+//= 3.03 Added Max Players Option
+//= 3.04 Optimized and fixed SQL queries [Secret]
+//= 3.05 Replaced some queries with addrid(0)
+//= 3.06 Updated Rewards to RODEX compatable
+//= 3.07 Fixed all rom referancing room [0] player limit
+//= 3.08 Made Made .MaxPlayers = 0, mean unlimited
+//= 3.09 Removed use of getd
+//= 3.0A Cleaned up some code
+//= 3.0B Moved Menu Generation to fix Map Count not showing
+//= 3.0C Actually Added RoDex Support now
+//= 3.0D Fixed Map Menu Generation
+//= 3.0E Fixed sql query
+//= 3.0F Cleaned Code a bit
+//= 3.10 Did more Cleaned Code a bit
+//= 3.11 Fixed a logic bug in GM reset
+//= 3.12 Added Waiting Room
+//= 3.13 Added Dynamic Waiting Room
+//= 3.14 Moved and added more At_Commands
+//= 3.15 Dynamic Waiting Room (&4096) require Waiting Room (&2048) to work
+//= 3.16 Increased Waiting Room Rotation Time
+//= 3.17 Fixed Typos in Reset PVP Stats
+//= 3.18 Removed unnessisary next, creating hang screens
+//= 3.19 Made compatable with new mail command
+//= 3.1A Reformatted Rewards in conf to support 5 items
+//= 3.1B Fixeda Hang when entering Nightmare PVP (thanks klesler)
+//= 3.1C Cied incorrrect use of close
+//= 3.1D Fixed Missing Party Check (thanks Haikenz)
+//= 3.1E Fixed Not opening PVP ladder, only GVG ladder (thanks Haikenz)
+//= 3.1F Fixed a warning when generating waitingroom
+//= 3.20 Fixed Missing Guild Check (thanks Haikenz)
+//= 3.21 Changed Default maps to pvp maps
+//===== Todo: ================================================
+//= Condence repeat queries
+//===== Contact Ifo: =========================================
+//= [Stolao]
+// Email: Taingram11@gmail.com
+//============================================================
+prontera,161,196,2	script	Ladder	837,{
+//==================================
+OnPvpLadder:	//-- Menus
+//==================================
+
+	.@Menu = select(((getarraysize(.MapName$))?"Enter PvP Map:":":")+
+			((.Options&1)?"Pvp Ladder:":":")+
+			((.Options&2)?"GvG Ladder:":":")+
+			((.Options&8)?"Top Guild:":":")+
+			((.Options&16)?"PvP Shops:":":")+
+			((.Options&1 || .Options&2 || .Options&8 || .Options&16)?"Personal Stats:":":")+
+			((getgmlevel() >= 99)?"Reset PVP Stats":""));
+	switch(.@Menu){ 
+		case 2:
+		case 3:
+			if(.@Menu == 2){
+				if(.Options&384)
+					.@key$ = "m_kda";
+				else if(.Options&256)
+					.@key$ = "kda";
+				else if(.Options&128)
+					.@key$ = "m_pkcount";
+				else 	.@key$ = "pl_pkcount";
+			} else {
+				if(.Options&384)
+					.@key$ = "gvg_kda";
+				else if(.Options&256)
+					.@key$ = "m_gvg_kda";
+				else if(.Options&128)
+					.@key$ = "m_gvg_kcount";
+				else 	.@key$ = "gvg_kcount";
+			}
+			query_sql("SELECT `char_reg_num`.`value`,`char`.`name`,`char`.`char_id` FROM `char` INNER JOIN `char_reg_num` ON `char_reg_num`.`char_id`=`char`.`char_id` WHERE `char_reg_num`.`key`='" + .@key$ + "' ORDER BY `char_reg_num`.`value` DESC LIMIT 10",.@value,.@name$,.@cid);
+			if(!(.Options&256)){
+				for(.@i = 0; .@i < getarraysize(.@cid); .@i++) {
+					if(.@i == 2){
+						if(.Options&128)
+							.@key$ = "m_dthcount";
+						else	.@key$ = "pl_dthcount";
+					} else if(.Options&128)
+						.@key$ = "m_gvg_dcount";
+					else	.@key$ = "gvg_dcount";
+					query_sql("SELECT CAST(`value` AS SIGNED) FROM `char_reg_num` WHERE char_id = "+.@cid[.@i]+" AND `key` = '';",.@j);
+					.@Death[.@i] = .@j;
+				}
+			}
+			mes "~ ^990000"+((.Options&128)?"Monthly ":"") + ((.@Menu == 2)?"PvP":"GvG") +" Ladder^000000 ~";
+			if (!getarraysize(.@cid)){
+				mes "The rankings are empty.";
+			} else {
+				for(.@i = 0; .@i<getarraysize(.@cid); .@i++){
+					if((.@i+1) % 10 != 0){
+						if(.Options&256)
+							mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 "+.@value[.@i];
+						else 	mes "#"+(.@i+1)+" ^0000FF"+.@name$[.@i]+"^000000 [^00EE00"+callfunc("F_InsertPlural",.@value[.@i],"~ kill")+"] [^EE0000"+callfunc("F_InsertPlural",.@Death[.@i],"~ death")+"]";
+					} else next;
+				}
+			}
+			close;
+		case 4:
+			if(.Options&256)
+				.@key$ = "Guild_Kda";
+			else	.@key$ = "Guild_Kills";
+			if(.Options&128)
+				.@key$ = "$M_" + .@key$;
+			else	.@key$ = "$" + .@key$;
+			query_sql("SELECT `index`, CAST(`value` AS SIGNED) FROM `global_acc_reg_num` WHERE `key` = '" + .@key$ + "' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT 10",.@gid,.@value);
+			if (!getarraysize(.@gid)){
+				mes "The rankings are empty.";
+			} else {
+				for(.@i = 0; .@i < getarraysize(.@gid); .@i++){
+					//query_sql("SELECT `value` FROM `global_acc_reg_num` WHERE `index` = "+.@gid[.@i]+";",.@j$); // ??? [Secret]
+					mes "#"+(.@i+1)+" ^0000EE["+getguildname(.@gid[.@i])+"]^000000 with [^00EE00"+callfunc("F_InsertPlural",$Guild_Kills[.@gid[.@i]],"~ kill")+"] and [^EE0000"+callfunc("F_InsertPlural",$Guild_Deaths[.@gid[.@i]],"~ death")+"]";
+				}
+			}
+			close;
+		case 5:
+			callshop "PvP_Cash_Shop",1;
+			end;
+		case 6:
+			if(.Options&1){
+				mes "[PvP]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",pl_pkcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",pl_dthcount,"death") + ((.Options&256)?" - ^0000EE"+ kda +" Total":"") +"^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",m_pkcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",m_dthcount,"death") + ((.Options&256)?" - ^0000EE"+ m_kda +" Total":"") +"^000000";
+			}
+			if(.Options&16) mes "You Have "+ #PvpPoints +" Spendable Points";
+			if(.Options&2){
+				if(.Options&1) next;
+				mes "[GvG]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",gvg_kcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",gvg_dcount,"death")+((.Options&256)?" - ^0000EE"+ gvg_kda +" Total":"")+"^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",m_gvg_kcount,"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",m_gvg_dcount,"death") + ((.Options&256)?" - ^0000EE"+ m_gvg_kda +" Total":"") +"^000000";
+			}
+			if(.Options&8 && getcharid(2)){
+				if(.Options&2 || .Options&3) next;
+				mes "[Guild Stats]";
+				mes "Lifetime:","^00EE00"+ callfunc("F_InsertPlural",$Guild_Kills[getcharid(2)],"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",$Guild_Deaths[getcharid(2)],"death") + ((.Options&256)?" - ^0000EE"+ $Guild_Kda[getcharid(2)] +" Total":"")+ "^000000";
+				if(.Options&128) mes "Monthly:","^00EE00"+ callfunc("F_InsertPlural",$M_Guild_Kills[getcharid(2)],"kill") +"^000000 - ^EE0000"+ callfunc("F_InsertPlural",$M_Guild_Deaths[getcharid(2)],"death") + ((.Options&256)?" - ^0000EE"+ $M_Guild_Kda[getcharid(2)] +" Total":"") +"^000000";
+			}
+			close;
+
+		case 7:
+			.@i = select("Monthly:Lifetime") - 1;
+			.@L$[0] = (.Options&1)?"Pvp Ladder":"";
+			.@L$[1] = (.Options&2)?"GvG Ladder":"";
+			.@L$[2] = (.Options&8)?"Top Guild":"";
+			.@j = select(implode(.@L$,":")) - 1;
+			mes "Are you sure you want to reset this the "+((.@i)?"Lifetime":"Monthly")+" "+.@L$[.@j]+"?";
+			if(select("No:Yes")!=2)
+				close;
+			close2;
+			switch(.@i * 3 + .@j){
+				case 0:
+					query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount' OR `key` = 'm_kda' OR `key` = 'pl_dthcount'");
+					addrid(0);
+					m_pkcount = m_kda = m_dthcount = 0;
+					break;
+				case 1:
+					query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'pl_pkcount' OR `key` = 'kda' OR `key` = 'pl_dthcount'");
+					addrid(0);
+					pl_pkcount = kda = pl_dthcount = 0;
+					break;
+				case 2:
+					query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_gvg_kcount' OR `key` = 'm_gvg_kda' OR `key` = 'm_gvg_dcount'");
+					addrid(0);
+					m_gvg_kcount = m_gvg_kda = m_gvg_dcount = 0;
+					break;
+				case 3:
+					query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'gvg_kcount' OR `key` = 'gvg_kda' OR `key` = 'gvg_dcount'");
+					addrid(0);
+					gvg_kcount = gvg_kda = gvg_dcount = 0;
+					break;
+				case 4:
+					cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
+					cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
+					cleararray $M_Guild_Deaths[0],0,getarraysize($M_Guild_Deaths);
+					break;
+				case 5:
+					cleararray $Guild_Kills[0],0,getarraysize($Guild_Kills);
+					cleararray $Guild_Kda[0],0,getarraysize($Guild_Kda);
+					cleararray $Guild_Deaths[0],0,getarraysize($Guild_Deaths);
+					break;
+			}
+			end;
+
+		case 1:	//===== Dont Touch - Menu Generation ======================
+			for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
+				.@MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"^EE3333Nightmare ":"") + 
+					((.MapMode[.@i]&4)?"Party ":"") + 
+					((.MapMode[.@i]&1)?"GvG":"PvP") +"^000000] "+ 
+					((.MapMode[.@i] >= 8)?"No ":"") + 
+					((.MapMode[.@i]&8)?"Ygg ":"") + 
+					((.MapMode[.@i]&16)?"3rds ":"") + 
+					((.MapMode[.@i]&32)?"Trans ":"") + 
+					((.MapMode[.@i]&64)?.MapName$[.@i]:"") + 
+					((.MaxPlayers[.@i])?"["+getmapusers(.MapName$[.@i])+"/"+.MaxPlayers[.@i]+"]":"");
+			}
+			//==========================================================
+			.@m = select(implode(.@MapList$,":")) - 1;
+			if(.MapMode[.@m]&2){
+				mes "You are about to enter NIGHTMARE PvP, on death you will lose gear randomly.";
+				if(select("Nevermind:Continue") == 1)
+					close;
+			} else	if(.MapMode[.@m]&8 && (countitem(607) || countitem(608))){
+				mes "No "+getitemname(607)+" or "+getitemname(608)+" Allowed.";
+				close;
+			} else 	if(.MapMode[.@m]&16){
+				mes "No 3rd Classes Allowed.";
+				close;
+			} else	if(.MapMode[.@m]&32){
+				mes "No Trans Classes Allowed.";
+				close;
+			} else if(.MaxPlayers[.@m] && getmapusers(.MapName$[.@m]) >= .MaxPlayers[.@m]){
+				mes "Room is Full.";
+				close;
+			} else	if(.MapMode[.@m]&4 && getcharid(1) <= 0 ){
+				mes "You must be in a Party to join.";
+				close;
+			} else	if(.MapMode[.@m]&1 && getcharid(2) <= 0 ){
+				mes "You must be in a Guild to join.";
+				close;
+			}
+			announce "[ PvP Warper ] "+strcharinfo(0)+" has entered in "+((.MapMode[.@m]&1)?"GvG":"PvP")+" Room",0,((.MapMode[.@m]&1)?0x00CC99:0xEE0000);
+			warp .MapName$[.@m],0,0;
+	}
+	end;
+
+//==================================
+OnPCKillEvent:	//-- Adding Stats
+//==================================
+
+	if(!getgmlevel() || .Options&512){
+		if(LastPK == killedrid) RepeatKill++;
+		else {
+			LastPK = killedrid;
+			RepeatKill = 0;
+		}
+		if(.Options&4)
+			announce "[PVP]: "+strcharinfo(0)+" has slain "+ rid2name(LastPK) + ((RepeatKill)?" for the "+callfunc("F_GetNumSuffix",RepeatKill)+" time in a row":"") +".",bc_all;
+		if((RepeatKill < .RepeatCount && .Options&32) || !.Options&32){
+			if(.Options&1) pl_pkcount++;
+			if(.Options&129) m_pkcount++;
+			if(.Options&257) kda++;
+			if(.Options&385) m_kda++;
+			if(.Options&16) #PvpPoints++;
+			if((getmapflag(strcharinfo(3),MF_GVG) || getmapflag(strcharinfo(3),MF_GVG_NOPARTY)) && (agitcheck() || agitcheck2()) && getcharid(2) && .Options&2){
+				gvg_kcount++;
+				if(.Options&128) m_gvg_kcount++;
+				if(.Options&256) gvg_kda++;
+				if(.Options&384) m_gvg_kda++;
+				if(.Options&8) $Guild_Kills[getcharid(2)]++;
+				if(.Options&136) $M_Guild_Kills[getcharid(2)]++;
+				if(.Options&256) $Guild_Kda[getcharid(2)]++;
+				if(.Options&264) $M_Guild_Kda[getcharid(2)]++;
+			}
+			attachrid(LastPK);
+			if(.Options&1) pl_dthcount++;
+			if(.Options&129) m_dthcount++;
+			if(.Options&257) kda -= 1;
+			if(.Options&385) m_kda -= 1;
+			if((getmapflag(strcharinfo(3),MF_GVG) || getmapflag(strcharinfo(3),MF_GVG_NOPARTY)) && (agitcheck() || agitcheck2()) && getcharid(2) && .Options&2){
+				gvg_dcount++;
+				if(.Options&128) m_gvg_dcount++;
+				if(.Options&258) gvg_kda -= 1;
+				if(.Options&384) m_gvg_kda -= 1;
+				if(.Options&8) $Guild_Deaths[getcharid(2)]++;
+				if(.Options&136) $M_Guild_Deaths[getcharid(2)]++;
+				if(.Options&256) $Guild_Kda[getcharid(2)] -= 1;
+				if(.Options&264) $M_Guild_Kda[getcharid(2)] -= 1;
+			}
+		} else if(.Options&1024) atcommand "@request [PvP Ladder]: "+strcharinfo(0)+" is showing signs of abusing the PvP Ladder Please Investigate";
+		if(.Options&64) warp "Save",0,0;
+	}
+	end;
+
+//==================================
+OnHour00:	//-- Monthly Rewards
+//==================================
+
+	if(gettime(5) == 1 && .Options&128 && .MailType){
+		if(.RewardType&1 && .Options&1){
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_kda":"m_pkcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+getarraysize(.PVP_Items$)+"",.@cid,.@name$,.@value);
+			for(.@i = 0; .@i< getarraysize(.@cid); .@i++)
+				mail .@cid[.@i], "no-reply", "PvP Ranking", "Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month % % %[ Your reward is attached. ]", .PVP_Zeny[.@i], getd(".Pitem"+.@i), getd(".Pqnt"+.@i);
+			announce "[PVP Ranking]: Rewards have been mailed to the top "+getarraysize(.PVP_Items$)+" in PvP~!",bc_blue|bc_all;
+			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
+		}
+		sleep 10000;
+		if(.RewardType&2 && .Options&2){
+			query_sql("SELECT char_id,`char`.name,CAST(`value` AS SIGNED) FROM `char_reg_num` INNER JOIN `char` ON `char`.char_id = `char_reg_num`.char_id WHERE `key` = '"+((.Options&256)?"m_gvg_kda":"m_gvg_kcount")+"' ORDER BY CAST(`value` AS SIGNED) DESC LIMIT "+getarraysize(.GVG_Items$)+"",.@cid,.@name$,.@value);
+			for(.@i = 0; .@i<getarraysize(.@cid); .@i++) 
+				mail .@cid[.@i], "no-reply", "PvP Ranking", "Congratulations!% You have placed #"+(.@i+1)+" in the PvP Raning this Month % % %[ Your reward is attached. ]", .GVG_Zeny[.@i], getd(".Gitem"+.@i), getd(".Gqnt"+.@i);
+			announce "[GVG Ranking]: Rewards have been mailed to the top "+getarraysize(.GVG_Items$)+" in GvG~!",bc_blue|bc_all;
+			query_sql("UPDATE `mail` SET message = REPLACE(message,'%',CHAR(13)) WHERE send_name = 'no-reply'");
+		}
+		cleararray $M_Guild_Kills[0],0,getarraysize($M_Guild_Kills);
+		cleararray $M_Guild_Kda[0],0,getarraysize($M_Guild_Kda);
+		cleararray $M_Guild_Deaths[0],0,getarraysize($M_Guild_Deaths);
+		query_sql("DELETE FROM `char_reg_num` WHERE `key` = 'm_pkcount' OR `key` = 'm_kda' OR `key` = 'm_dthcount' OR `key` = 'm_gvg_kcount' OR `key` = 'm_gvg_kda' OR `key` = 'm_gvg_dcount'");
+		addrid(0);
+		m_pkcount = 0;
+		m_kda = 0;
+		m_dthcount = 0;
+		m_gvg_kcount = 0;
+		m_gvg_kda = 0;	
+		m_gvg_dcount = 0;
+		end;
+	}
+
+//==================================
+OnInit:		//-- Config
+//==================================
+
+	// Gets NPC Name
+	// Lets you change NPC name without breaking anything
+	.NPC$ = strnpcinfo(0);
+
+	// At_Commands
+	bindatcmd("PvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("Pvpladder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("pvpLadder" ,.NPC$+"::OnPvpLadder",0,99);
+	bindatcmd("pvpladder" ,.NPC$+"::OnPvpLadder",0,99);
+
+	// Bitwise Variable
+	// 1: Record PvP
+	// 2: Record GvG (agit on and gvg map)
+	// 4: Announce When Someone gets a kill
+	// 8: Record Total Guild Stats
+	// 16: Gain PvP Points on Kills (#PvpPoints)
+	// 32: Repeat Kill Protection
+	// 64: Warp to Save on abuse
+	// 128: Monthly Stats
+	// 256: Order by KDA instead of most kills
+	// 512: Allow GMs to Join PvP
+	// 1024: Request a GM on Abuse
+	// 2048: Enable Waiting Room
+	// 4096: Dynamic Waiting Room
+	.Options = 1|2|4|8|16|32|128|256|1024|2048|4096;
+
+	// Monthly Reward Types
+	// 1: Pvp
+	// 2: Gvg
+	.RewardType = 1|2;
+
+	// PVP Rewards
+	// Rewards are Mailed to winners
+	// Zeny Rewards
+	setarray .PVP_Zeny,
+		1000000,500000,250000,125000,62500,// 1st - 5th
+		  31250, 15620,  7810,  3905, 1952;// 6th - 10th
+
+	// Ro Dex Supports 5 Items
+	// Old Mail DOES NOT support multiple items
+	// "Item 1, Qnt 1, Item 2, Qnt 2, Item 3, Qnt 3, Item 4, Qnt 4, Item 5, Qnt 5"
+	setarray .PVP_Items$,
+		"501,10,0,0,0,0,0,0,0,0",// 1st
+		"501,9,0,0,0,0,0,0,0,0",
+		"501,8,0,0,0,0,0,0,0,0",
+		"501,7,0,0,0,0,0,0,0,0",
+		"501,6,0,0,0,0,0,0,0,0",
+		"501,5,0,0,0,0,0,0,0,0",
+		"501,4,0,0,0,0,0,0,0,0",
+		"501,3,0,0,0,0,0,0,0,0",
+		"501,2,0,0,0,0,0,0,0,0",
+		"501,1,0,0,0,0,0,0,0,0";// 10th
+
+	// GVG Rewards
+	// Rewards are Mailed to winners
+	// Zeny Rewards
+	setarray .GVG_Zeny,
+		1000000,500000,250000,125000,62500,// 1st - 5th
+		  31250, 15620,  7810,  3905, 1952;// 6th - 10th
+
+	// Ro Dex Supports 5 Items
+	// Old Mail DOES NOT support multiple items
+	// "Item 1, Qnt 1, Item 2, Qnt 2, Item 3, Qnt 3, Item 4, Qnt 4, Item 5, Qnt 5"
+	setarray .GVG_Items$,
+		"501,10,0,0,0,0,0,0,0,0",// 1st
+		"501,9,0,0,0,0,0,0,0,0",
+		"501,8,0,0,0,0,0,0,0,0",
+		"501,7,0,0,0,0,0,0,0,0",
+		"501,6,0,0,0,0,0,0,0,0",
+		"501,5,0,0,0,0,0,0,0,0",
+		"501,4,0,0,0,0,0,0,0,0",
+		"501,3,0,0,0,0,0,0,0,0",
+		"501,2,0,0,0,0,0,0,0,0",
+		"501,1,0,0,0,0,0,0,0,0";// 10th
+
+	// Number of kills on same person before it detects abuse
+	.RepeatCount = 5;
+
+	// Players Shown in PvP Ladder
+	.MaxRank = 10;
+
+	// Map Names
+	setarray .MapName$,"pvp_n_1-2","pvp_n_1-1","pvp_n_1-4","pvp_n_1-3","pvp_n_1-5";
+
+	// Pvp Mode
+	// Modes are Addative
+	//	0 = Normal Pvp
+	//	1 = Gvg
+	//	2 = Nightmare
+	//	4 = Party
+	//	8 = No Ygg
+	//	16 = No 3rds
+	//	32 = No Trans
+	//	64 = Show Map Name
+	setarray .MapMode,0,1,2,4,56;
+
+	// Max Players Per Map
+	// 0 = No Limit
+	setarray .MaxPlayers,0,50,10,36,50;
+
+	// Mapflags for all PvP maps
+	// regardless of Mode
+	setarray .mapflag,
+		mf_nowarp,	mf_nowarpto,		mf_nosave,
+		mf_nomemo,	mf_noteleport,		mf_nopenalty,
+		mf_noreturn,	mf_nobranch,		mf_nomobloot,
+		mf_nomvploot,	MF_NOZENYPENALTY,	MF_NOTRADE,
+		MF_NOCOMMAND,	mf_nodrop;
+
+//===== Dont Touch - Mapflag & Waiting Room Generation =====
+	if(getwaitingroomstate(1) == -1)
+		delwaitingroom;
+	if(.Options&2048 && !.Options&4096)
+		waitingroom "PvP Ladder",0;
+	for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
+		for ( .@f = 0; .@f < .@size; .@f++ )
+			setmapflag .MapName$[.@i], .mapflag[.@f];
+		if(.MapMode[.@i]&4) setmapflag .MapName$[.@i], mf_partylock;
+		if(.MapMode[.@i]&2) setmapflag .MapName$[.@i], MF_NIGHTMAREDROP;
+		if(.MapMode[.@i]&1){
+			setmapflag .MapName$[.@i], MF_GUILDLOCK;
+			setmapflag .MapName$[.@i], MF_GVG;
+		} else{
+			setmapflag .MapName$[.@i], MF_PVP_NOGUILD;
+			setmapflag .MapName$[.@i], MF_PVP;
+		}
+		if(!.MapMode[.@i]&4){
+			if(.MapMode[.@i]&1) setmapflag .MapName$[.@i], MF_GVG_NOPARTY;
+				else	setmapflag .MapName$[.@i], MF_NOPARTY;
+		}
+	}
+	freeloop(1);
+	for(.@i = 0; .@i < getarraysize(.PVP_Items$); .@i++){
+		explode(.@convert$,.PVP_Items$[.@i],",");
+		for(.@c = 0; .@c < getarraysize(.@convert$) && .@c < 10; .@c++)
+			.@convert[.@c] = atoi(.@convert$[.@c]);
+		for(.@k = 0; .@k < getarraysize(.@convert); .@k += 2){
+			setd ".Pitem"+.@i+"["+getarraysize(getd(".Pitem"+.@i))+"]",.@convert[.@k];
+			setd ".Pqnt"+.@i+"["+getarraysize(getd(".Pqnt"+.@i))+"]",.@convert[.@k+1];
+		}
+	}
+	for(.@i = 0; .@i < getarraysize(.GVG_Items$); .@i++){
+		explode(.@convert$,.GVG_Items$[.@i],",");
+		for(.@c = 0; .@c < getarraysize(.@convert$) && .@c < 10; .@c++)
+			.@convert[.@c] = atoi(.@convert$[.@c]);
+		for(.@k = 0; .@k < getarraysize(.@convert); .@k += 2){
+			setd ".Gitem"+.@i+"["+getarraysize(getd(".Gitem"+.@i))+"]",.@convert[.@k];
+			setd ".Gqnt"+.@i+"["+getarraysize(getd(".Gqnt"+.@i))+"]",.@convert[.@k+1];
+		}
+	}
+	while(.Options&6144) {
+		for(.@i = 0; .@i < getarraysize(.MapName$); .@i++){
+			.@MapList$[.@i] = "["+ ((.MapMode[.@i]&2)?"Nightmare ":"") + 
+				((.MapMode[.@i]&4)?"Party ":"") + 
+				((.MapMode[.@i]&1)?"GvG":"PvP") +"] "+ 
+				((.MapMode[.@i] >= 8)?"No ":"") + 
+				((.MapMode[.@i]&8)?"Ygg ":"") + 
+				((.MapMode[.@i]&16)?"3rds ":"") + 
+				((.MapMode[.@i]&32)?"Trans ":"") + 
+				((.MapMode[.@i]&64)?.MapName$[.@i]:"") + 
+				((.MaxPlayers[.@i])?"["+getmapusers(.MapName$[.@i])+"/"+.MaxPlayers[.@i]+"]":"");
+			delwaitingroom;
+			waitingroom .@MapList$[.@i],0;
+			sleep 3000;
+		}
+	}
+//==========================================================
+}
+
+//==================================
+		//-- Call Shop
+//==================================
+
+-	pointshop	PvP_Cash_Shop	-1,#PvpPoints,501:1,502:2

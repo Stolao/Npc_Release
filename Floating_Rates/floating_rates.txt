@@ -1,0 +1,88 @@
+//===== EinherjarRO Scripts ================================== 
+//= Floating Rates
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.08
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Floating Rates
+//===== Uses: ================================================
+//= Exp and Item Rates Change Dynaimcally based on Online
+//= Player count and a configurable variables
+//===== Comments: ============================================
+//= [Stolao]
+//= Optimize]
+//= In Game Menu / @Command?
+//===== Additional Comments: =================================
+//= 1.00 Origional Make
+//= 1.01 Removed Unessisary Line
+//= 1.02 Added Config
+//= 1.03 Made auto collect base rates
+//= 1.04 Fixed a bug where would keep increasing every hour
+//= 1.05 Made Multipliers into an array
+//= 1.06 Fixed typos
+//= 1.07 Fixed Set -> setarray
+//= 1.08 Added @setrates
+//= 1.09 Fixed typo with rates with .01 - .09% at end
+//= 1.0A Tabulation
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+-	script	floating_rate	-1,{
+OnSetRate:
+	input .@r,.Random[0],.Random[1];
+OnMinute30:
+	.@i = getusers(1);
+	if(!.@r) .@r = rand(.Random[0],.Random[1]);
+	setbattleflag( "base_exp_rate",		$R[0] + (.@r + .@i) * .ExpMulti[0]);
+	setbattleflag( "job_exp_rate", 		$R[1] + (.@r + .@i) * .ExpMulti[1]);
+	setbattleflag( "item_rate_common",	$R[2] + (.@r + .@i) * .ItemMulti[0]);
+	setbattleflag( "item_rate_heal", 	$R[3] + (.@r + .@i) * .ItemMulti[1]);
+	setbattleflag( "item_rate_use", 	$R[4] + (.@r + .@i) * .ItemMulti[2]);
+	setbattleflag( "item_rate_equip", 	$R[5] + (.@r + .@i) * .ItemMulti[3]);
+	atcommand "@reloadmobdb";
+	Announce "[Server]: Rates are now "+getbattleflag("base_exp_rate")/100+((getbattleflag("base_exp_rate")%100)?"."+((getbattleflag("base_exp_rate")%100 < 10)?"0":"")+getbattleflag("base_exp_rate")%100:"")+
+			"x / "+getbattleflag("job_exp_rate")/100+((getbattleflag("job_exp_rate")%100)?"."+((getbattleflag("job_exp_rate")%100 < 10)?"0":"")+getbattleflag("job_exp_rate")%100:"")+
+			"x / "+getbattleflag("item_rate_common")/100+((getbattleflag("item_rate_common")%100)?"."+((getbattleflag("item_rate_common")%100 < 10)?"0":"")+getbattleflag("item_rate_common")%100:"")+"x !",8;
+	end;
+
+OnInit:
+	bindatcmd("setrates","floating_rate::OnSetRate",99,99);
+
+	// Multiplier Per Player and .Random
+	// Each point is .01x Increase in exp rates
+	// [0] = Base Exp
+	// [1] = Job Exp
+	//    eg: rand = 75 , getuser = 100, Multi = 3
+	//    rates will be increase by 5.25x
+	setarray .ExpMulti ,1,1;
+
+	// Multiplier Per Player and .Random
+	// Each point is .01x Increase in exp rates
+	// [0] = Common Items
+	// [1] = Healing Items
+	// [2] = Useable Items
+	// [3] = Equipment Items
+	//    eg: rand = 75 , getuser = 100, Multi = 1
+	//    rates will be increase by 1.75x
+	setarray .ItemMulti,1,1,1,1;
+
+	// The Random Variable Min and Max
+	// [0] = Min
+	// [1] = Max
+	setarray .Random,0,100;
+	end;
+
+OnInterIfInitOnce:
+	// Dont Touch
+	// Used to collect the base rates
+	setarray $R, getbattleflag("base_exp_rate"), getbattleflag("job_exp_rate"), getbattleflag("item_rate_common"), getbattleflag("item_rate_heal"), getbattleflag("item_rate_use"), getbattleflag("item_rate_equip");
+	end;
+}
+
+
+

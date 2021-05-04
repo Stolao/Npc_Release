@@ -1,0 +1,360 @@
+//===== EinherjarRO Scripts ================================== 
+//= Instanced Farms
+//===== By: ================================================== 
+//= Stolao (Script)
+//= Haziel (Sprites)
+//= Azura Skyy (Maps)
+//= Chemical Crush (Maps)
+//===== Current Version: ===================================== 
+//= 1.01
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A pretty neat way of farming
+//===== Comments: ============================================
+//= Can probably make better, but this is just initial release
+//= Sprites and Maps have been tested
+//===== Additional Comments: =================================
+//= 1.00 Initial release
+//= 1.01 Minor Tabulation Fixes and removing of 'set'
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+prontera,136,171,4	script	Farm_Core	123,{
+	if(!instance_id()){
+		.@i = select("Payon Farm::Rachel Farm:Xmas Farm");
+		setarray .@md_name$[1],"Payon Farm","Prontera Farm","Rachel Farm","Xmas Farm";
+	} else {
+		 switch(Farm_Instance){
+			case 1: instance_enter("Payon Farm"); break;
+			case 2: instance_enter("Prontera Farm"); break;
+			case 3: instance_enter("Rachel Farm"); break;
+			case 4: instance_enter("Xmas Farm"); break;
+		}
+	}
+	if (instance_create(.@md_name$[.@i],IM_CHAR) < 0) {
+		message strcharinfo(0),"^0000ff"+.@md_name$[.@i]+" ^000000 - Reservation Failed.";
+		end;
+	} else {
+		Farm_Instance = .@i;
+		message strcharinfo(0),"^0000ff"+.@md_name$+"^000000- Attempting to book an entrance";
+		message strcharinfo(0),"After making a reservation, you have to select 'Enter the Dungeon' from the menu if you wish to enter the "+.@md_name$[.@i]+".";
+		switch(Farm_Instance){
+			case 1:
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay01",instance_id()),#Farm_Pay01[0],#Farm_Pay01[1],#Farm_Pay01[2],"Pay01";
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay02",instance_id()),#Farm_Pay02[0],#Farm_Pay02[1],#Farm_Pay02[2],"Pay01";
+				instance_enter("Payon Farm");
+			break;
+			case 2:
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt01",instance_id()),#Farm_Prt01[0],#Farm_Prt01[1],#Farm_Prt01[2],"Prt01";
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt02",instance_id()),#Farm_Prt02[0],#Farm_Prt02[1],#Farm_Prt02[2],"Prt01";
+				instance_enter("Prontera Farm");
+			break;
+			case 3:
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch01",instance_id()),#Farm_Rch01[0],#Farm_Rch01[1],#Farm_Rch01[2],"Rch01";
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch02",instance_id()),#Farm_Rch02[0],#Farm_Rch02[1],#Farm_Rch02[2],"Rch01";
+				instance_enter("Rachel Farm");
+			break;
+			case 4:
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms01",instance_id()),#Farm_Xms01[0],#Farm_Xms01[1],#Farm_Xms01[2],"Xms01";
+				callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms02",instance_id()),#Farm_Xms02[0],#Farm_Xms02[1],#Farm_Xms02[2],"Xms01";
+				instance_enter("Xmas Farm");
+			break;
+		}
+	}
+	Farm_Instance = 0;
+	message strcharinfo(0),"Your Already Attached to an Instance";
+	end;
+OnInit:
+	setarray .@mapname$,
+			"xmas_farm",
+			"prt_farm",
+			"pay_farm",
+			"rachel_farm";
+	setarray $@PlantStart[1],     1, 7,13,18,23,28,33,39,45,51,57,63;
+	setarray $@PlantDeathRate[1],20,20,25,25,25,25,30,30,20,15,15;
+	setarray $@PantName$[1],
+			"Sprout","Leaflet","Sapling","Bush","Grape Bush","Dead Bush",
+			"Sprout","Leaflet","Sapling","Bush","Strawberry Bush","Dead Bush",
+			"Sprout","Leaflet","Herb","Blue Herb","Dead Herb",
+			"Sprout","Leaflet","Herb","Red Herb","Dead Herb",
+			"Sprout","Leaflet","Herb","White Herb","Dead Herb",
+			"Sprout","Leaflet","Herb","Yellow Herb","Dead Herb",
+			"Root_1","Root_2","Root_3","Root_4","Carrot","Dead Root",
+			"Root_1","Root_2","Root_3","Root_4","Potatoe","Dead Root",
+			"Sapling","Leaflet","Trunk","Tree","Samara Tree","Dead Tree",
+			"Sapling","Leaflet","Trunk","Tree","Plum Tree","Dead Tree",
+			"Sapling","Leaflet","Trunk","Tree","Apple Tree","Dead Tree";
+	setarray $@PantGrothTime[1],
+			30,60,90,120,5040,0,
+			30,60,90,120,5040,0,
+			20,40,60,5040,0,
+			20,40,60,5040,0,
+			20,40,60,5040,0,
+			20,40,60,5040,0,
+			15,30,45,60,5040,0,
+			15,30,45,60,5040,0,
+			30,60,120,240,5040,0,
+			30,60,120,240,5040,0,
+			30,60,120,240,5040,0;
+	//Bush-01 Sprite ID
+	.@BS = 10206;
+	setarray $@PlantSprite[1],
+		.@BS + 0,.@BS + 1,.@BS + 2,.@BS + 3,.@BS + 5,.@BS + 7,
+		.@BS + 0,.@BS + 1,.@BS + 2,.@BS + 4,.@BS + 6,.@BS + 7,
+		.@BS + 16,.@BS + 17,.@BS + 18,.@BS + 22,.@BS + 15,
+		.@BS + 16,.@BS + 17,.@BS + 19,.@BS + 23,.@BS + 15,
+		.@BS + 16,.@BS + 17,.@BS + 20,.@BS + 24,.@BS + 15,
+		.@BS + 16,.@BS + 17,.@BS + 21,.@BS + 25,.@BS + 15,
+		.@BS + 37,.@BS + 38,.@BS + 39,.@BS + 40,.@BS + 41,.@BS + 36,
+		.@BS + 37,.@BS + 38,.@BS + 39,.@BS + 40,.@BS + 41,.@BS + 36,
+		.@BS + 61,.@BS + 62,.@BS + 63,.@BS + 64,.@BS + 66,.@BS + 54,
+		.@BS + 61,.@BS + 62,.@BS + 63,.@BS + 64,.@BS + 65,.@BS + 54,
+		.@BS + 61,.@BS + 62,.@BS + 63,.@BS + 64,.@BS + 66,.@BS + 54,
+		//Snow Versions + 62
+		.@BS + 8,.@BS + 9,.@BS + 10,.@BS + 11,.@BS + 13,.@BS + 7,
+		.@BS + 8,.@BS + 9,.@BS + 10,.@BS + 12,.@BS + 14,.@BS + 7,
+		.@BS + 26,.@BS + 27,.@BS + 28,.@BS + 32,.@BS + 15,
+		.@BS + 26,.@BS + 27,.@BS + 29,.@BS + 33,.@BS + 15,
+		.@BS + 26,.@BS + 27,.@BS + 30,.@BS + 34,.@BS + 15,
+		.@BS + 26,.@BS + 27,.@BS + 31,.@BS + 35,.@BS + 15,
+		.@BS + 42,.@BS + 43,.@BS + 44,.@BS + 45,.@BS + 46,.@BS + 36,
+		.@BS + 42,.@BS + 43,.@BS + 44,.@BS + 45,.@BS + 46,.@BS + 36,
+		.@BS + 55,.@BS + 56,.@BS + 57,.@BS + 58,.@BS + 59,.@BS + 54,
+		.@BS + 55,.@BS + 56,.@BS + 57,.@BS + 58,.@BS + 60,.@BS + 54,
+		.@BS + 55,.@BS + 56,.@BS + 57,.@BS + 58,.@BS + 59,.@BS + 54;
+
+	setarray $@PlantDrops$[1],
+		"905,1,7500,7186,1,7500,5419,1,100,7194,1,5000,711,3,5000,511,1,1000",
+		"905,1,7500,905,2,5000,7186,1,5000,5419,1,200,7194,2,5000,711,5,5000,511,1,5000",
+		"905,3,7500,7186,2,8000,902,5,3000,520,1,3000,7194,5,2500,5419,1,500,2270,1,500,5064,1,500,511,3,5000",
+		"905,5,5000,7186,703,1,1000,704,1,1000,520,5,5000,707,1,1000,514,1,2000,514,2,1500,514,5,1000,511,5,7500",
+		"703,5,5000,704,5,1000,520,5,10000,521,5,5000,514,25,10000,514,10,3500,514,10,2000,514,10,1000,511,5,10000",
+		"1032,10,5000,1033,10,5000,521,5,3000,706,1,1000,5596,1,1000,5189,1,100,5270,1,50,621,5,5000,511,5,1000,608,1,100",
+		"905,1,7500,7186,1,7500,5419,1,100,7194,1,5000,711,3,5000,511,1,1000",
+		"905,1,7500,905,2,5000,7186,1,5000,5419,1,200,7194,2,5000,711,5,5000,511,1,5000",
+		"905,3,7500,7186,2,8000,902,5,3000,520,1,3000,7194,5,2500,5419,1,500,2270,1,500,5064,1,500,511,3,5000",
+		"905,5,5000,7186,703,1,1000,704,1,1000,520,5,5000,707,1,1000,578,1,2000,578,2,1500,578,5,1000,511,5,7500",
+		"703,5,5000,704,5,1000,520,5,10000,521,5,5000,578,25,10000,578,10,3500,578,10,2000,578,10,1000,511,5,10000,707,1,10000",
+		"1032,10,5000,1033,10,5000,521,5,3000,706,1,1000,5596,1,1000,5189,1,100,5270,1,50,621,5,5000,511,5,1000,608,1,100",
+		"905,1,10000,712,1,5000,711,1,5000,906,1,1000,708,1,10,511,1,1000",
+		"905,1,10000,712,1,7500,711,3,5000,906,1,1500,708,1,20,511,1,5000",
+		"905,3,10000,712,1,10000,711,7,5500,906,1,2500,708,1,30,510,1,9000,510,2,5000,510,3,1000,621,3,3000,511,3,5000",
+		"905,5,10000,708,1,30,710,1,30,629,1,1000,510,15,10000,510,5,7500,510,5,5000,510,5,2000,510,5,100,518,5,5000,608,2,1000,621,5,5000,511,10,10000",
+		"905,5,10000,905,5,5000,1032,10,5000,1033,5,5000,521,5,3000,7194,5,1000,5419,1,500,5596,1,500,5064,1,500,621,5,5000,511,5,1000,707,1,10000,608,1,100",
+		"905,1,10000,712,1,5000,711,1,7500,906,1,1000,708,1,10,511,1,1000",
+		"905,1,10000,712,1,7500,711,3,5000,906,1,1500,708,1,20,511,1,5000",
+		"905,3,10000,712,1,10000,711,5,7500,906,1,2500,708,1,30,507,1,9000,507,2,5000,507,3,1000,621,3,3000,511,3,5000",
+		"905,5,10000,708,1,30,710,1,30,629,1,1000,507,15,10000,507,5,7500,507,5,5000,507,5,2000,507,5,100,518,5,5000,608,2,1000,621,5,5000,511,10,10000",
+		"905,5,10000,905,5,5000,1032,10,5000,1033,5,5000,521,5,3000,7194,5,1000,5419,1,500,5596,1,500,5064,1,500,621,5,5000,511,5,1000,707,1,10000,608,1,100",
+		"905,1,10000,712,1,5000,711,1,5000,906,1,1000,708,1,10,511,1,1000",
+		"905,1,10000,712,1,7500,711,3,5000,906,1,1500,708,1,20,511,1,5000",
+		"905,3,10000,712,1,10000,711,5,7500,906,1,2500,708,1,30,509,1,9000,509,2,5000,509,3,1000,621,3,3000,511,3,5000",
+		"905,5,10000,708,1,30,710,1,30,629,1,1000,509,15,10000,509,5,7500,509,5,5000,509,5,2000,509,5,100,518,5,5000,608,2,1000,621,5,5000,511,10,10000",
+		"905,5,10000,905,5,5000,1032,10,5000,1033,5,5000,521,5,3000,7194,5,1000,5419,1,500,5596,1,500,5064,1,500,621,5,5000,511,5,1000,707,1,10000,608,1,100",
+		"905,1,10000,712,1,5000,711,1,5000,906,1,1000,708,1,10,511,1,1000",
+		"905,1,10000,712,1,7500,711,3,5000,906,1,1500,708,1,20,511,1,5000",
+		"905,3,10000,712,1,10000,711,5,7500,906,1,2500,708,1,30,508,1,9000,508,2,5000,508,3,1000,621,3,3000,511,3,5000",
+		"905,5,10000,708,1,30,710,1,30,629,1,1000,508,15,10000,508,5,7500,508,5,5000,508,5,2000,508,5,100,518,5,5000,608,2,1000,621,5,5000,511,10,10000",
+		"905,5,10000,905,5,5000,1032,10,5000,1033,5,5000,521,5,3000,7194,5,1000,5419,1,500,5596,1,500,5064,1,500,621,5,5000,511,5,1000,707,1,10000,608,1,100",
+		"905,1,10000,711,1,10000,7194,1,2500,1033,1,1000,511,1,1000,705,1,5000",
+		"905,1,10000,711,3,10000,7194,1,5000,1033,1,2500,511,1,5000,705,1,7500",
+		"905,3,10000,711,5,10000,7194,1,5000,1033,1,7500,1032,1,1000,511,3,5000,705,1,10000,706,1,5000",
+		"905,5,10000,704,1,5000,708,1,5000,,511,5,7500,705,10,5000,706,1,10000,1033,1,10000,515,1,10000,515,4,2500,622,1,5000",
+		"707,1,10000,1033,5,10000,515,50,10000,515,10,7500,515,10,5000,515,10,1000,622,5,5000,622,3,2000,622,1,1000,623,3,2500",
+		"621,5,5000,511,5,1000,5189,1,100,5270,1,50,608,1,100",
+		"905,1,10000,711,1,10000,7194,1,2500,1033,1,1000,511,1,1000,705,1,5000",
+		"905,1,10000,711,3,10000,7194,1,5000,1033,1,2500,511,1,5000,705,1,7500",
+		"905,3,10000,711,5,10000,7194,1,5000,1033,1,7500,1032,1,1000,511,3,5000,705,1,10000,706,1,5000",
+		"905,5,10000,704,1,5000,708,1,5000,,511,5,7500,705,10,5000,706,1,10000",
+		"707,1,10000,1033,5,10000,516,50,10000,516,10,7500,516,10,5000,516,10,1000,549,10,5000,549,5,1000,633,1,10000,633,1,2500,623,3,2500",
+		"621,5,5000,511,5,1000,5189,1,100,5270,1,50,608,1,100",
+		"905,1,10000,711,1,10000,511,1,2500,705,1,7500","1019,5,10000,511,1,5000,705,1,10000,705,1,10000",
+		"1019,10,10000,921,1,10000,921,10,10000,7100,5,7000,7100,5,10000,521,5,2500,521,1,9000,576,1,1000,7298,10,2000,7298,5,5000,518,1,5000",
+		"1019,15,10000,921,5,10000,921,20,10000,7100,10,8000,7100,10,10000,521,5,5000,521,3,9000,576,5,5000,7298,10,5000,7298,5,10000,518,5,5000",
+		"1019,25,10000,921,5,10000,921,30,10000,7100,15,9000,7100,15,10000,521,5,7500,521,5,9000,576,10,9000,7298,10,8000,7298,10,10000,518,10,5000,12293,10,5000,12293,5,3000,12293,5,1000,610,5,5000,610,1,10000,608,1,5000,604,10,5000,604,5,3000,604,5,1000",
+		"1019,25,10000,921,5,10000,921,30,10000,7100,15,9000,7100,15,10000,521,5,7500,521,5,9000,576,10,9000,7298,10,8000,7298,10,10000,518,10,5000,12293,10,5000,12293,5,3000,12293,5,1000,610,5,5000,610,1,10000,608,1,5000,604,10,5000,604,5,3000,604,5,1000",
+		"1019,25,10000,1019,25,5000,921,921,40,10000,7100,20,1000,7100,20,10000,521,5,10000,521,7,9000,576,15,10000,7298,10,10000,7298,10,10000,518,10,7500,607,10,10000,607,1,3000,607,3,2000,607,5,1000,608,5,10000,608,1,5000,610,5,10000,5,1000,604,10,7500,604,5,1000",
+		"1019,10,5000,921,10,5000,7100,10,5000,7100,5,5000,521,5,2000,576,5,1000,7298,5,5000,608,10,10000,608,5,1000,5189,1,100,5270,1,50,608,1,100",
+		"905,1,10000,711,1,10000,511,1,2500,705,1,7500","1019,5,10000,511,1,5000,705,1,10000,705,1,10000",
+		"1019,10,10000,921,1,10000,921,10,10000,7100,5,7000,7100,5,10000,521,5,2500,521,1,9000,576,1,1000,7298,10,2000,7298,5,5000,518,1,5000",
+		"1019,15,10000,921,5,10000,921,20,10000,7100,10,8000,7100,10,10000,521,5,5000,521,3,9000,576,5,5000,7298,10,5000,7298,5,10000,518,5,5000",
+		"1019,25,10000,921,5,10000,921,30,10000,7100,15,9000,7100,15,10000,521,5,7500,521,5,9000,576,10,9000,7298,10,8000,7298,10,10000,518,10,5000,522,10,5000,522,5,3000,522,5,1000,604,10,5000,604,5,3000,604,5,1000",
+		"1019,25,10000,1019,25,5000,921,921,40,10000,7100,20,1000,7100,20,10000,521,5,10000,521,7,9000,576,15,10000,7298,10,10000,7298,10,10000,518,10,7500,522,15,10000,522,5,5000,522,5,5000,522,5,5000,604,10,7500,604,5,1000",
+		"1019,10,5000,921,10,5000,7100,10,5000,7100,5,5000,521,5,2000,576,5,1000,7298,5,5000,608,10,10000,608,5,1000,5189,1,100,5270,1,50,608,1,100",
+		"905,1,10000,711,1,10000,511,1,2500,705,1,7500",
+		"1019,5,10000,511,1,5000,705,1,10000,705,1,10000",
+		"1019,10,10000,921,1,10000,921,10,10000,7100,5,7000,7100,5,10000,521,5,2500,521,1,9000,576,1,1000,7298,10,2000,7298,5,5000,518,1,5000",
+		"1019,15,10000,921,5,10000,921,20,10000,7100,10,8000,7100,10,10000,521,5,5000,521,3,9000,576,5,5000,7298,10,5000,7298,5,10000,518,5,5000",
+		"1019,25,10000,921,5,10000,921,30,10000,7100,15,9000,7100,15,10000,521,5,7500,521,5,9000,576,10,9000,7298,10,8000,7298,10,10000,518,10,5000,512,30,5000,512,15,3000,512,15,1000,604,10,5000,604,5,3000,604,5,1000,619,1,5000",
+		"1019,25,10000,1019,25,5000,921,921,40,10000,7100,20,1000,7100,20,10000,521,5,10000,521,7,9000,576,15,10000,7298,10,10000,7298,10,10000,518,10,7500,512,30,10000,512,15,5000,512,15,5000,512,15,5000,604,10,7500,604,5,1000,2285,1,1000,619,5,5000",
+		"1019,10,5000,921,10,5000,7100,10,5000,7100,5,5000,521,5,2000,576,5,1000,7298,5,5000,608,10,10000,608,5,1000,5189,1,100,5270,1,50,608,1,100";
+
+}
+
+Function	Script	F_OpenFarm	{
+	// [0] Variabel Referance
+	// [1] PlantID
+	// [2] Last Check View ID
+	// [2] Plant Time
+	if(!getarg(1)){
+		setarray .@pnames$,"Grape","Strawberry","Blue Herb","Red Herb","White Herb","Yellow Herb","Carrot","Potatoe","Samara","Plum","Apple";
+		setarray .@seedid,47081,47082,47083,47084,47085,47086,47087,47088,47089,47090,47091;
+		for(.@i = 0; .@i < getarraysize(.@pnames$); .@i++){
+			set .@menu$, .@menu$ + ((countitem(.@seedid[.@i]))?"Plant "+ .@pnames$[.@i] +":":":");
+		}
+		.@menu$, += "Cancel";
+		.@i = select(.@menu$);
+		if(.@i < getarraysize(.@pnames$) + 1){
+			delitem .@seedid[.@i-1],1;
+			setarray getd("#Farm_"+getarg(0)), .@i, 0, ((gettime(7)-2000) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
+		}
+	} else {
+		if(select("Leave:Collect")>1){
+			explode(.@ItemList$,$@PlantDrops$[getarg(2)],",");
+			for(.@i = 0; .@i < getarraysize(.@ItemList$) - 2; .@i += 3){
+				if(rand(10000) < atoi(.@ItemList$[.@i + 2])) getitem atoi(.@ItemList$[.@i]),rand(1,atoi(.@ItemList$[.@i + 1]));
+			}
+			setarray getd("#Farm_"+getarg(0)), 0, 0, 0;
+		}
+	}
+	return;
+}
+
+Function	Script	F_CheckGrowth	{
+	// [0] Npc Names
+	// [1] PlantID
+	// [2] Last Check View ID
+	// [3] Plant Time
+	// [4] Variabel Referance
+	if(getarg(1)){
+		.@i = ((gettime(7)-2000) * 365 * 24 * 60) + (gettime(8) * 24 * 60) + (gettime(3) * 60) +gettime(2);
+		.@i -= getarg(3);
+		for(.@end = ((getarg(2)>0)?getarg(2):$@PlantStart[getarg(1)]); .@end < $@PlantStart[getarg(1)] + 7; .@end++){
+			if(rand(1000) < $@PlantDeathRate[getarg(1)]){
+				.@end = $@PlantStart[getarg(1) + 1] - 1;
+				break;
+			}
+			if(.@i < $@PantGrothTime[.@end] || $@PantGrothTime[.@end] == 0)
+				break;
+		}
+		if(Farm_Instance == 4)
+			setnpcdisplay(getarg(0), $@PantName$[.@end + 62], $@PlantSprite[.@end + 62]);
+		else	setnpcdisplay(getarg(0), $@PantName$[.@end], $@PlantSprite[.@end]);
+		setd("#Farm_"+getarg(4)+"[1]"),.@end;
+	} else	setnpcdisplay(getarg(0), "Fertile Soil", 111);
+	return;
+}
+
+-	script	Leave	-1,{
+OnTouch:
+	if(select("Stay:Leave")==1) end;
+	Farm_Instance = 0;
+	instance_destroy;
+}
+
+-	script	Storage	-1,{
+OnTouch:
+	if(select("Open Storage:Leave")==1)
+		openstorage;
+	end;
+}
+
+rachel_farm,40,34,4	Script	Fertile Soil#Rch01	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch01",instance_id()),#Farm_Rch01[0],#Farm_Rch01[1],#Farm_Rch01[2],"Rch01";
+	callfunc "F_OpenFarm","Rch01",#Farm_Rch01[0],#Farm_Rch01[1],#Farm_Rch01[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch01",instance_id()),#Farm_Rch01[0],#Farm_Rch01[1],#Farm_Rch01[2],"Rch01";
+	end;
+}
+
+rachel_farm,40,49,4	Script	Fertile Soil#Rch02	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch02",instance_id()),#Farm_Rch02[0],#Farm_Rch02[1],#Farm_Rch02[2],"Rch02";
+	callfunc "F_OpenFarm","Rch02",#Farm_Rch02[0],#Farm_Rch02[1],#Farm_Rch02[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Rch02",instance_id()),#Farm_Rch02[0],#Farm_Rch02[1],#Farm_Rch02[2],"Rch02";
+end;
+}
+
+xmas_farm,32,43,4	Script	Fertile Soil#Xms01	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms01",instance_id()),#Farm_Xms01[0],#Farm_Xms01[1],#Farm_Xms01[2],"Xms01";
+	callfunc "F_OpenFarm","Xms01",#Farm_Xms01[0],#Farm_Xms01[1],#Farm_Xms01[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms01",instance_id()),#Farm_Xms01[0],#Farm_Xms01[1],#Farm_Xms01[2],"Xms01";
+	end;
+}
+
+xmas_farm,41,35,4	Script	Fertile Soil#Xms02	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms02",instance_id()),#Farm_Xms02[0],#Farm_Xms02[1],#Farm_Xms02[2],"Xms02";
+	callfunc "F_OpenFarm","Xms02",#Farm_Xms02[0],#Farm_Xms02[1],#Farm_Xms02[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Xms02",instance_id()),#Farm_Xms02[0],#Farm_Xms02[1],#Farm_Xms02[2],"Xms02";
+	end;
+}
+
+prt_farm,49,34,4	Script	Fertile Soil#Prt01	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt01",instance_id()),#Farm_Prt01[0],#Farm_Prt01[1],#Farm_Prt01[2],"Prt01";
+	callfunc "F_OpenFarm","Prt01",#Farm_Prt01[0],#Farm_Prt01[1],#Farm_Prt01[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt01",instance_id()),#Farm_Prt01[0],#Farm_Prt01[1],#Farm_Prt01[2],"Prt01";
+	end;
+}
+
+prt_farm,60,34,4	Script	Fertile Soil#Prt02	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt02",instance_id()),#Farm_Prt02[0],#Farm_Prt02[1],#Farm_Prt02[2],"Prt02";
+	callfunc "F_OpenFarm","Prt02",#Farm_Prt02[0],#Farm_Prt02[1],#Farm_Prt02[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Prt02",instance_id()),#Farm_Prt02[0],#Farm_Prt02[1],#Farm_Prt02[2],"Prt02";
+	end;
+}
+
+pay_farm,36,44,4	script	Fertile Soil#Pay01	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay01",instance_id()),#Farm_Pay01[0],#Farm_Pay01[1],#Farm_Pay01[2],"Pay01";
+	callfunc "F_OpenFarm","Pay01",#Farm_Pay01[0],#Farm_Pay01[1],#Farm_Pay01[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay01",instance_id()),#Farm_Pay01[0],#Farm_Pay01[1],#Farm_Pay01[2],"Pay01";
+	end;
+}
+
+pay_farm,36,38,4	script	Fertile Soil#Pay02	111,{
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay02",instance_id()),#Farm_Pay02[0],#Farm_Pay02[1],#Farm_Pay02[2],"Pay02";
+	callfunc "F_OpenFarm","Pay02",#Farm_Pay02[0],#Farm_Pay02[1],#Farm_Pay02[2];
+	callfunc "F_CheckGrowth",instance_npcname("Fertile Soil#Pay02",instance_id()),#Farm_Pay02[0],#Farm_Pay02[1],#Farm_Pay02[2],"Pay02";
+	end;
+}
+rachel_farm,34,55,1	duplicate(Leave)	Leave#Rch	45,3,3
+xmas_farm,29,30,1	duplicate(Leave)	Leave#Xms	45,3,3
+prt_farm,49,44,1	duplicate(Leave)	Leave#Prt	45,3,3
+pay_farm,45,32,1	duplicate(Leave)	Leave#Pay	45,3,3
+pay_farm,46,40,4	duplicate(Storage)	Storage#Pay	10024
+rachel_farm,32,51,6	duplicate(Storage)	Storage#Rch	10024
+xmas_farm,42,45,4	duplicate(Storage)	Storage#Xms	10024
+prt_farm,52,47,1	duplicate(Storage)	Storage#Prt	10024
+
+xmas_farm	mapflag	nobranch
+rachel_farm	mapflag	nobranch
+prt_farm	mapflag	nobranch
+pay_farm	mapflag	nobranch
+xmas_farm	mapflag	nocommand
+rachel_farm	mapflag	nocommand
+prt_farm	mapflag	nocommand
+pay_farm	mapflag	nocommand
+xmas_farm	mapflag	nomemo
+rachel_farm	mapflag	nomemo
+prt_farm	mapflag	nomemo
+pay_farm	mapflag	nomemo
+xmas_farm	mapflag	nosave	SavePoint
+rachel_farm	mapflag	nosave	SavePoint
+prt_farm	mapflag	nosave	SavePoint
+pay_farm	mapflag	nosave	SavePoint
+xmas_farm	mapflag	noskill
+rachel_farm	mapflag	noskill
+prt_farm	mapflag	noskill
+pay_farm	mapflag	noskill
+xmas_farm	mapflag	noteleport
+rachel_farm	mapflag	noteleport
+prt_farm	mapflag	noteleport
+pay_farm	mapflag	noteleport
+xmas_farm	mapflag	nowarp
+rachel_farm	mapflag	nowarp
+prt_farm	mapflag	nowarp
+pay_farm	mapflag	nowarp
+xmas_farm	mapflag	nowarpto
+rachel_farm	mapflag	nowarpto
+prt_farm	mapflag	nowarpto
+pay_farm	mapflag	nowarpto

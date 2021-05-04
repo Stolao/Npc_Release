@@ -1,0 +1,46 @@
+//===== EinherjarRO Scripts ================================== 
+//= Custom_Functions
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Grants a random item from an array based of the item 
+//= "Weight" similar to how an OBB or any IG_ item works
+//===== Comments: ============================================
+//= Optmize more?
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//= 1.01 Added a getargcount() check for increase item counts
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+//callfunc	"F_RandWeight",Implode(<ArrayName>,",");
+//callfunc	"F_RandWeight","<Item 1>,<Weight 1>,<Item 2>,<Weight 2>,<Item 3>,<Weight 3>.....";
+//			Note: Arrays set as a String will have a limit of about 28 Items
+//callfunc	"F_RandWeight",<Item 1>,<Weight 1>{,<Item 2>,<Weight 2>{,<Item 3>,<Weight 3>.....}};
+//			Note: Arrays set as a String will have a limit of about 1,073,741,823 Items 
+//				however total Wight cannot exceed 2,147,483,647
+function	script	F_RandWeight	{
+		if(getargcount() == 1){
+			explode(.@E$,getarg(0),",");
+			for(.@x = 0; .@x < getarraysize(.@E$); .@x++)
+				.@D[.@x] = atoi(.@E$[.@x]);
+			for(.@x = 0; .@x < getarraysize(.@D); .@x = .@x + 2){
+				.@Total = .@Total + .@D[.@x + 1];
+				for(.@z = 0; .@z < .@D[.@x + 1]; .@z++)
+					.@Items[getarraysize(.@Items)] = .@D[.@x];
+			}
+		} else {
+			for(.@x = 0; .@x < getargcount(); .@x = .@x + 2){
+				.@Total = .@Total + getarg(.@x + 1);
+				for(.@z = 0; .@z < getarg(.@x + 1); .@z++)
+					.@Items[getarraysize(.@Items)] = getarg(.@x);
+			}
+		}
+		getitem .@Items[rand(.@Total)],1;
+		return 1;
+}

@@ -1,0 +1,52 @@
+//===== EinherjarRO Scripts ================================== 
+//= Poring Power
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.02
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Porings are more fun~
+//===== Comments: ============================================
+//= Suggestions?
+//= Apply to other "Poring"
+//===== Additional Comments: =================================
+//= 1.00 Initial Make
+//= 1.01 Coverted to new areamob format
+//= 1.02 Tabulation
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+-	script	porsize	-1,{
+OnEventPor1:
+	Getmapxy(.@m$,.@x,.@y,0);
+	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor2",0,0;
+	end;
+
+OnEventPor2:
+	Getmapxy(.@m$,.@x,.@y,0);
+	Areamonster .@m$,.@x+5,.@y+5,.@x-5,.@y-5,"--ja--",.mobid,2,"porsize::OnEventPor3",1,0;
+	end;
+
+OnEventPor3:
+	Set .count,.count+1;
+	If(.count == 4){
+		areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,1,"porsize::OnEventPor1",2,0;
+		Set .count,0;
+	}
+	end;
+
+OnInit:
+	Set .TotalBig,100;
+	Set .PlayMap$,"prt_fild08";
+	Set .mobid,1002;
+	Set .B,rand(.TotalBig)+1;
+	Set .M,rand(.TotalBig-.B);
+	Set .S,.TotalBig-.B-.M;
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.B,"porsize::OnEventPor1",2,0;
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.M*2,"porsize::OnEventPor2",0,0;
+	areamonster .PlayMap$,0,0,500,500,"--ja--",.mobid,.S*4,"porsize::OnEventPor3",1,0;
+	end;
+}
