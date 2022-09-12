@@ -13,39 +13,23 @@
 //= More Functions
 //===== Additional Comments: =================================
 //= 1.00 Original Make
+//= 1.01 Remade using a whitelist
 //===== Contact Ifo: =========================================
 //= [Stolao] 
 //= Email: Taingram11@gmail.com
 //============================================================
 
 function	script	dispell	{
-	while ( .@STATUS < 297 ) {
-		if (	
-			.@STATUS != SC_WEIGHT50 &&
-			.@STATUS != SC_WEIGHT90 &&
-			.@STATUS != SC_NOCHAT &&
-			.@STATUS != SC_XMAS &&
-			.@STATUS != SC_SUMMER &&
-			.@STATUS != SC_JAILED &&
-			.@STATUS != SC_STRFOOD &&
-			.@STATUS != SC_AGIFOOD &&
-			.@STATUS != SC_VITFOOD &&
-			.@STATUS != SC_INTFOOD &&
-			.@STATUS != SC_DEXFOOD &&
-			.@STATUS != SC_LUKFOOD &&
-			.@STATUS != SC_FLEEFOOD &&
-			.@STATUS != SC_BATKFOOD &&
-			.@STATUS != SC_WATKFOOD &&
-			.@STATUS != SC_MATKFOOD &&
-			.@STATUS != SC_SCRESIST &&
-			.@STATUS != SC_EXPBOOST &&
-			.@STATUS != SC_ITEMBOOST &&
-			.@STATUS != SC_BOSSMAPINFO &&
-			.@STATUS != SC_LIFEINSURANCE &&
-			.@STATUS != SC_JEXPBOOST
-		)
-		sc_end .@STATUS;
-		set .@STATUS, .@STATUS+1;
+	setarray .@WhiteList,	SC_WEIGHT50, SC_WEIGHT90, SC_NOCHAT, SC_XMAS, SC_SUMMER,
+			SC_JAILED, SC_STRFOOD, SC_AGIFOOD, SC_VITFOOD, SC_INTFOOD,
+			SC_DEXFOOD, SC_LUKFOOD, SC_FLEEFOOD, SC_BATKFOOD, SC_WATKFOOD,
+			SC_MATKFOOD, SC_SCRESIST, SC_EXPBOOST, SC_ITEMBOOST, SC_BOSSMAPINFO,
+			SC_LIFEINSURANCE, SC_JEXPBOOST;
+	freeloop(1);
+	for (.@s = 0; .@s < SC_MAX; .@s++ ) {
+		if (inarray(.@WhiteList[0],.@s) < 0)
+			sc_end .@s;
 	}
-return;
+	freeloop(0);
+	return;
 }
