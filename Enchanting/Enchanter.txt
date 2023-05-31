@@ -1,0 +1,739 @@
+//===== EinherjarRO Scripts ================================== 
+//= Enchanter
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Basic Enchantment Function
+//===== Comments: ============================================
+//= Spend Zeny to add Random Options based of differant trees
+//= No Quest Included
+//= No Option List Included
+//= No Client Side Included
+//===== Additional Comments: =================================
+//= 1.00 Initial Release
+//===== Todo: ================================================
+//= No Longer Supported
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+// callfunc("R_Old_Enchanter",<"Name">,<Gear Allowed>,<Max Enchant>,<Price Multi>,<Fail Over>,<Max Multi>);
+
+// --------------------------------------------------
+//	Enchantment Definitions:
+// --------------------------------------------------
+
+prontera,156,156,4	script	Enchantment_Vars	123,{
+	function F_GenOpt;
+	.@i = select(implode(.indices$,":"))-1;
+	freeloop(1);
+	for(.@y = 0; .@y < getarraysize(getd("$@"+.indices$[.@i])); .@y++)
+		dispbottom .indices$[.@i]+"["+ .@y +"]: "+callfunc("F_RandOptDisp",getd("$@"+.indices$[.@i]+"["+.@y+"]"),$@MaxValue[getd("$@"+.indices$[.@i]+"["+.@y+"]")],0);
+	end;
+
+	function	F_GenOpt	{
+		if(getargcount() != 5){
+			debugmes "F_GenOpt: Requires 5 variables only "+getargcount()+" found, skipping...";
+			return;
+		}
+		if(getarg(0) == 0){
+			debugmes "F_GenOpt: Unkown random option recived, values are "+getarg(0)+","+getarg(1)+","+getarg(2)+","+getarg(3)+" skipping...";
+			return;
+		}
+		if(getarg(4) == 0){
+			debugmes "F_GenOpt: No enchantment location recived "+getarg(0)+" depricated...";
+		} else {
+			for(.@i = 1; .@i < getarraysize(.indices); .@i++){
+				if(getarg(4,2047)&(1<<.@i) || getarg(4,2047)&1)
+					setd ("$@"+.indices$[.@i]+"["+getarraysize(getd("$@"+.indices$[.@i]))+"]"),getarg(0);
+			}
+		}
+		$@IncRate[getarg(0)] = getarg(1);
+		$@IncCost[getarg(0)] = getarg(2);
+		$@MaxValue[getarg(0)] = getarg(3);
+	}
+	return;
+
+OnInit:
+	setarray .indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
+	setarray .indices$[1],"AEGIS","STABILITY","RUIN","PRIMORDIAL","FLOW","POTENTIAL","INSIGHT";
+	freeloop(1);
+	for(.@i = 1; .@i < getarraysize(.indices); .@i++){
+		.@size = getarraysize(getd("$@"+.indices$[.@i]));
+		for(.@j = 0; .@j < .@size; .@j++)
+			setd "$@"+.indices$[.@i]+"["+.@j+"]",0;
+	}
+
+	// Item to Use Adept Enchanter (not Consumed)
+	$@AdeptIdCheck = 501;
+
+	// Item to Use Master Enchanter (not Consumed)
+	$@MasterIdCheck = 502;
+
+	// F_GenOpt(Option,Increase Range,Increase Cost,Max Total,Location);
+	// Weapon (Ruin)
+	F_GenOpt(RDMOPT_DAMAGE_SIZE_PERFECT,			0,       0,  0,	8 );// Special Check Later
+	F_GenOpt(RDMOPT_VAR_ATTPOWER,				3,  500000, 25,	8 );
+	F_GenOpt(RDMOPT_VAR_ATTMPOWER,				5,  250000, 50,	8 );
+
+	// Armor (Aegis)
+	F_GenOpt(RDMOPT_BODY_ATTR_NOTHING,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_WATER,		0,     	 0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_GROUND,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_FIRE,			0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_WIND,			0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_POISON,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_SAINT,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_DARKNESS,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_TELEKINESIS,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_BODY_ATTR_UNDEAD,		0,       0,    0,	2 );// Special Check Later
+	F_GenOpt(RDMOPT_VAR_ITEMDEFPOWER,		1,  750000,    5,	4 );
+	F_GenOpt(RDMOPT_VAR_MDEFPOWER,			1,  750000,    5,	4 );
+
+	// Boots (Flow)
+	F_GenOpt(RDMOPT_VAR_AVOIDSUCCESSVALUE,		 3,  350000,  15,	32 );
+	F_GenOpt(RDMOPT_VAR_PLUSAVOIDSUCCESSVALUE,	 1,  500000,   7,	32 );
+
+	// Garment (Primordial)
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_NOTHING_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_WATER_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_GROUND_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_FIRE_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_WIND_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_POISON_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_SAINT_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_DARKNESS_USER,		1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_TELEKINESIS_USER,	1,  750000, 10,	16 );
+	F_GenOpt(RDMOPT_DAMAGE_PROPERTY_UNDEAD_USER,		1,  750000, 10,	16 );
+
+	// Shield (Stability)
+	F_GenOpt(RDMOPT_RETURN_SHORT,			1,  750000, 5,	4 );
+	F_GenOpt(RDMOPT_RETURN_LONG,			1,  750000, 5,	4 );
+	F_GenOpt(RDMOPT_RETURN_MAGIC,			1,  750000, 5,	4 );
+
+	// Right Acc (Potential)
+	F_GenOpt(RDMOPT_VAR_STRAMOUNT,		 1, 2500000,  5,	64 );
+	F_GenOpt(RDMOPT_VAR_AGIAMOUNT,		 1, 2500000,  5,	64 );
+	F_GenOpt(RDMOPT_VAR_VITAMOUNT,		 1, 2500000,  5,	64 );
+	F_GenOpt(RDMOPT_VAR_INTAMOUNT,		 1, 2500000,  5,	64 );
+	F_GenOpt(RDMOPT_VAR_DEXAMOUNT,		 1, 2500000,  5,	64 );
+	F_GenOpt(RDMOPT_VAR_LUKAMOUNT,		 1, 2500000,  5,	64 );
+
+	// Left Acc (Insight)
+	F_GenOpt(RDMOPT_EFF_TOLERACE_BLIND,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_CURSE,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_POISON,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_FREEZE,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_SILENCE,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_SLEEP,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_STONE,	1, 25000, 35,	128 );
+	F_GenOpt(RDMOPT_EFF_TOLERACE_STUN,	1, 25000, 35,	128 );
+	freeloop(0);
+}
+
+// --------------------------------------------------
+//	Insight Enchanters:
+// --------------------------------------------------
+// callfunc("R_Old_Enchanter",<"Name">,<Gear Allowed>,<Max Enchant>,<Price Multi>,<Fail Over>,<Max Multi>);
+// [0] = Name (Default "[ Enchanter ]")
+// [1] = Gear Allowed (Default is All)
+//	Bitwise
+//	2 = EQI_HEAD_TOP
+//	4 = EQI_ARMOR
+//	8 = EQI_HAND_L
+//	16 = EQI_HAND_R
+//	32 = EQI_GARMENT
+//	64 = EQI_SHOES
+//	128 = EQI_ACC_L
+//	256 = EQI_ACC_R
+//	512 = EQI_HEAD_MID
+//	1024 = EQI_HEAD_LOW
+// [2] = Max Enchants (Default 3)
+//	Max Amount of Enchantments Allowed from this NPC
+// [3] = Price Multi (Default 100)
+//	What % of price should this npc go up to in the rand()
+// [4] = Fail Over
+//	What encahntment will it start to fail over
+// [5] = Max Multi (Default 100)
+//	What % of Max Value should this npc go up to in the rand()
+function	script	R_Old_Enchanter	{
+	mes getarg(0,"[ Enchanter ]"),"Do you want anything Enhanted?";
+	setarray .@gems[1],0,719,721,723,727,720,726,729;
+	setarray .@gear[1],0,38005,38007,38006,38004,38008,38009,38010;
+	setarray .@indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
+	setarray .@indices$[1],"AEGIS","STABILITY","RUIN","PRIMORDIAL","FLOW","POTENTIAL","INSIGHT";
+	setarray .@EQP[1], EQP_SHADOW_ARMOR, EQP_SHADOW_SHIELD, EQP_SHADOW_WEAPON, EQP_COSTUME_GARMENT, EQP_SHADOW_SHOES, EQP_SHADOW_ACC_R, EQP_SHADOW_ACC_L;
+	for(.@i = 1; .@i<getarraysize(.@indices); .@i++) {
+		if(getequipisequiped(.@indices[.@i]) && getarg(1,2047)&(1<<.@i)){
+			.@menu$ += "[" + getequipname(.@indices[.@i]) + "]";
+			.@equipped = 1;
+		}
+		.@menu$ += ":";
+	}
+	if (.@equipped == 0) {
+		next;
+		mes getarg(0,"[ Enchanter ]");
+		mes "You're not wearing";
+		mes "anything there that";
+		mes "I can Enchant.";
+		for(.@i = 1; .@i<getarraysize(.@indices); .@i++) {
+			if(getarg(1,2047)&(1<<.@i)){
+				.@menu2$ += "1x "+ getitemname(.@gems[.@i]) +"-["+ getitemname(.@gear[.@i]) +"]";
+				.@tradegems = 1;
+			}
+			.@menu2$ += ":";
+		}
+		if(.@tradegems){
+			next;
+			mes getarg(0,"[ Enchanter ]");
+			mes "Would you like me to create an^0000CC Ornament^000000 for you?";
+			.@i = select(.@menu2$);
+			next;
+			mes getarg(0,"[ Enchanter ]");
+			if(countitem(.@gems[.@i]) && zeny >= 10000 && countitem(1001)){
+				mes "Alright here is your^0000CC "+getitemname(.@gear[.@i])+"^000000.";
+				zeny -= 10000;
+				delitem 1001,1;
+				delitem .@gems[.@i],1;
+				getitem .@gear[.@i],1;
+				close;
+			}
+			mes "Sorry but you^0000CC 1 "+getitemname(.@gems[.@i])+"^000000,^0000CC 1 "+getitemname(1001)+"^000000 and 10000z for me to make you an^0000CC "+getitemname(.@gear[.@i])+"^000000.";
+		}
+		emotion ET_FRET;
+		close;
+	}
+	.@pselect = select(.@menu$);
+	.@part = .@indices[.@pselect];
+	.@itemid = getequipid(.@part);
+	if(!getequipisequiped(.@part)){
+		next;
+		mes getarg(0,"[ Enchanter ]");
+		mes "I don't think I can Enchant any items you have...";
+		close;
+	}
+	getinventorylist;
+	for(.@i = 0; .@i < @inventorylist_count; .@i++) {
+		if(@inventorylist_equip[.@i] == .@EQP[.@pselect] && @inventorylist_id[.@i] == .@itemid && @inventorylist_expire[.@i]){
+			next;
+			mes getarg(0,"[ Enchanter ]");
+			mes "You're wearing something your borrowing, don't think I'm willing to Enchant something thats not yours.";
+			emotion ET_FRET;
+			close;
+		}
+	}
+	for(.@j = 0; .@j < 5; .@j++)
+		if(getequiprandomoption(.@part,.@j,ROA_ID))
+			.@pre++;
+	if(.@pre >= getarg(2,3)){
+		next;
+		freeloop 1;
+		for(.@i = 0; .@i < @inventorylist_count; .@i++)
+			if(@inventorylist_equip[.@i] == .@EQP[.@pselect] && @inventorylist_id[.@i] == .@itemid)
+				break;
+		freeloop 0;
+		mes getarg(0,"[ Enchanter ]"),"Seems your ^3E75B8" + getitemname( .@itemid ) + "^000000 is already enchanted to the max I can enchant. Would you like me to overwrite an encahntment instead? I'll need a star crumb and a yellow gemstone to work my magic.";
+		if(select("Yes:No") == 2)
+			close;
+		setarray .@id,@inventorylist_option_id1[.@i],@inventorylist_option_id2[.@i],@inventorylist_option_id3[.@i],@inventorylist_option_id4[.@i],@inventorylist_option_id5[.@i];
+		setarray .@val,@inventorylist_option_value1[.@i],@inventorylist_option_value2[.@i],@inventorylist_option_value3[.@i],@inventorylist_option_value4[.@i],@inventorylist_option_value5[.@i];
+		setarray .@par,@inventorylist_option_parameter1[.@i],@inventorylist_option_parameter2[.@i],@inventorylist_option_parameter3[.@i],@inventorylist_option_parameter4[.@i],@inventorylist_option_parameter5[.@i];
+		.@refine = @inventorylist_refine[.@i];
+		.@bound = @inventorylist_bound[.@i];
+		setarray .@cards,@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i];
+		for(.@x = 0; .@x < getarg(2,3); .@x++){
+			if(.@id[.@x])
+				.@menu$[.@x] = callfunc("F_RandOptDisp",.@id[.@x],.@val[.@x],.@par[.@x]);
+			else	.@menu$[.@x] = "";
+		}
+		.@remove = select(implode(.@menu$,":"));
+		next;
+		mes getarg(0,"[ Enchanter ]"),"Are you sure you want to remove ^CC4444"+.@menu$[.@remove-1]+"^000000 for another enchantment?";
+		if(select("Yes:No")==2){
+			next;
+			mes getarg(0,"[ Enchanter ]"),"Maybe another time?";
+			close;
+		}
+	}
+	.@price = 5000;
+	.@price += .@pre * 2000;
+	if(.@remove > 0){
+		.@price += 1000 * .@remove * .@remove;
+		for(.@k = 0; .@k < .@remove; .@k++)
+			.@price += .@price * .@remove / 3;
+	} else {
+		for(.@k = 0; .@k < .@pre; .@k++)
+			.@price += .@price * .@pre / 4;
+	}
+	.@price += .@price * getarg(4,1) / 100;
+	next;
+	mes getarg(0,"[ Enchanter ]"),"Your ^3E75B8" + getitemname( .@itemid ) + "^000000 will be Enchanted for ^3CBB75"+callfunc("F_InsertComma",.@price)+"z^000000.",
+		((getarg(4,1) && .@pre > getarg(4,1))?"There is a small chance this could fail":""),
+		"Are you sure?";
+	if( select("Confirm:No") == 2 ){
+		next;
+		mes getarg(0,"[ Enchanter ]"),"Come back if you've changed your mind.";
+		close;
+	}
+	.@e = .@pre + 1;
+	if(zeny < .@price){
+		next;
+		mes getarg(0,"[ Enchanter ]"),"For me to Enchant your ^3E75B8" + getitemname( .@itemid ) + "^000000 it cost "+.@price+"z. Come back when you have enough funds.";
+		close;
+	}
+	if(.@pre == 0 || .@remove == 1){
+		if(.@indices[.@pselect] == EQI_SHADOW_WEAPON){// Special Check Later
+			if(rand(200) <  pow((getarg(2,3) - 1),4))
+				.@allowall = 1;
+		} else if(.@indices[.@pselect] == EQI_SHADOW_ARMOR){// Special Check Later
+			if(rand(250) <  pow((getarg(2,3) - 1),2))
+				.@allowall = 1;
+		}
+	}
+	if(.@remove){
+		if(!countitem(1000)|| !countitem(715)) {
+			next;
+			mes getarg(0,"[ Enchanter ]"),"I need a star crumb and a yellow gemstone to work my magic.";
+			close;
+		}
+	}
+	close2;
+	if(Enchanters >= 17 && Enchanters < 19 && !rand(4))
+		Enchanters++;
+	zeny -= .@price;
+	if(.@remove){
+		delitem 1000,1;
+		delitem 715,1;
+	}
+	if(.@itemid != getequipid(.@part))
+		 .@fail = 1;
+	if((.@pre || .@remove) && !rand((1000 + (getarg(2,3) * getarg(2,3)) - .@pre)) && getarg(4,1) && !.@fail){
+		mes getarg(0,"[ Enchanter ]");
+		emotion (!rand(5))?ET_MONEY:ET_HUK;
+		if(rand(10)){
+			mes getarg(0,"[ Enchanter ]");
+			mes "OH! MY GOD!";
+			mes "Damn it! Not again!";
+			mes "I'm terribly sorry, but you know practice does make perfect.";
+			mes "Um, right? Heh heh...";
+			close;
+		} else	.@fail = 1;
+	}
+	if(.@pselect == 3 && getiteminfo(.@itemid,2) == 5)
+		.@pselect = 4;
+	if(.@pselect == 4 && !.@allowall)// Special Check Later
+		.@r = rand(8,getarraysize(getd("$@"+.@indices$[.@pselect]))-1);
+	else if(.@pselect == 2 && !.@allowall)// Special Check Later
+		.@r = rand(10,getarraysize(getd("$@"+.@indices$[.@pselect]))-1);
+	else	.@r = rand(getarraysize(getd("$@"+.@indices$[.@pselect])));
+	.@max = $@MaxValue[ getd("$@"+.@indices$[.@pselect]+"["+.@r+"]") ] * min(getarg(5,100),100) / 100;
+	if(.@max >= 0)
+		.@rmax = rand(1, .@max);
+	else 	.@rmax = rand(-1, .@max);
+	if(.@remove){
+		delitem3 .@itemid,1,1,.@refine,0,.@cards[0],.@cards[1],.@cards[2],.@cards[3],.@id,.@val,.@par;
+		.@id[.@remove-1] = getd("$@"+.@indices$[.@pselect]+"["+.@r+"]");
+		if(.@fail)
+			.@val[.@remove-1] = -.@rmax;
+		else	.@val[.@remove-1] = .@rmax;
+		if(.@bound)
+			getitembound3 .@itemid,1,1,.@refine,0,.@cards[0],.@cards[1],.@cards[2],.@cards[3],Bound_Account,.@id,.@val,.@par;
+		else	getitem3 .@itemid,1,1,.@refine,0,.@cards[0],.@cards[1],.@cards[2],.@cards[3],.@id,.@val,.@par;
+		equip .@itemid;
+	}
+	if(.@fail){
+		if(!.@remove){
+			setrandomoption(.@part,.@pre,getd("$@"+.@indices$[.@pselect]+"["+.@r+"]"),-.@rmax,0);
+			if(!rand(3))
+				breakequip .@part;
+		}
+		mes getarg(0,"[ Enchanter ]");
+		mes "Crap!";
+		mes "It couldn't take";
+		mes "much more tampering!";
+		mes "Sorry about this...";
+		close;
+	} else if(!.@remove)
+		setrandomoption(.@part,.@pre,getd("$@"+.@indices$[.@pselect]+"["+.@r+"]"),.@rmax,0);
+	return;
+}
+
+// --------------------------------------------------
+//	Enchantress / Improve:
+// --------------------------------------------------
+gef_tower,104,35,4	script	Enchantress	435,{
+	mes "[ Enchantress ]","Do you want any enchantment improved?";
+	switch(select("Yes, I would.:Whats it cost?:No thanks.")){
+		case 2:
+			next;
+			mes "[ Enchantress ]","I charge a flat fee of "+callfunc("F_InsertComma",.Cost)+" zeny, increasing with power of the enchantment already active. In addition, I need a Old Magic Book as well as 7 each Red Yellow and Blue gemstone.";
+			close;
+		case 3:
+			next;
+			mes "[ Enchantress ]","Very well. Return at once if you ever seek my services.";
+			close;
+		case 1:
+			for(.@i = 1; .@i<getarraysize(.indices); .@i++) {
+				if(getequipisequiped(.indices[.@i])){
+					.@menu$ += F_getpositionname(.indices[.@i]) + "-[" + getequipname(.indices[.@i]) + "]";
+					.@equipped = 1;
+				}
+				.@menu$ += ":";
+			}
+			if (.@equipped == 0) {
+				next;
+				mes "[ Enchantress ]";
+				mes "I don't think I can improve any items you have...";
+				close;
+			}
+			.@pselect = select(.@menu$);
+			.@part = .indices[.@pselect];
+			.@itemid = getequipid(.@part);
+			getinventorylist;
+			freeloop 1;
+			for(.@i = 0; .@i < @inventorylist_count; .@i++){
+				if(@inventorylist_equip[.@i] == .EQP[.@pselect] && @inventorylist_id[.@i] == .@itemid){
+					if(@inventorylist_expire[.@i]){
+						next;
+						mes "[ Enchantress ]";
+						mes "You're wearing something your borrowing, don't think I'm willing to improve on something thats not yours.";
+						emotion E_FRET;
+						close;
+					} else if(!@inventorylist_option_id1[.@i] && !@inventorylist_option_id2[.@i] && !@inventorylist_option_id3[.@i] && !@inventorylist_option_id4[.@i] && !@inventorylist_option_id5[.@i]){
+						next;
+						mes "[ Enchantress ]";
+						mes "This doesnt seem to be enchanted sorry.";
+						emotion E_FRET;
+						close;
+					} else	break;
+				}
+			}
+			freeloop 0;
+			next;
+			mes "[ Enchantress ]","Which enchantment would you like to improve";
+			setarray .@menu$,((@inventorylist_option_id1[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id1[.@i],@inventorylist_option_value1[.@i],@inventorylist_option_parameter1[.@i]):""),
+					((@inventorylist_option_id2[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id2[.@i],@inventorylist_option_value2[.@i],@inventorylist_option_parameter2[.@i]):""),
+					((@inventorylist_option_id3[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id3[.@i],@inventorylist_option_value3[.@i],@inventorylist_option_parameter3[.@i]):""),
+					((@inventorylist_option_id4[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id4[.@i],@inventorylist_option_value4[.@i],@inventorylist_option_parameter4[.@i]):""),
+					((@inventorylist_option_id5[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id5[.@i],@inventorylist_option_value5[.@i],@inventorylist_option_parameter5[.@i]):"");
+			.@remove = select(implode(.@menu$,":")) - 1;
+			setarray .@id,@inventorylist_option_id1[.@i],@inventorylist_option_id2[.@i],@inventorylist_option_id3[.@i],@inventorylist_option_id4[.@i],@inventorylist_option_id5[.@i];
+			setarray .@val,@inventorylist_option_value1[.@i],@inventorylist_option_value2[.@i],@inventorylist_option_value3[.@i],@inventorylist_option_value4[.@i],@inventorylist_option_value5[.@i];
+			setarray .@par,@inventorylist_option_parameter1[.@i],@inventorylist_option_parameter2[.@i],@inventorylist_option_parameter3[.@i],@inventorylist_option_parameter4[.@i],@inventorylist_option_parameter5[.@i];
+			.@cost = .Cost;
+			if(.@val[.@remove] < 0)
+				.@cost += -.@val[.@remove] * $@IncCost[.@id[.@remove]];
+			else	.@cost += .@val[.@remove] * $@IncCost[.@id[.@remove]];
+			.@cost += .@cost * .@remove * (.@remove - 1);
+			next;
+
+			if($@IncCost[.@id[.@remove]] > 0){
+				freeloop(1);
+				for(.@x = 0; .@x < getarraysize(getd("$@"+.indices$[.@pselect]));.@x++){
+					if(getd("$@"+.indices$[.@pselect]+"["+.@x+"]") == .@id[.@remove]){
+						.@pass = 1;
+						 break;
+					}
+				}
+				freeloop 0;
+				if(!.@pass){
+					mes "[ Enchantress ]","Seems this enchantment doesn't normally resonate on this gear, this is some old magic beyond even me.";
+					close;
+				}
+			}
+
+			if(($@MaxValue[.@id[.@remove]] < 0 && .@val[.@remove] <= $@MaxValue[.@id[.@remove]]) || ($@MaxValue[.@id[.@remove]] > 0 && .@val[.@remove] >= $@MaxValue[.@id[.@remove]]) || $@IncRate[.@id[.@remove]] == 0){
+				mes "[ Enchantress ]","Seems this magic is beyond even me.";
+				close;
+			}
+			mes "[ Enchantress ]","Are you sure you want to improve ^3E75B8"+.@menu$[.@remove]+"^000000 its going to cost "+callfunc("F_InsertComma",.@cost)+"z";
+			if(select("No:Yes")==1){
+				next;
+				mes "[ Enchantress ]","Maybe another time?";
+				close;
+			}
+			if(zeny < .@cost || (countitem(1006) < 1) || (countitem(715) < 7) || (countitem(716) < 7) || (countitem(717) < 7)) {
+				next;
+				mes "[ Enchantress ]","You do not have all the items I require to work my magic, child. Come again when you do.";
+				close;
+			}
+			zeny -= .@cost;
+			delitem 1006,1;
+			delitem 715,7;
+			delitem 716,7;
+			delitem 717,7;
+			if(rand(10000) < .FailRate || .@itemid != getequipid(.@part)){
+				next;
+				mes "[ Enchantress ]","Oops, Seems it failed, but your item is safe. We can try again later if you like.";
+				close;
+			}
+			delitem3 .@itemid,1,@inventorylist_identify[.@i],@inventorylist_refine[.@i],@inventorylist_attribute[.@i],@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i],.@id,.@val,.@par;
+			if($@IncRate[.@id[.@remove]] < 0){
+				.@newval = .@val[.@remove] + max(rand(-1,$@IncRate[.@id[.@remove]]),rand(-1,$@IncRate[.@id[.@remove]]));
+				if(.@newval < $@MaxValue[.@id[.@remove]])
+					.@newval = $@MaxValue[.@id[.@remove]];
+			} else {
+				.@newval = .@val[.@remove] + max(rand(1,$@IncRate[.@id[.@remove]]),rand(1,$@IncRate[.@id[.@remove]]));
+				if(.@newval > $@MaxValue[.@id[.@remove]])
+					.@newval = $@MaxValue[.@id[.@remove]];
+			}
+			.@val[.@remove] = .@newval;
+			getitem3 .@itemid,1,@inventorylist_identify[.@i],@inventorylist_refine[.@i],@inventorylist_attribute[.@i],@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i],.@id,.@val,.@par;
+			equip .@itemid;
+			next;
+			mes "[ Enchantress ]","Ok all done~";
+			close;
+	}
+	close;
+
+OnInit:
+	// Zeny Cost
+	.Cost = 100000;
+
+	// Fail Chance
+	// 1 = 0.01%
+	.FailRate = 1;
+
+	// Menu Generation
+	setarray .indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
+	setarray .indices$[1],"AEGIS","STABILITY","RUIN","PRIMORDIAL","FLOW","POTENTIAL","INSIGHT";
+	setarray .EQP[1], EQP_SHADOW_ARMOR, EQP_SHADOW_SHIELD, EQP_SHADOW_WEAPON, EQP_COSTUME_GARMENT, EQP_SHADOW_SHOES, EQP_SHADOW_ACC_R, EQP_SHADOW_ACC_L;
+}
+
+// --------------------------------------------------
+//	Enchanters:
+// --------------------------------------------------
+
+// callfunc("R_Old_Enchanter",<"Name">,<Gear Allowed>,<Max Enchant>,<Price Multi>,<Fail Over>,<Max Multi>);
+
+payon,119,172,7	script	Primordial Enchanter#2	439,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",32,2,50,1,30);	}
+nif_in,31,100,3	script	Primordial Enchanter#3	439,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",32,3,100,1,50);	}
+lhz_in02,275,35,4	script	Primordial Enchanter#4	439,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",32,4,150,1,70);
+}
+rachel,48,87,4	script	Primordial Enchanter#5	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",32,5,300,1,90);
+}
+prt_in,90,73,4	script	Aegis Enchanter#2	436,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",4,2,50,1,30);	}
+aldeba_in,39,48,3	script	Aegis Enchanter#4	443,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",4,3,100,1,50);	}
+yuno_in01,175,21,2	script	Aegis Enchanter#5	439,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",4,4,150,1,70);
+}
+brasilis,267,314,4	script	Aegis Enchanter#6	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",4,5,300,1,90);
+}
+izlude_in,116,76,4	script	Ruin Enchanter#2	439,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",16,2,50,1,30);	}
+ama_in01,102,21,3	script	Ruin Enchanter#3	439,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",16,3,100,1,50);	}
+yuno_in01,168,34,4	script	Ruin Enchanter#4	439,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",16,4,100,1,70);
+}
+spl_in01,163,225,5	script	Ruin Enchanter#5	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",16,5,300,1,90);
+}
+ayo_in01,83,194,3	script	Stability Enchanter#2	443,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",8,2,50,1,30);	}
+ein_in01,97,27,5	script	Stability Enchanter#3	443,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",8,3,100,1,50);	}
+ve_in,385,239,2	script	Stability Enchanter#4	443,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",8,4,150,1,70);
+}
+man_in01,363,134,5	script	Stability Enchanter#5	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",8,5,300,1,90);
+}
+morocc_in,52,166,4	script	Flow Enchanter#2	440,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",64,2,50,1,30);	}
+hu_in01,115,315,3	script	Flow Enchanter#3	439,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",64,3,100,1,50);	}
+lou_in02,126,181,5	script	Flow Enchanter#5	442,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",64,4,150,1,70);
+}
+mid_camp,249,273,4	script	Flow Enchanter#6	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",64,5,300,1,90);
+}
+xmas_in,174,100,4	script	Potential Enchanter#1	440,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",128,2,50,1,30);	}
+lhz_in01,264,97,4	script	Potential Enchanter#6	442,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",128,3,100,1,50);	}
+ein_in01,26,87,4	script	Potential Enchanter#7	442,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",128,4,150,1,70);
+}
+moscovia,144,110,4	script	Potential Enchanter#9	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",128,5,300,1,90);
+}
+alberta_in,171,25,5	script	Insight Enchanter#1	444,{	callfunc("R_Old_Enchanter","[ Novice Enchanter ]",256,2,50,1,30);	}
+ein_in01,27,40,5	script	Insight Enchanter#4	444,{	callfunc("R_Old_Enchanter","[ Apprentice Enchanter ]",256,3,100,1,40);	}
+um_in,151,126,5	script	Insight Enchanter#7	439,{
+	if(!countitem($@AdeptIdCheck)){
+		mes "[ Adept Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Adept Enchanter ]",256,4,150,1,70);
+}
+ve_in,355,256,4	script	Insight Enchanter#8	439,{
+	if(!countitem($@MasterIdCheck)){
+		mes "[ Master Enchanter ]","You don't seeem to have permission to use my services from the mistress.";
+		close;
+	}
+	callfunc("R_Old_Enchanter","[ Master Enchanter ]",256,5,300,1,90);
+}
+
+// --------------------------------------------------
+//	Duplicates:
+// --------------------------------------------------
+
+gef_tower,104,33,4	duplicate(Insight Enchanter#1)	Insight Enchanter#3	435
+
+// --------------------------------------------------
+//	Removed:
+// --------------------------------------------------
+/*
+prt_in,95,71,2	script	Disenchanter	445,{
+	mes "[ Disenchanter ]","Do you want any gear disenchanted?";
+	switch(select("Yes, I would.:Whats it cost?:No thanks.")){
+		case 2:
+			next;
+			mes "[ Disenchanter ]","I charge a flat fee of "+callfunc("F_InsertComma",.Cost)+" zeny, increasing per enchantment slot. In addition, I need a star crumb and a yellow gemstone to work my magic.";
+			close;
+		case 3:
+			next;
+			mes "[ Disenchanter ]","Very well. Return at once if you seek my services.";
+			close;
+		case 1:
+			for(.@i = 1; .@i<getarraysize(.indices); .@i++) {
+				if(getequipisequiped(.indices[.@i])){
+					.@menu$ += F_getpositionname(.indices[.@i]) + "-[" + getequipname(.indices[.@i]) + "]";
+					.@equipped = 1;
+				}
+				.@menu$ += ":";
+			}
+			if (.@equipped == 0) {
+				next;
+				mes "[ Disenchanter ]";
+				mes "I don't think I can disenchant any items you have...";
+				close;
+			}
+			.@part = .indices[select(.@menu$)];
+			.@itemid = getequipid(.@part);
+			getinventorylist;
+			freeloop 1;
+			for(.@i = 0; .@i < @inventorylist_count; .@i++){
+				if(@inventorylist_equip[.@i] && @inventorylist_id[.@i] == .@itemid){
+					if(@inventorylist_expire[.@i]){
+						next;
+						mes "[ Disenchanter ]";
+						mes "You're wearing something your borrowing, don't think I'm willing to disenchant on something thats not yours.";
+						emotion e_an;
+						close;
+					} else 
+					.@pre = (@inventorylist_option_id1[.@i]?1:0) + (@inventorylist_option_id2[.@i]?1:0) + (@inventorylist_option_id3[.@i]?1:0) + (@inventorylist_option_id4[.@i]?1:0) + (@inventorylist_option_id5[.@i]?1:0);
+					if(!.@pre){
+						next;
+						mes "[ Disenchanter ]";
+						mes "This doesnt seem to be enchanted sorry.";
+						emotion e_an;
+						close;
+					} else	break;
+				}
+			}
+			freeloop 0;
+			next;
+			mes "[ Disenchanter ]","Which enchantment would you like to remove";
+			setarray .@menu$,((@inventorylist_option_id1[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id1[.@i],@inventorylist_option_value1[.@i],@inventorylist_option_parameter1[.@i]):""),
+					((@inventorylist_option_id2[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id2[.@i],@inventorylist_option_value2[.@i],@inventorylist_option_parameter2[.@i]):""),
+					((@inventorylist_option_id3[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id3[.@i],@inventorylist_option_value3[.@i],@inventorylist_option_parameter3[.@i]):""),
+					((@inventorylist_option_id4[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id4[.@i],@inventorylist_option_value4[.@i],@inventorylist_option_parameter4[.@i]):""),
+					((@inventorylist_option_id5[.@i])?callfunc("F_RandOptDisp",@inventorylist_option_id5[.@i],@inventorylist_option_value5[.@i],@inventorylist_option_parameter5[.@i]):"");
+			.@remove = select(implode(.@menu$,":")) - 1;
+			next;
+			mes "[ Disenchanter ]","Are you sure you want to remove ^CC4444"+.@menu$[.@remove]+"^000000. It'll cost "+.Cost[.@pre]+"z.";
+			if(select("No:Yes")==1){
+				next;
+				mes "[ Disenchanter ]","Maybe another time?";
+				close;
+			}
+			if(zeny < .Cost[.@pre] || (countitem(1000) < 1) || (countitem(715) < 1)) {
+				mes "[ Disenchanter ]","You do not have all the items I require to work my magic, child. Come again when you do.";
+				close;
+			}
+			setarray .@id,@inventorylist_option_id1[.@i],@inventorylist_option_id2[.@i],@inventorylist_option_id3[.@i],@inventorylist_option_id4[.@i],@inventorylist_option_id5[.@i];
+			setarray .@val,@inventorylist_option_value1[.@i],@inventorylist_option_value2[.@i],@inventorylist_option_value3[.@i],@inventorylist_option_value4[.@i],@inventorylist_option_value5[.@i];
+			setarray .@par,@inventorylist_option_parameter1[.@i],@inventorylist_option_parameter2[.@i],@inventorylist_option_parameter3[.@i],@inventorylist_option_parameter4[.@i],@inventorylist_option_parameter5[.@i];
+			zeny -= .Cost[.@pre];
+			delitem 1000,1;
+			delitem 715,1;
+			if(rand(10000) < .FailRate){
+				mes "[ Disenchanter ]","Oops, Seems it failed, but your item is safe. We can try again later if you like.";
+				close;
+			}
+			delitem3 .@itemid,1,@inventorylist_identify[.@i],@inventorylist_refine[.@i],@inventorylist_attribute[.@i],@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i],.@id,.@val,.@par;
+			deletearray .@id[.@remove],1;
+			deletearray .@val[.@remove],1;
+			deletearray .@par[.@remove],1;
+			if(.@id)
+				getitem3 .@itemid,1,@inventorylist_identify[.@i],@inventorylist_refine[.@i],@inventorylist_attribute[.@i],@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i],.@id,.@val,.@par;
+			else	getitem2 .@itemid,1,@inventorylist_identify[.@i],@inventorylist_refine[.@i],@inventorylist_attribute[.@i],@inventorylist_card1[.@i],@inventorylist_card2[.@i],@inventorylist_card3[.@i],@inventorylist_card4[.@i];
+			equip .@itemid;
+			next;
+			mes "[ Disenchanter ]","Ok all done~";
+			close;
+	}
+	close;
+OnInit:
+	// Zeny Cost
+	setarray .Cost[1],50000,50000,50000,50000,50000;
+
+	// Fail Chance
+	// Lose Zeny, Star Crumb and Yellow Gemstone, item uneffected
+	// 1 = 1%
+	.FailRate = 6;
+
+	// Menu Generation
+	setarray .indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
+}
+*/

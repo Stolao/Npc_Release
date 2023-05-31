@@ -1,0 +1,126 @@
+//===== EinherjarRO Scripts ================================== 
+//= Refillable Items
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.05
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= @commands for refillable 
+//===== Comments: ============================================
+//= Item DB
+/*
+35501,Wing_Of_Fly_,Endless Fly Wing,11,60,,50,,,,,0xFFFFFFFF,63,2,,,,,,{ .@i = countitem(601); if(.@i){ delitem 601,.@i; #FlyWing += .@i; } else if(#FlyWing){ #FlyWing--; if(@fw){ message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining"; } warp "Random",0,0; } },{},{}
+35502,Wing_Of_Butterfly_,Endless Butterfly Wing,11,300,,50,,,,,0xFFFFFFFF,63,2,,,,,,{  .@i = countitem(602); if(.@i){ delitem 602,.@i; #BFlyWing += .@i; } else if(#BFlyWing){ #BFlyWing--; if(@bfw){ message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining"; } warp "SavePoint",0,0; } },{},{}
+35503,Magnifier_,Endless Magnifier,11,300,,50,,,,,0xFFFFFFFF,63,2,,,,,,{  .@i = countitem(611); if(.@i){ delitem 611,.@i; #Magnifier += .@i; } else if(#Magnifier){ #Magnifier--; if(@MFG){ message strcharinfo(0),"[Magnifier]: "+#Magnifier+" Uses Remaining"; } itemskill "MC_IDENTIFY",1; } },{},{}
+*/
+//= ItemInfo
+/*
+	[35501] = {
+		unidentifiedDisplayName = "Refillable Fly Wing",
+		unidentifiedResourceName = "파리의날개",
+		unidentifiedDescriptionName = {
+			"A Magic Fly Wing that absorbs the magic of any Fly Wings owned and stores the power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		identifiedDisplayName = "Refillable Fly Wing",
+		identifiedResourceName = "파리의날개",
+		identifiedDescriptionName = {
+			"A Magic Fly Wing that absorbs the magic of any Fly Wings owned and stores the power",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+
+	[35502] = {
+		unidentifiedDisplayName = "Refillable Butterfly Wing",
+		unidentifiedResourceName = "나비의날개",
+		unidentifiedDescriptionName = {
+			"A Magic Butterfly Wing that absorbs the magic of any Butterfly Wings owned and stores there power for future use.",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		identifiedDisplayName = "Refillable Butterfly Wing",
+		identifiedResourceName = "나비의날개",
+		identifiedDescriptionName = {
+			"A Magic Butterfly Wing that absorbs the magic of any Butterfly Wings owned and stores there power for future use.",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+	[35503] = {
+		unidentifiedDisplayName = "Refillable Magnifier",
+		unidentifiedResourceName = "돋보기",
+		unidentifiedDescriptionName = { },
+		identifiedDisplayName = "Magnifier",
+		identifiedResourceName = "돋보기",
+		identifiedDescriptionName = {
+			"A Magic Magnifier Wing that absorbs the magic of any Magnifier owned and stores there power for future use.",
+			"^ffffff_^000000",
+			"Weight: ^7777775^000000"
+		},
+		slotCount = 0,
+		ClassNum = 0
+	},
+
+*/
+//===== Additional Comments: =================================
+//= 1.00 Origional Make
+//= 1.01 Fixed 2 missing "
+//= 1.02 Added a Magnify Glass
+//= 1.03 Tabulation
+//= 1.04 Removed use of set
+//= 1.05 Fixed missing "" in item_db entry
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+-	script	atbfw	-1,{
+OnBFW:
+	if(@bfw)
+		@bfw = 0; 
+	else	@bfw = 1;
+	message strcharinfo(0),"[Butterfly Wing]: Count Messages "+((@bfw)?"Enabled":"Disabled");
+	message strcharinfo(0),"[Butterfly Wing]: "+#BFlyWing+" Uses Remaining";
+	end;
+
+OnFW:
+	if(@fw)
+		@fw = 0;
+	else	@fw = 1;
+	message strcharinfo(0),"[Fly Wing]: Count Messages "+((@fw)?"Enabled":"Disabled");
+	message strcharinfo(0),"[Fly Wing]: "+#FlyWing+" Uses Remaining";
+	end;
+
+OnMFG:
+	if(@mfg)
+		@mfg = 0;
+	else	@mfg = 1;
+	message strcharinfo(0),"[Magnifier]: Count Messages "+((@MFG)?"Enabled":"Disabled");
+	message strcharinfo(0),"[Magnifier]: "+#Magnifier+" Uses Remaining";
+	end;
+
+F_Identify:
+OnInit:
+	bindatcmd("fw","atbfw::OnFW",0,99);
+	bindatcmd("bfw","atbfw::OnBFW",0,99);
+	bindatcmd("mfg","atbfw::OnMFG",0,99);
+	end;
+}
+
+
+
+
+
+
+
+
+
+

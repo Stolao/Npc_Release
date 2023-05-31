@@ -1,0 +1,63 @@
+//===== EinherjarRO Scripts ================================== 
+//= Healer w/ Buffer
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.06
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= A Simple Non-Abuse Healer w/ Buffer
+//===== Comments: ============================================
+//= Suggestions?
+//===== Additional Comments: =================================
+//= 1.00 Initial Make
+//= 1.01 Changed while(1) -> for
+//= 1.02 Changed for -> while(hp/sp)
+//= 1.03 Fixed Logic Bug
+//= 1.04 Added Config
+//= 1.05 Added Buffer per requests
+//= 1.06 Tabulation
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+prontera,156,204,0	script	Fountain	111,{
+	mes "Drink From Fountain?";
+	if(select("Yes:No")!=1) close;
+	close2;
+	while( ( HP < MaxHP || SP < MaxSP ) && .Mode & 1){
+		progressbar "0x11CC99",.HealDelay;
+		percentheal rand(.healrate),rand(.healrate);
+	}
+	if(.Mode & 2)
+		for(set .@x,0; .@x < getarraysize(.BuffInfo); set .@x,.@x + 3)
+			sc_start .BuffInfo[.@x], .BuffInfo[.@x + 1] * 60000, .BuffInfo[.@x + 2];
+	end;
+
+OnInit:
+	// Bitwise
+	// [1]: Healer [2]: Buffer
+	// 1+2 = Healer and Buffer on
+	.Mode = 1|2;
+
+	// Player is healed a random amount up to this in both hp and sp
+	.healrate = 5;
+
+	//Number of Seconds between Heals
+	.HealDelay = 2;
+
+	// Each buff contains 3 variables (42 Total Max Buffs)
+	// <Type>,<Duration>,<Rate>, // Buff 1
+	// <Type>,<Duration>,<Rate>, // Buff 2
+	//   ...;
+	//
+	//  Example: 188,45,3
+	//    -Player gains +3 Str for 45 mins
+	//
+	//  Type is 188, which references which SC_ to use, SC_INCSTR in this example
+	//     -For a full list of SC_ visit the db/const.txt
+	setarray .BuffInfo	,30,45,10	// Level 10 Blessing for 45 mins
+				,32,45,10;	// Level 10 Increase Agi for 45 mins
+	end;
+}

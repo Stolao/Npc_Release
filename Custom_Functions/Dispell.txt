@@ -1,0 +1,35 @@
+//===== EinherjarRO Scripts ================================== 
+//= Function Dispell
+//===== By: ================================================== 
+//= Stolao
+//===== Current Version: ===================================== 
+//= 1.00
+//===== Compatible With: ===================================== 
+//= rAthena SVN
+//===== Description: ========================================= 
+//= Function use to replace sc_end all; when relevent
+//===== Comments: ============================================
+//= Optmize more?
+//= More Functions
+//===== Additional Comments: =================================
+//= 1.00 Original Make
+//= 1.01 Remade using a whitelist
+//===== Contact Ifo: =========================================
+//= [Stolao] 
+//= Email: Taingram11@gmail.com
+//============================================================
+
+function	script	dispell	{
+	setarray .@WhiteList,	SC_WEIGHT50, SC_WEIGHT90, SC_NOCHAT, SC_XMAS, SC_SUMMER,
+			SC_JAILED, SC_STRFOOD, SC_AGIFOOD, SC_VITFOOD, SC_INTFOOD,
+			SC_DEXFOOD, SC_LUKFOOD, SC_FLEEFOOD, SC_BATKFOOD, SC_WATKFOOD,
+			SC_MATKFOOD, SC_SCRESIST, SC_EXPBOOST, SC_ITEMBOOST, SC_BOSSMAPINFO,
+			SC_LIFEINSURANCE, SC_JEXPBOOST;
+	freeloop(1);
+	for (.@s = 0; .@s < SC_MAX; .@s++ ) {
+		if (inarray(.@WhiteList[0],.@s) < 0)
+			sc_end .@s;
+	}
+	freeloop(0);
+	return;
+}

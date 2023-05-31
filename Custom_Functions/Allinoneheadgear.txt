@@ -1,0 +1,38 @@
+	//example
+	//2201,Sunglasses,Sunglasses,5,5000,,100,,0,,0,0xFFFFFFFF,7,2,512,,0,0,12,{ your bonuses here },{ set @gear,3; callfunc ChooseHeadgear; },{ setlook 3,0; }
+	//be sure put the set @gear and the callfunc ChooseHeadgear; in the OnEquip
+	//as well as the setlook in the On UnEquip
+	//@gear and setlook determins which gear is changed
+	//3 Lower
+	//4 Upper
+	//5 Mid
+
+
+function	script	ChooseHeadgear	{
+
+	set .@Max,873;		//This is the max used headgear veiw ID
+	mes "~Headgear~";
+	mes "Why dont I change our look?";
+	while(.@i < 10){
+		mes "Veiw ID: "+.@look+"";
+		switch(select("Next:Back:Choose One:This One")){
+			case 1:
+			set .@look,.@look+1;;
+			if(.@look > .@Max) set .@look,0;
+			setlook @gear,.@look;
+			break;
+			case 2:
+			set .@look,.@look-1;
+			if(.@look < 0)set .@look,.@Max;
+			setlook @gear,.@look;
+			break;
+			case 3:
+			input .@look;
+			if(.@look > .@Max) set .@look,0;
+			if(.@look < 0)set .@look,.@Max;
+			setlook @gear,.@look;
+			break;
+			case 4: set .@i, 50; mes "We look wonderful."; close; break;
+		}
+	}
+}
