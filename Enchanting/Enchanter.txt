@@ -164,8 +164,8 @@ function	script	R_Old_Enchanter	{
 	mes getarg(0,"[ Enchanter ]"),"Do you want anything Enhanted?";
 	setarray .@gems[1],0,719,721,723,727,720,726,729;
 	setarray .@gear[1],0,38005,38007,38006,38004,38008,38009,38010;
-	setarray .indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
-	setarray .indices$[1],"AEGIS","STABILITY","RUIN","PRIMORDIAL","FLOW","POTENTIAL","INSIGHT";
+	setarray .@indices[1],EQI_SHADOW_ARMOR,EQI_SHADOW_SHIELD,EQI_SHADOW_WEAPON,EQI_COSTUME_GARMENT,EQI_SHADOW_SHOES,EQI_SHADOW_ACC_R,EQI_SHADOW_ACC_L;
+	setarray .@indices$[1],"AEGIS","STABILITY","RUIN","PRIMORDIAL","FLOW","POTENTIAL","INSIGHT";
 	setarray .@EQP[1], EQP_SHADOW_ARMOR, EQP_SHADOW_SHIELD, EQP_SHADOW_WEAPON, EQP_COSTUME_GARMENT, EQP_SHADOW_SHOES, EQP_SHADOW_ACC_R, EQP_SHADOW_ACC_L;
 	for(.@i = 1; .@i<getarraysize(.@indices); .@i++) {
 		if(getequipisequiped(.@indices[.@i]) && getarg(1,2047)&(1<<.@i)){
